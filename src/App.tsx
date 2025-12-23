@@ -9,6 +9,7 @@ import ToolPage from "./pages/ToolPage";
 import Auth from "./pages/Auth";
 import History from "./pages/History";
 import NotFound from "./pages/NotFound";
+import { AdminDashboard, AdminAds, AdminEmails, AdminBanners, AdminSEO, AdminAnalytics, AdminSettings } from "./pages/admin";
 
 const queryClient = new QueryClient();
 
@@ -24,7 +25,14 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/history" element={<History />} />
             <Route path="/tool/:toolId" element={<ToolPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/ads" element={<AdminAds />} />
+            <Route path="/admin/emails" element={<AdminEmails />} />
+            <Route path="/admin/banners" element={<AdminBanners />} />
+            <Route path="/admin/seo" element={<AdminSEO />} />
+            <Route path="/admin/analytics" element={<AdminAnalytics />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
