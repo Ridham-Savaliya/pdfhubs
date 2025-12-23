@@ -41,8 +41,14 @@ export function SignaturePad({ onSignatureCreate, onClose }: SignaturePadProps) 
     if (!ctx) return;
     
     const rect = canvas.getBoundingClientRect();
-    const x = ('touches' in e) ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = ('touches' in e) ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const clientX = ('touches' in e) ? e.touches[0].clientX : e.clientX;
+    const clientY = ('touches' in e) ? e.touches[0].clientY : e.clientY;
+    
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
     
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -58,8 +64,14 @@ export function SignaturePad({ onSignatureCreate, onClose }: SignaturePadProps) 
     if (!ctx) return;
     
     const rect = canvas.getBoundingClientRect();
-    const x = ('touches' in e) ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = ('touches' in e) ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const clientX = ('touches' in e) ? e.touches[0].clientX : e.clientX;
+    const clientY = ('touches' in e) ? e.touches[0].clientY : e.clientY;
+    
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
     
     ctx.strokeStyle = penColor;
     ctx.lineWidth = penSize;

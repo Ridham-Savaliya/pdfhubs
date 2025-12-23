@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
-import { Hero } from "@/components/Hero";
+import { DynamicHero } from "@/components/DynamicHero";
+import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { ToolsGrid } from "@/components/ToolsGrid";
 import { Features } from "@/components/Features";
 import { Stats } from "@/components/Stats";
@@ -8,9 +9,10 @@ import { Footer } from "@/components/Footer";
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <AnnouncementBar />
       <Header />
       <main className="flex-1">
-        <Hero />
+        <DynamicHero />
         <ToolsGrid />
         <Stats />
         <Features />

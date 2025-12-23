@@ -131,19 +131,29 @@ export function PDFSigner({ file }: PDFSignerProps) {
         // Convert base64 to bytes
         const base64Data = sig.signatureData.split(',')[1];
         const binaryString = atob(base64Data);
-        const imageBuffer = new ArrayBuffer(binaryString.length);
-        const imageBytes = new Uint8Array(imageBuffer);
+        const imageBytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
           imageBytes[i] = binaryString.charCodeAt(i);
         }
         
-        const image = await pdfDoc.embedPng(imageBuffer);
+        // Check if PNG or JPEG based on data URI
+        const isPng = sig.signatureData.includes('image/png');
+        const image = isPng 
+          ? await pdfDoc.embedPng(imageBytes)
+          : await pdfDoc.embedJpg(imageBytes);
         
-        const { width, height } = page.getSize();
-        const sigWidth = (sig.width / 100) * width * 2;
-        const sigHeight = (sig.height / 100) * height * 2;
-        const sigX = (sig.x / 100) * width;
-        const sigY = height - (sig.y / 100) * height - sigHeight;
+        const { width: pageWidth, height: pageHeight } = page.getSize();
+        
+        // Get container dimensions for accurate positioning
+        const containerWidth = containerRef.current?.clientWidth || 800;
+        const containerHeight = containerRef.current?.clientHeight || 600;
+        
+        // Calculate signature dimensions and position relative to page
+        const sigWidth = (sig.width / containerWidth) * pageWidth;
+        const sigHeight = (sig.height / containerHeight) * pageHeight;
+        const sigX = (sig.x / 100) * pageWidth;
+        // PDF y-coordinates start from bottom, so we need to flip
+        const sigY = pageHeight - (sig.y / 100) * pageHeight - sigHeight;
 
         page.drawImage(image, {
           x: sigX,
@@ -156,10 +166,7 @@ export function PDFSigner({ file }: PDFSignerProps) {
       setProgress(80);
 
       const pdfBytes = await pdfDoc.save();
-      const buffer = new ArrayBuffer(pdfBytes.length);
-      const view = new Uint8Array(buffer);
-      view.set(pdfBytes);
-      const blob = new Blob([buffer], { type: 'application/pdf' });
+      const blob = new Blob([new Uint8Array(pdfBytes).buffer as ArrayBuffer], { type: 'application/pdf' });
       
       setProgress(100);
       downloadFile(blob, `signed-${file.name}`);
