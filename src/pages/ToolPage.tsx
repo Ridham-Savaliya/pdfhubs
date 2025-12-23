@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Download, Settings, FileText, RotateCw } from "lucide-react";
-import { useState } from "react";
+import { Progress } from "@/components/ui/progress";
+import { ArrowLeft, Download, Settings, FileText, RotateCw, Loader2 } from "lucide-react";
+import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import {
   mergePDFs,
@@ -17,7 +18,9 @@ import {
   addWatermark,
   addPageNumbers,
   imagesToPDF,
+  pdfToImages,
   downloadFile,
+  downloadFiles,
   getPDFInfo,
 } from "@/lib/pdf-utils";
 
@@ -28,11 +31,10 @@ const toolInfo: Record<string, {
   acceptedFiles: string;
   minFiles?: number;
   maxFiles?: number;
-  hasOptions?: boolean;
 }> = {
   "merge-pdf": {
     title: "Merge PDF",
-    description: "Combine multiple PDFs into a single document. Just upload your files and we'll do the rest.",
+    description: "Combine multiple PDFs into a single document. Upload your files in the order you want them merged.",
     color: "bg-tool-merge",
     acceptedFiles: ".pdf",
     minFiles: 2,
@@ -40,7 +42,7 @@ const toolInfo: Record<string, {
   },
   "split-pdf": {
     title: "Split PDF",
-    description: "Extract pages or split your PDF into multiple separate documents.",
+    description: "Split your PDF into separate single-page documents. Each page becomes its own file.",
     color: "bg-tool-split",
     acceptedFiles: ".pdf",
     minFiles: 1,
@@ -48,32 +50,8 @@ const toolInfo: Record<string, {
   },
   "compress-pdf": {
     title: "Compress PDF",
-    description: "Reduce the file size of your PDFs while maintaining quality.",
+    description: "Reduce file size significantly by optimizing images and content. Choose quality level based on your needs.",
     color: "bg-tool-compress",
-    acceptedFiles: ".pdf",
-    minFiles: 1,
-    maxFiles: 10,
-  },
-  "pdf-to-word": {
-    title: "PDF to Word",
-    description: "Convert your PDF documents to editable Word files in seconds.",
-    color: "bg-tool-convert",
-    acceptedFiles: ".pdf",
-    minFiles: 1,
-    maxFiles: 10,
-  },
-  "pdf-to-excel": {
-    title: "PDF to Excel",
-    description: "Extract data from PDFs and convert to Excel spreadsheets.",
-    color: "bg-tool-convert",
-    acceptedFiles: ".pdf",
-    minFiles: 1,
-    maxFiles: 10,
-  },
-  "pdf-to-powerpoint": {
-    title: "PDF to PowerPoint",
-    description: "Convert your PDFs to editable PowerPoint presentations.",
-    color: "bg-tool-convert",
     acceptedFiles: ".pdf",
     minFiles: 1,
     maxFiles: 10,
@@ -88,15 +66,63 @@ const toolInfo: Record<string, {
   },
   "jpg-to-pdf": {
     title: "JPG to PDF",
-    description: "Convert your JPG images to PDF format quickly and easily.",
+    description: "Convert your images (JPG, PNG) to a single PDF document.",
     color: "bg-tool-convert",
-    acceptedFiles: ".jpg,.jpeg,.png",
+    acceptedFiles: ".jpg,.jpeg,.png,.webp",
     minFiles: 1,
-    maxFiles: 20,
+    maxFiles: 50,
+  },
+  "rotate-pdf": {
+    title: "Rotate PDF",
+    description: "Rotate all pages in your PDF to the correct orientation.",
+    color: "bg-tool-rotate",
+    acceptedFiles: ".pdf",
+    minFiles: 1,
+    maxFiles: 10,
+  },
+  "add-watermark": {
+    title: "Add Watermark",
+    description: "Add custom text watermarks to protect your PDF documents.",
+    color: "bg-tool-watermark",
+    acceptedFiles: ".pdf",
+    minFiles: 1,
+    maxFiles: 10,
+  },
+  "add-page-numbers": {
+    title: "Add Page Numbers",
+    description: "Insert page numbers to your PDF documents with custom positioning.",
+    color: "bg-tool-edit",
+    acceptedFiles: ".pdf",
+    minFiles: 1,
+    maxFiles: 10,
+  },
+  "pdf-to-word": {
+    title: "PDF to Word",
+    description: "Convert PDF to editable Word format. (Requires server - coming soon)",
+    color: "bg-tool-convert",
+    acceptedFiles: ".pdf",
+    minFiles: 1,
+    maxFiles: 10,
+  },
+  "pdf-to-excel": {
+    title: "PDF to Excel",
+    description: "Extract tables from PDF to Excel. (Requires server - coming soon)",
+    color: "bg-tool-convert",
+    acceptedFiles: ".pdf",
+    minFiles: 1,
+    maxFiles: 10,
+  },
+  "pdf-to-powerpoint": {
+    title: "PDF to PowerPoint",
+    description: "Convert PDF to PowerPoint. (Requires server - coming soon)",
+    color: "bg-tool-convert",
+    acceptedFiles: ".pdf",
+    minFiles: 1,
+    maxFiles: 10,
   },
   "word-to-pdf": {
     title: "Word to PDF",
-    description: "Convert Word documents to PDF format with perfect formatting.",
+    description: "Convert Word to PDF. (Requires server - coming soon)",
     color: "bg-tool-convert",
     acceptedFiles: ".doc,.docx",
     minFiles: 1,
@@ -104,42 +130,23 @@ const toolInfo: Record<string, {
   },
   "edit-pdf": {
     title: "Edit PDF",
-    description: "Add text, images, shapes, and annotations to your PDF documents.",
+    description: "Edit PDF content. (Interactive editor coming soon)",
     color: "bg-tool-edit",
     acceptedFiles: ".pdf",
     minFiles: 1,
     maxFiles: 1,
   },
-  "rotate-pdf": {
-    title: "Rotate PDF",
-    description: "Rotate your PDF pages to the correct orientation.",
-    color: "bg-tool-rotate",
-    acceptedFiles: ".pdf",
-    minFiles: 1,
-    maxFiles: 10,
-    hasOptions: true,
-  },
-  "add-watermark": {
-    title: "Add Watermark",
-    description: "Add custom text or image watermarks to your PDF pages.",
-    color: "bg-tool-watermark",
-    acceptedFiles: ".pdf",
-    minFiles: 1,
-    maxFiles: 10,
-    hasOptions: true,
-  },
   "protect-pdf": {
     title: "Protect PDF",
-    description: "Add password protection to encrypt your PDF documents.",
+    description: "Add password protection. (Coming soon)",
     color: "bg-tool-protect",
     acceptedFiles: ".pdf",
     minFiles: 1,
     maxFiles: 10,
-    hasOptions: true,
   },
   "unlock-pdf": {
     title: "Unlock PDF",
-    description: "Remove password protection from your PDF files.",
+    description: "Remove password protection. (Coming soon)",
     color: "bg-tool-unlock",
     acceptedFiles: ".pdf",
     minFiles: 1,
@@ -147,24 +154,15 @@ const toolInfo: Record<string, {
   },
   "organize-pages": {
     title: "Organize Pages",
-    description: "Reorder, rotate, and delete pages within your PDF.",
+    description: "Reorder and delete pages. (Drag & drop coming soon)",
     color: "bg-tool-organize",
     acceptedFiles: ".pdf",
     minFiles: 1,
     maxFiles: 1,
   },
-  "add-page-numbers": {
-    title: "Add Page Numbers",
-    description: "Insert page numbers to your PDF documents with custom styling.",
-    color: "bg-tool-edit",
-    acceptedFiles: ".pdf",
-    minFiles: 1,
-    maxFiles: 10,
-    hasOptions: true,
-  },
   "sign-pdf": {
     title: "Sign PDF",
-    description: "Add your signature to PDF documents electronically.",
+    description: "Add digital signature. (Coming soon)",
     color: "bg-tool-protect",
     acceptedFiles: ".pdf",
     minFiles: 1,
@@ -172,7 +170,7 @@ const toolInfo: Record<string, {
   },
   "compare-pdf": {
     title: "Compare PDFs",
-    description: "Find and highlight differences between two PDF documents.",
+    description: "Compare two PDFs. (Coming soon)",
     color: "bg-tool-organize",
     acceptedFiles: ".pdf",
     minFiles: 2,
@@ -184,29 +182,39 @@ export default function ToolPage() {
   const { toolId } = useParams<{ toolId: string }>();
   const [files, setFiles] = useState<File[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [pdfInfo, setPdfInfo] = useState<{ pageCount: number } | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [pdfInfo, setPdfInfo] = useState<{ pageCount: number; fileSize: number } | null>(null);
   
   // Options state
   const [rotation, setRotation] = useState<"90" | "180" | "270">("90");
   const [watermarkText, setWatermarkText] = useState("CONFIDENTIAL");
-  const [pageNumberPosition, setPageNumberPosition] = useState<"bottom-center" | "bottom-left" | "bottom-right">("bottom-center");
+  const [watermarkPosition, setWatermarkPosition] = useState<"center" | "diagonal" | "tiled">("diagonal");
+  const [pageNumberPosition, setPageNumberPosition] = useState<"bottom-center" | "bottom-left" | "bottom-right" | "top-center">("bottom-center");
+  const [compressionQuality, setCompressionQuality] = useState<"low" | "medium" | "high">("medium");
+  const [imageFormat, setImageFormat] = useState<"jpeg" | "png">("jpeg");
 
   const tool = toolId ? toolInfo[toolId] : null;
 
-  const handleFilesSelected = async (newFiles: File[]) => {
+  const handleFilesSelected = useCallback(async (newFiles: File[]) => {
     setFiles(newFiles);
+    setProgress(0);
     
-    // Get PDF info for the first file
-    if (newFiles.length > 0 && newFiles[0].name.endsWith('.pdf')) {
+    if (newFiles.length > 0 && newFiles[0].name.toLowerCase().endsWith('.pdf')) {
       try {
         const info = await getPDFInfo(newFiles[0]);
-        setPdfInfo({ pageCount: info.pageCount });
+        setPdfInfo({ pageCount: info.pageCount, fileSize: info.fileSize });
       } catch (e) {
         setPdfInfo(null);
       }
     } else {
       setPdfInfo(null);
     }
+  }, []);
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
   };
 
   const handleProcess = async () => {
@@ -222,34 +230,42 @@ export default function ToolPage() {
     }
 
     setIsProcessing(true);
+    setProgress(0);
 
     try {
       switch (toolId) {
         case "merge-pdf": {
           const blob = await mergePDFs(files);
           downloadFile(blob, "merged.pdf");
-          toast.success("PDFs merged successfully!");
+          toast.success(`Successfully merged ${files.length} PDFs!`);
           break;
         }
 
         case "split-pdf": {
           const blobs = await splitPDF(files[0]);
-          // Download each page as a separate file
-          blobs.forEach((blob, index) => {
-            downloadFile(blob, `page-${index + 1}.pdf`);
-          });
-          toast.success(`PDF split into ${blobs.length} pages!`);
+          const baseName = files[0].name.replace(".pdf", "");
+          const filenames = blobs.map((_, i) => `${baseName}-page-${i + 1}.pdf`);
+          downloadFiles(blobs, filenames);
+          toast.success(`Split into ${blobs.length} separate PDF files!`);
           break;
         }
 
         case "compress-pdf": {
-          for (const file of files) {
-            const blob = await compressPDF(file);
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
             const originalSize = file.size;
+            
+            const blob = await compressPDF(file, compressionQuality, (p) => {
+              setProgress(((i + p / 100) / files.length) * 100);
+            });
+            
             const newSize = blob.size;
-            const reduction = ((originalSize - newSize) / originalSize * 100).toFixed(1);
+            const reduction = ((originalSize - newSize) / originalSize * 100);
+            
             downloadFile(blob, `compressed-${file.name}`);
-            toast.success(`Compressed ${file.name} (${reduction}% smaller)`);
+            toast.success(
+              `${file.name}: ${formatFileSize(originalSize)} → ${formatFileSize(newSize)} (${reduction.toFixed(0)}% smaller)`
+            );
           }
           break;
         }
@@ -260,13 +276,17 @@ export default function ToolPage() {
             const blob = await rotatePDF(file, rotationAngle);
             downloadFile(blob, `rotated-${file.name}`);
           }
-          toast.success(`PDF(s) rotated ${rotation}°!`);
+          toast.success(`Rotated ${files.length} PDF(s) by ${rotation}°`);
           break;
         }
 
         case "add-watermark": {
+          if (!watermarkText.trim()) {
+            toast.error("Please enter watermark text");
+            return;
+          }
           for (const file of files) {
-            const blob = await addWatermark(file, watermarkText);
+            const blob = await addWatermark(file, watermarkText, { position: watermarkPosition });
             downloadFile(blob, `watermarked-${file.name}`);
           }
           toast.success("Watermark added successfully!");
@@ -278,33 +298,49 @@ export default function ToolPage() {
             const blob = await addPageNumbers(file, { position: pageNumberPosition });
             downloadFile(blob, `numbered-${file.name}`);
           }
-          toast.success("Page numbers added successfully!");
+          toast.success("Page numbers added!");
           break;
         }
 
         case "jpg-to-pdf": {
           const blob = await imagesToPDF(files);
-          downloadFile(blob, "converted.pdf");
-          toast.success("Images converted to PDF!");
+          downloadFile(blob, "images-converted.pdf");
+          toast.success(`Converted ${files.length} image(s) to PDF!`);
           break;
         }
 
-        case "pdf-to-jpg":
+        case "pdf-to-jpg": {
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const baseName = file.name.replace(".pdf", "");
+            
+            const blobs = await pdfToImages(file, { format: imageFormat, quality: 0.9 }, (p) => {
+              setProgress(((i + p / 100) / files.length) * 100);
+            });
+            
+            const ext = imageFormat === "png" ? "png" : "jpg";
+            const filenames = blobs.map((_, j) => `${baseName}-page-${j + 1}.${ext}`);
+            downloadFiles(blobs, filenames);
+            toast.success(`Converted ${blobs.length} pages to ${imageFormat.toUpperCase()}!`);
+          }
+          break;
+        }
+
         case "pdf-to-word":
         case "pdf-to-excel":
         case "pdf-to-powerpoint":
         case "word-to-pdf":
-          toast.info("This conversion requires a server-side API. Coming soon!");
+          toast.info("This conversion requires a server-side API. Enable Lovable Cloud to use this feature!");
           break;
 
         case "protect-pdf":
         case "unlock-pdf":
-          toast.info("Password protection features coming soon!");
+          toast.info("Password protection requires server-side processing. Coming soon!");
           break;
 
         case "edit-pdf":
         case "sign-pdf":
-          toast.info("Interactive PDF editing coming soon!");
+          toast.info("Interactive PDF editing is coming soon!");
           break;
 
         case "organize-pages":
@@ -320,6 +356,7 @@ export default function ToolPage() {
       toast.error(error instanceof Error ? error.message : "An error occurred while processing");
     } finally {
       setIsProcessing(false);
+      setProgress(0);
     }
   };
 
@@ -381,12 +418,41 @@ export default function ToolPage() {
               <div className="mt-4 p-4 bg-secondary rounded-xl flex items-center gap-3">
                 <FileText className="h-5 w-5 text-primary" />
                 <span className="text-sm text-foreground">
-                  {pdfInfo.pageCount} page{pdfInfo.pageCount !== 1 ? 's' : ''} detected
+                  {pdfInfo.pageCount} page{pdfInfo.pageCount !== 1 ? 's' : ''} • {formatFileSize(pdfInfo.fileSize)}
                 </span>
               </div>
             )}
 
-            {/* Tool-specific options */}
+            {/* Compression Options */}
+            {files.length > 0 && toolId === "compress-pdf" && (
+              <div className="mt-6 p-4 bg-secondary rounded-xl space-y-4">
+                <Label className="text-sm font-medium text-foreground block">
+                  Compression Level
+                </Label>
+                <div className="grid grid-cols-3 gap-3">
+                  {(["low", "medium", "high"] as const).map((level) => (
+                    <Button
+                      key={level}
+                      variant={compressionQuality === level ? "default" : "outline"}
+                      onClick={() => setCompressionQuality(level)}
+                      className="flex-col h-auto py-3"
+                    >
+                      <span className="capitalize font-medium">{level}</span>
+                      <span className="text-xs opacity-70">
+                        {level === "low" && "Smallest file"}
+                        {level === "medium" && "Balanced"}
+                        {level === "high" && "Best quality"}
+                      </span>
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Lower quality = smaller file size. Medium is recommended for most uses.
+                </p>
+              </div>
+            )}
+
+            {/* Rotate Options */}
             {files.length > 0 && toolId === "rotate-pdf" && (
               <div className="mt-6 p-4 bg-secondary rounded-xl">
                 <Label className="text-sm font-medium text-foreground mb-3 block">
@@ -401,27 +467,48 @@ export default function ToolPage() {
                       className="flex-1"
                     >
                       <RotateCw className="h-4 w-4 mr-2" />
-                      {angle}°
+                      {angle}° {angle === "90" ? "Right" : angle === "270" ? "Left" : "Flip"}
                     </Button>
                   ))}
                 </div>
               </div>
             )}
 
+            {/* Watermark Options */}
             {files.length > 0 && toolId === "add-watermark" && (
-              <div className="mt-6 p-4 bg-secondary rounded-xl">
-                <Label className="text-sm font-medium text-foreground mb-3 block">
-                  Watermark Text
-                </Label>
-                <Input
-                  value={watermarkText}
-                  onChange={(e) => setWatermarkText(e.target.value)}
-                  placeholder="Enter watermark text"
-                  className="bg-background"
-                />
+              <div className="mt-6 p-4 bg-secondary rounded-xl space-y-4">
+                <div>
+                  <Label className="text-sm font-medium text-foreground mb-2 block">
+                    Watermark Text
+                  </Label>
+                  <Input
+                    value={watermarkText}
+                    onChange={(e) => setWatermarkText(e.target.value)}
+                    placeholder="Enter watermark text"
+                    className="bg-background"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-foreground mb-2 block">
+                    Style
+                  </Label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {(["diagonal", "center", "tiled"] as const).map((pos) => (
+                      <Button
+                        key={pos}
+                        variant={watermarkPosition === pos ? "default" : "outline"}
+                        onClick={() => setWatermarkPosition(pos)}
+                        className="capitalize"
+                      >
+                        {pos}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
+            {/* Page Number Options */}
             {files.length > 0 && toolId === "add-page-numbers" && (
               <div className="mt-6 p-4 bg-secondary rounded-xl">
                 <Label className="text-sm font-medium text-foreground mb-3 block">
@@ -435,8 +522,44 @@ export default function ToolPage() {
                     <SelectItem value="bottom-center">Bottom Center</SelectItem>
                     <SelectItem value="bottom-left">Bottom Left</SelectItem>
                     <SelectItem value="bottom-right">Bottom Right</SelectItem>
+                    <SelectItem value="top-center">Top Center</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            )}
+
+            {/* PDF to Image Options */}
+            {files.length > 0 && toolId === "pdf-to-jpg" && (
+              <div className="mt-6 p-4 bg-secondary rounded-xl">
+                <Label className="text-sm font-medium text-foreground mb-3 block">
+                  Output Format
+                </Label>
+                <div className="flex gap-3">
+                  {(["jpeg", "png"] as const).map((fmt) => (
+                    <Button
+                      key={fmt}
+                      variant={imageFormat === fmt ? "default" : "outline"}
+                      onClick={() => setImageFormat(fmt)}
+                      className="flex-1 uppercase"
+                    >
+                      {fmt}
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  JPEG: smaller files, good for photos. PNG: lossless, good for text/graphics.
+                </p>
+              </div>
+            )}
+
+            {/* Progress Bar */}
+            {isProcessing && progress > 0 && (
+              <div className="mt-6">
+                <div className="flex justify-between text-sm text-muted-foreground mb-2">
+                  <span>Processing...</span>
+                  <span>{Math.round(progress)}%</span>
+                </div>
+                <Progress value={progress} className="h-2" />
               </div>
             )}
 
@@ -450,7 +573,7 @@ export default function ToolPage() {
                 >
                   {isProcessing ? (
                     <>
-                      <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Processing...
                     </>
                   ) : (
@@ -465,7 +588,7 @@ export default function ToolPage() {
           </div>
 
           <div className="mt-12 text-center text-sm text-muted-foreground">
-            <p>Your files are processed locally in your browser and never uploaded to our servers.</p>
+            <p>🔒 Your files are processed entirely in your browser. Nothing is uploaded to any server.</p>
           </div>
         </div>
       </main>

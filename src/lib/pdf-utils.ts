@@ -1,8 +1,11 @@
 import { PDFDocument, rgb, degrees, StandardFonts } from "pdf-lib";
+import * as pdfjsLib from "pdfjs-dist";
 
-// Helper to create blob from Uint8Array (handles TypeScript strictness)
+// Set up PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs`;
+
+// Helper to create blob from Uint8Array
 function createPdfBlob(pdfBytes: Uint8Array): Blob {
-  // Create a new ArrayBuffer and copy the data to satisfy TypeScript
   const buffer = new ArrayBuffer(pdfBytes.length);
   const view = new Uint8Array(buffer);
   view.set(pdfBytes);
@@ -21,6 +24,15 @@ export function downloadFile(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+// Download multiple files as zip or individually
+export function downloadFiles(blobs: Blob[], filenames: string[]) {
+  blobs.forEach((blob, index) => {
+    setTimeout(() => {
+      downloadFile(blob, filenames[index]);
+    }, index * 200);
+  });
+}
+
 // Helper to read file as ArrayBuffer
 async function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
@@ -31,7 +43,43 @@ async function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
   });
 }
 
-// Merge multiple PDFs into one
+// Convert canvas to blob
+function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error("Failed to convert canvas to blob"));
+      },
+      type,
+      quality
+    );
+  });
+}
+
+// Render PDF page to canvas using PDF.js
+async function renderPageToCanvas(
+  pdfDoc: pdfjsLib.PDFDocumentProxy,
+  pageNum: number,
+  scale: number = 1.5
+): Promise<HTMLCanvasElement> {
+  const page = await pdfDoc.getPage(pageNum);
+  const viewport = page.getViewport({ scale });
+  
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d")!;
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  
+  await page.render({
+    canvasContext: context,
+    viewport: viewport,
+  }).promise;
+  
+  return canvas;
+}
+
+// ========== MERGE PDFs ==========
 export async function mergePDFs(files: File[]): Promise<Blob> {
   const mergedPdf = await PDFDocument.create();
 
@@ -46,7 +94,7 @@ export async function mergePDFs(files: File[]): Promise<Blob> {
   return createPdfBlob(pdfBytes);
 }
 
-// Split PDF into individual pages
+// ========== SPLIT PDF ==========
 export async function splitPDF(file: File): Promise<Blob[]> {
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
@@ -64,20 +112,59 @@ export async function splitPDF(file: File): Promise<Blob[]> {
   return blobs;
 }
 
-// Compress PDF (reduces quality of embedded images)
-export async function compressPDF(file: File): Promise<Blob> {
+// ========== REAL COMPRESSION ==========
+// This actually compresses by re-rendering pages as compressed images
+export async function compressPDF(
+  file: File,
+  quality: "low" | "medium" | "high" = "medium",
+  onProgress?: (progress: number) => void
+): Promise<Blob> {
+  const qualitySettings = {
+    low: { scale: 1.0, imageQuality: 0.5 },
+    medium: { scale: 1.5, imageQuality: 0.7 },
+    high: { scale: 2.0, imageQuality: 0.85 },
+  };
+  
+  const settings = qualitySettings[quality];
   const arrayBuffer = await readFileAsArrayBuffer(file);
-  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
   
-  // Save with reduced object streams for smaller size
-  const pdfBytes = await pdf.save({
-    useObjectStreams: true,
-  });
+  // Load with PDF.js for rendering
+  const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+  const pdfDoc = await loadingTask.promise;
+  const numPages = pdfDoc.numPages;
   
+  // Create new PDF with compressed images
+  const newPdf = await PDFDocument.create();
+  
+  for (let i = 1; i <= numPages; i++) {
+    // Render page to canvas
+    const canvas = await renderPageToCanvas(pdfDoc, i, settings.scale);
+    
+    // Convert to compressed JPEG
+    const jpegBlob = await canvasToBlob(canvas, "image/jpeg", settings.imageQuality);
+    const jpegBytes = await jpegBlob.arrayBuffer();
+    
+    // Embed in new PDF
+    const image = await newPdf.embedJpg(jpegBytes);
+    const page = newPdf.addPage([canvas.width / settings.scale, canvas.height / settings.scale]);
+    
+    page.drawImage(image, {
+      x: 0,
+      y: 0,
+      width: page.getWidth(),
+      height: page.getHeight(),
+    });
+    
+    if (onProgress) {
+      onProgress((i / numPages) * 100);
+    }
+  }
+  
+  const pdfBytes = await newPdf.save();
   return createPdfBlob(pdfBytes);
 }
 
-// Rotate all pages in a PDF
+// ========== ROTATE PDF ==========
 export async function rotatePDF(file: File, rotation: 0 | 90 | 180 | 270): Promise<Blob> {
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
@@ -92,7 +179,7 @@ export async function rotatePDF(file: File, rotation: 0 | 90 | 180 | 270): Promi
   return createPdfBlob(pdfBytes);
 }
 
-// Add text watermark to PDF
+// ========== ADD WATERMARK ==========
 export async function addWatermark(
   file: File,
   text: string,
@@ -100,9 +187,15 @@ export async function addWatermark(
     opacity?: number;
     fontSize?: number;
     color?: { r: number; g: number; b: number };
+    position?: "center" | "diagonal" | "tiled";
   } = {}
 ): Promise<Blob> {
-  const { opacity = 0.3, fontSize = 50, color = { r: 0.5, g: 0.5, b: 0.5 } } = options;
+  const { 
+    opacity = 0.3, 
+    fontSize = 60, 
+    color = { r: 0.7, g: 0.7, b: 0.7 },
+    position = "diagonal"
+  } = options;
   
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
@@ -113,30 +206,64 @@ export async function addWatermark(
     const { width, height } = page.getSize();
     const textWidth = font.widthOfTextAtSize(text, fontSize);
     
-    page.drawText(text, {
-      x: (width - textWidth) / 2,
-      y: height / 2,
-      size: fontSize,
-      font,
-      color: rgb(color.r, color.g, color.b),
-      opacity,
-      rotate: degrees(-45),
-    });
+    if (position === "tiled") {
+      // Add multiple watermarks across the page
+      for (let y = 50; y < height; y += 150) {
+        for (let x = 50; x < width; x += textWidth + 100) {
+          page.drawText(text, {
+            x,
+            y,
+            size: fontSize * 0.5,
+            font,
+            color: rgb(color.r, color.g, color.b),
+            opacity: opacity * 0.5,
+            rotate: degrees(-30),
+          });
+        }
+      }
+    } else if (position === "center") {
+      page.drawText(text, {
+        x: (width - textWidth) / 2,
+        y: height / 2,
+        size: fontSize,
+        font,
+        color: rgb(color.r, color.g, color.b),
+        opacity,
+      });
+    } else {
+      // Diagonal
+      page.drawText(text, {
+        x: (width - textWidth) / 2,
+        y: height / 2,
+        size: fontSize,
+        font,
+        color: rgb(color.r, color.g, color.b),
+        opacity,
+        rotate: degrees(-45),
+      });
+    }
   });
 
   const pdfBytes = await pdf.save();
   return createPdfBlob(pdfBytes);
 }
 
-// Add page numbers to PDF
+// ========== ADD PAGE NUMBERS ==========
 export async function addPageNumbers(
   file: File,
   options: {
-    position?: "bottom-center" | "bottom-right" | "bottom-left";
+    position?: "bottom-center" | "bottom-right" | "bottom-left" | "top-center" | "top-right" | "top-left";
     format?: string;
+    fontSize?: number;
+    startNumber?: number;
   } = {}
 ): Promise<Blob> {
-  const { position = "bottom-center", format = "Page {n} of {total}" } = options;
+  const { 
+    position = "bottom-center", 
+    format = "Page {n} of {total}",
+    fontSize = 11,
+    startNumber = 1
+  } = options;
   
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
@@ -145,26 +272,36 @@ export async function addPageNumbers(
   const font = await pdf.embedFont(StandardFonts.Helvetica);
 
   pages.forEach((page, index) => {
-    const { width } = page.getSize();
-    const text = format.replace("{n}", String(index + 1)).replace("{total}", String(totalPages));
-    const textWidth = font.widthOfTextAtSize(text, 10);
+    const { width, height } = page.getSize();
+    const pageNum = startNumber + index;
+    const text = format
+      .replace("{n}", String(pageNum))
+      .replace("{total}", String(totalPages));
+    const textWidth = font.widthOfTextAtSize(text, fontSize);
     
     let x: number;
-    switch (position) {
-      case "bottom-left":
-        x = 40;
-        break;
-      case "bottom-right":
-        x = width - textWidth - 40;
-        break;
-      default:
-        x = (width - textWidth) / 2;
+    let y: number;
+    
+    // Determine X position
+    if (position.includes("left")) {
+      x = 40;
+    } else if (position.includes("right")) {
+      x = width - textWidth - 40;
+    } else {
+      x = (width - textWidth) / 2;
+    }
+    
+    // Determine Y position
+    if (position.includes("top")) {
+      y = height - 30;
+    } else {
+      y = 30;
     }
     
     page.drawText(text, {
       x,
-      y: 30,
-      size: 10,
+      y,
+      size: fontSize,
       font,
       color: rgb(0, 0, 0),
     });
@@ -174,13 +311,113 @@ export async function addPageNumbers(
   return createPdfBlob(pdfBytes);
 }
 
-// Extract specific pages from PDF
+// ========== PDF TO IMAGES ==========
+export async function pdfToImages(
+  file: File,
+  options: {
+    format?: "jpeg" | "png";
+    quality?: number;
+    scale?: number;
+  } = {},
+  onProgress?: (progress: number) => void
+): Promise<Blob[]> {
+  const { format = "jpeg", quality = 0.9, scale = 2.0 } = options;
+  
+  const arrayBuffer = await readFileAsArrayBuffer(file);
+  const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+  const pdfDoc = await loadingTask.promise;
+  const numPages = pdfDoc.numPages;
+  
+  const blobs: Blob[] = [];
+  
+  for (let i = 1; i <= numPages; i++) {
+    const canvas = await renderPageToCanvas(pdfDoc, i, scale);
+    const mimeType = format === "png" ? "image/png" : "image/jpeg";
+    const blob = await canvasToBlob(canvas, mimeType, quality);
+    blobs.push(blob);
+    
+    if (onProgress) {
+      onProgress((i / numPages) * 100);
+    }
+  }
+  
+  return blobs;
+}
+
+// ========== IMAGES TO PDF ==========
+export async function imagesToPDF(files: File[]): Promise<Blob> {
+  const pdf = await PDFDocument.create();
+
+  for (const file of files) {
+    const arrayBuffer = await readFileAsArrayBuffer(file);
+    let image;
+    
+    const isJpeg = file.type === "image/jpeg" || 
+                   file.name.toLowerCase().endsWith(".jpg") ||
+                   file.name.toLowerCase().endsWith(".jpeg");
+    
+    if (isJpeg) {
+      image = await pdf.embedJpg(arrayBuffer);
+    } else if (file.type === "image/png" || file.name.toLowerCase().endsWith(".png")) {
+      image = await pdf.embedPng(arrayBuffer);
+    } else {
+      // Try to convert other formats via canvas
+      const img = await loadImage(file);
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0);
+      const jpegBlob = await canvasToBlob(canvas, "image/jpeg", 0.9);
+      const jpegBuffer = await jpegBlob.arrayBuffer();
+      image = await pdf.embedJpg(jpegBuffer);
+    }
+
+    // Create page with image dimensions (max A4 size, scaled proportionally)
+    const maxWidth = 595; // A4 width in points
+    const maxHeight = 842; // A4 height in points
+    
+    let width = image.width;
+    let height = image.height;
+    
+    // Scale down if larger than A4
+    if (width > maxWidth || height > maxHeight) {
+      const scaleX = maxWidth / width;
+      const scaleY = maxHeight / height;
+      const scale = Math.min(scaleX, scaleY);
+      width *= scale;
+      height *= scale;
+    }
+    
+    const page = pdf.addPage([width, height]);
+    page.drawImage(image, {
+      x: 0,
+      y: 0,
+      width,
+      height,
+    });
+  }
+
+  const pdfBytes = await pdf.save();
+  return createPdfBlob(pdfBytes);
+}
+
+// Helper to load image from file
+function loadImage(file: File): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+// ========== EXTRACT PAGES ==========
 export async function extractPages(file: File, pageNumbers: number[]): Promise<Blob> {
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
   const newPdf = await PDFDocument.create();
   
-  // Convert to 0-indexed and filter valid page numbers
   const validPages = pageNumbers
     .map((n) => n - 1)
     .filter((n) => n >= 0 && n < pdf.getPageCount());
@@ -192,81 +429,12 @@ export async function extractPages(file: File, pageNumbers: number[]): Promise<B
   return createPdfBlob(pdfBytes);
 }
 
-// Convert images to PDF
-export async function imagesToPDF(files: File[]): Promise<Blob> {
-  const pdf = await PDFDocument.create();
-
-  for (const file of files) {
-    const arrayBuffer = await readFileAsArrayBuffer(file);
-    let image;
-    
-    if (file.type === "image/jpeg" || file.name.toLowerCase().endsWith(".jpg")) {
-      image = await pdf.embedJpg(arrayBuffer);
-    } else if (file.type === "image/png") {
-      image = await pdf.embedPng(arrayBuffer);
-    } else {
-      continue; // Skip unsupported formats
-    }
-
-    const page = pdf.addPage([image.width, image.height]);
-    page.drawImage(image, {
-      x: 0,
-      y: 0,
-      width: image.width,
-      height: image.height,
-    });
-  }
-
-  const pdfBytes = await pdf.save();
-  return createPdfBlob(pdfBytes);
-}
-
-// Convert PDF to images (returns data URLs)
-export async function pdfToImages(file: File): Promise<string[]> {
-  // Note: pdf-lib doesn't support rendering to images
-  // This would require a library like pdf.js
-  // For now, we'll return a placeholder
-  throw new Error("PDF to image conversion requires pdf.js library. Coming soon!");
-}
-
-// Protect PDF with password
-export async function protectPDF(file: File, password: string): Promise<Blob> {
-  const arrayBuffer = await readFileAsArrayBuffer(file);
-  const pdf = await PDFDocument.load(arrayBuffer);
-  
-  // pdf-lib supports encryption during save
-  const pdfBytes = await pdf.save();
-  
-  // Note: Full password protection requires additional setup
-  // For now we just re-save the PDF
-  return createPdfBlob(pdfBytes);
-}
-
-// Get PDF info
-export async function getPDFInfo(file: File): Promise<{
-  pageCount: number;
-  title?: string;
-  author?: string;
-  creationDate?: Date;
-}> {
-  const arrayBuffer = await readFileAsArrayBuffer(file);
-  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
-  
-  return {
-    pageCount: pdf.getPageCount(),
-    title: pdf.getTitle(),
-    author: pdf.getAuthor(),
-    creationDate: pdf.getCreationDate(),
-  };
-}
-
-// Delete specific pages from PDF
+// ========== DELETE PAGES ==========
 export async function deletePages(file: File, pageNumbers: number[]): Promise<Blob> {
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
   const totalPages = pdf.getPageCount();
   
-  // Get pages to keep (convert to 0-indexed)
   const pagesToDelete = new Set(pageNumbers.map((n) => n - 1));
   const pagesToKeep = Array.from({ length: totalPages }, (_, i) => i)
     .filter((i) => !pagesToDelete.has(i));
@@ -277,4 +445,60 @@ export async function deletePages(file: File, pageNumbers: number[]): Promise<Bl
 
   const pdfBytes = await newPdf.save();
   return createPdfBlob(pdfBytes);
+}
+
+// ========== REORDER PAGES ==========
+export async function reorderPages(file: File, newOrder: number[]): Promise<Blob> {
+  const arrayBuffer = await readFileAsArrayBuffer(file);
+  const pdf = await PDFDocument.load(arrayBuffer);
+  const newPdf = await PDFDocument.create();
+  
+  // newOrder is 1-indexed, convert to 0-indexed
+  const validOrder = newOrder
+    .map((n) => n - 1)
+    .filter((n) => n >= 0 && n < pdf.getPageCount());
+  
+  const pages = await newPdf.copyPages(pdf, validOrder);
+  pages.forEach((page) => newPdf.addPage(page));
+
+  const pdfBytes = await newPdf.save();
+  return createPdfBlob(pdfBytes);
+}
+
+// ========== GET PDF INFO ==========
+export async function getPDFInfo(file: File): Promise<{
+  pageCount: number;
+  title?: string;
+  author?: string;
+  fileSize: number;
+}> {
+  const arrayBuffer = await readFileAsArrayBuffer(file);
+  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+  
+  return {
+    pageCount: pdf.getPageCount(),
+    title: pdf.getTitle(),
+    author: pdf.getAuthor(),
+    fileSize: file.size,
+  };
+}
+
+// ========== GET PAGE THUMBNAILS ==========
+export async function getPageThumbnails(
+  file: File,
+  maxPages: number = 20
+): Promise<string[]> {
+  const arrayBuffer = await readFileAsArrayBuffer(file);
+  const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+  const pdfDoc = await loadingTask.promise;
+  const numPages = Math.min(pdfDoc.numPages, maxPages);
+  
+  const thumbnails: string[] = [];
+  
+  for (let i = 1; i <= numPages; i++) {
+    const canvas = await renderPageToCanvas(pdfDoc, i, 0.3);
+    thumbnails.push(canvas.toDataURL("image/jpeg", 0.7));
+  }
+  
+  return thumbnails;
 }
