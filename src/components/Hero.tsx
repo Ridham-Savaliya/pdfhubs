@@ -1,6 +1,6 @@
 import { Search, Sparkles, ArrowRight, Shield, Zap, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const allTools = [
@@ -40,6 +40,7 @@ const features = [
 export function Hero() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const filteredTools = useMemo(() => {
@@ -51,6 +52,8 @@ export function Hero() {
     ).slice(0, 6);
   }, [searchQuery]);
 
+  const showDropdown = isSearchFocused && (filteredTools.length > 0 || searchQuery.trim());
+
   const handleToolClick = (href: string) => {
     navigate(href);
     setSearchQuery("");
@@ -61,7 +64,22 @@ export function Hero() {
     if (e.key === 'Enter' && filteredTools.length > 0) {
       handleToolClick(filteredTools[0].href);
     }
+    if (e.key === 'Escape') {
+      setIsSearchFocused(false);
+    }
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <section className="relative overflow-hidden">
@@ -123,10 +141,10 @@ export function Hero() {
             className="mt-10 animate-fade-up"
             style={{ animationDelay: "300ms" }}
           >
-            <div className="relative mx-auto max-w-xl group">
+            <div ref={searchContainerRef} className="relative mx-auto max-w-xl group z-50">
               <div className="absolute -inset-1 bg-gradient-hero opacity-20 rounded-2xl blur-xl group-focus-within:opacity-30 transition-opacity" />
               <div className="relative">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary z-10" />
                 <Input
                   type="search"
                   placeholder="Search for any PDF tool..."
@@ -138,42 +156,43 @@ export function Hero() {
                 />
               </div>
               
-              {/* Search Results Dropdown */}
-              {isSearchFocused && filteredTools.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-2xl shadow-xl p-2 z-50 animate-fade-in">
-                  {filteredTools.map((tool, index) => (
-                    <button
-                      key={tool.href}
-                      onClick={() => handleToolClick(tool.href)}
-                      className={`w-full text-left px-4 py-3 rounded-xl hover:bg-accent transition-colors flex items-center justify-between ${index === 0 ? 'bg-accent/50' : ''}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="font-medium text-foreground">{tool.name}</span>
+              {/* Search Results Dropdown - Always on top */}
+              {showDropdown && (
+                <>
+                  {/* Backdrop overlay */}
+                  <div 
+                    className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40"
+                    onClick={() => setIsSearchFocused(false)}
+                  />
+                  
+                  {/* Dropdown */}
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-2xl shadow-2xl p-2 z-50 animate-fade-in">
+                    {filteredTools.length > 0 ? (
+                      filteredTools.map((tool, index) => (
+                        <button
+                          key={tool.href}
+                          onClick={() => handleToolClick(tool.href)}
+                          className={`w-full text-left px-4 py-3 rounded-xl hover:bg-accent transition-colors flex items-center justify-between ${index === 0 ? 'bg-accent/50' : ''}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="font-medium text-foreground">{tool.name}</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground px-2 py-1 rounded-full bg-muted">{tool.category}</span>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="p-6 text-center text-muted-foreground">
+                        <p>No tools found for "<span className="text-foreground font-medium">{searchQuery}</span>"</p>
+                        <p className="text-sm mt-1">Try searching for "merge", "compress", or "convert"</p>
                       </div>
-                      <span className="text-xs text-muted-foreground px-2 py-1 rounded-full bg-muted">{tool.category}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-              
-              {isSearchFocused && searchQuery && filteredTools.length === 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-2xl shadow-xl p-6 z-50 text-center text-muted-foreground animate-fade-in">
-                  <p>No tools found for "<span className="text-foreground font-medium">{searchQuery}</span>"</p>
-                  <p className="text-sm mt-1">Try searching for "merge", "compress", or "convert"</p>
-                </div>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           </div>
 
-          {/* Click outside to close search */}
-          {isSearchFocused && (
-            <div 
-              className="fixed inset-0 z-40" 
-              onClick={() => setIsSearchFocused(false)}
-            />
-          )}
-
-          {/* Popular Tools */}
+          {/* Popular Tools - Lower z-index */}
           <div 
             className="mt-8 flex flex-wrap items-center justify-center gap-3 animate-fade-up relative z-10"
             style={{ animationDelay: "400ms" }}

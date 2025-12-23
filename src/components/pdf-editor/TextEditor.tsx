@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, Trash2, Bold } from "lucide-react";
 import { TextAnnotation } from "./PDFEditor";
 
@@ -24,6 +25,15 @@ const colors = [
   "#FF6600",
 ];
 
+const fontFamilies = [
+  { value: "Helvetica", label: "Helvetica" },
+  { value: "Times-Roman", label: "Times Roman" },
+  { value: "Courier", label: "Courier" },
+  { value: "Arial", label: "Arial" },
+  { value: "Georgia", label: "Georgia" },
+  { value: "Verdana", label: "Verdana" },
+];
+
 export function TextEditor({ annotation, onUpdate, onClose, onDelete }: TextEditorProps) {
   const [text, setText] = useState(annotation.text);
 
@@ -32,12 +42,23 @@ export function TextEditor({ annotation, onUpdate, onClose, onDelete }: TextEdit
     onUpdate({ text: value });
   };
 
+  const handleClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-      <div className="bg-card rounded-xl border border-border shadow-xl p-6 w-full max-w-md animate-in fade-in zoom-in-95">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
+      onClick={handleClose}
+    >
+      <div 
+        className="bg-card rounded-xl border border-border shadow-xl p-6 w-full max-w-md animate-in fade-in zoom-in-95"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-heading text-lg font-semibold">Edit Text</h3>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={handleClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -52,6 +73,26 @@ export function TextEditor({ annotation, onUpdate, onClose, onDelete }: TextEdit
               placeholder="Enter text..."
               autoFocus
             />
+          </div>
+
+          {/* Font Family */}
+          <div className="space-y-2">
+            <Label>Font Family</Label>
+            <Select
+              value={annotation.fontFamily || "Helvetica"}
+              onValueChange={(value) => onUpdate({ fontFamily: value })}
+            >
+              <SelectTrigger className="bg-background">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {fontFamilies.map((font) => (
+                  <SelectItem key={font.value} value={font.value}>
+                    <span style={{ fontFamily: font.value }}>{font.label}</span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Font size */}
@@ -114,7 +155,7 @@ export function TextEditor({ annotation, onUpdate, onClose, onDelete }: TextEdit
             <Trash2 className="h-4 w-4 mr-2" />
             Delete
           </Button>
-          <Button onClick={onClose} className="bg-gradient-primary">
+          <Button onClick={handleClose} className="bg-gradient-primary">
             Done
           </Button>
         </div>

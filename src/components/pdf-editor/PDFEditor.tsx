@@ -1,14 +1,14 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { PDFDocument, rgb } from "pdf-lib";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import * as pdfjsLib from "pdfjs-dist";
 import { EditorToolbar } from "./EditorToolbar";
 import { EditorCanvas } from "./EditorCanvas";
 import { TextEditor } from "./TextEditor";
 import { ImageUploader } from "./ImageUploader";
 import { PageNavigator } from "./PageNavigator";
-import { Download, Save, Loader2, ZoomIn, ZoomOut } from "lucide-react";
+import { Download, Loader2, ZoomIn, ZoomOut } from "lucide-react";
 
 // Set up PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs`;
@@ -24,6 +24,7 @@ export interface TextAnnotation {
   fontSize: number;
   color: string;
   fontWeight: "normal" | "bold";
+  fontFamily?: string;
 }
 
 export interface DrawAnnotation {
@@ -49,6 +50,15 @@ interface PDFEditorProps {
   file: File;
   onSave?: (blob: Blob) => void;
 }
+
+const fontMap: Record<string, typeof StandardFonts[keyof typeof StandardFonts]> = {
+  "Helvetica": StandardFonts.Helvetica,
+  "Times-Roman": StandardFonts.TimesRoman,
+  "Courier": StandardFonts.Courier,
+  "Arial": StandardFonts.Helvetica,
+  "Georgia": StandardFonts.TimesRoman,
+  "Verdana": StandardFonts.Helvetica,
+};
 
 export function PDFEditor({ file, onSave }: PDFEditorProps) {
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
@@ -102,9 +112,12 @@ export function PDFEditor({ file, onSave }: PDFEditorProps) {
       fontSize,
       color: activeColor,
       fontWeight: "normal",
+      fontFamily: "Helvetica",
     };
     setTextAnnotations((prev) => [...prev, newText]);
     setEditingText(newText);
+    // Switch to select tool after adding text
+    setActiveTool("select");
   }, [currentPage, fontSize, activeColor]);
 
   const handleUpdateText = useCallback((id: string, updates: Partial<TextAnnotation>) => {
@@ -161,6 +174,11 @@ export function PDFEditor({ file, onSave }: PDFEditorProps) {
     );
   }, []);
 
+  const handleEditText = useCallback((annotation: TextAnnotation | null) => {
+    // Only set editing text, don't create new annotations
+    setEditingText(annotation);
+  }, []);
+
   const handleSave = async () => {
     if (!pdfDoc) return;
     
@@ -178,10 +196,21 @@ export function PDFEditor({ file, onSave }: PDFEditorProps) {
         const { height } = page.getSize();
         const color = hexToRgb(annotation.color);
         
+        // Get the appropriate font
+        const fontKey = fontMap[annotation.fontFamily || "Helvetica"] || StandardFonts.Helvetica;
+        const font = await pdfLibDoc.embedFont(
+          annotation.fontWeight === "bold" 
+            ? (fontKey === StandardFonts.Helvetica ? StandardFonts.HelveticaBold :
+               fontKey === StandardFonts.TimesRoman ? StandardFonts.TimesRomanBold :
+               StandardFonts.CourierBold)
+            : fontKey
+        );
+        
         page.drawText(annotation.text, {
           x: annotation.x,
           y: height - annotation.y - annotation.fontSize,
           size: annotation.fontSize,
+          font,
           color: rgb(color.r, color.g, color.b),
         });
       }
@@ -369,7 +398,7 @@ export function PDFEditor({ file, onSave }: PDFEditorProps) {
               onUpdateImage={handleUpdateImage}
               onDeleteAnnotation={handleDeleteAnnotation}
               editingText={editingText}
-              onEditText={setEditingText}
+              onEditText={handleEditText}
             />
           )}
         </div>

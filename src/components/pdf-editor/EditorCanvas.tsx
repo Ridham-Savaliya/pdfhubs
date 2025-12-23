@@ -21,6 +21,15 @@ interface EditorCanvasProps {
   onEditText: (annotation: TextAnnotation | null) => void;
 }
 
+const fontFamilyMap: Record<string, string> = {
+  "Helvetica": "Helvetica, Arial, sans-serif",
+  "Times-Roman": "Times New Roman, Times, serif",
+  "Courier": "Courier New, Courier, monospace",
+  "Arial": "Arial, Helvetica, sans-serif",
+  "Georgia": "Georgia, Times New Roman, serif",
+  "Verdana": "Verdana, Geneva, sans-serif",
+};
+
 export function EditorCanvas({
   pdfDoc,
   currentPage,
@@ -46,6 +55,7 @@ export function EditorCanvas({
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentPath, setCurrentPath] = useState<{ x: number; y: number }[]>([]);
   const [draggingImage, setDraggingImage] = useState<string | null>(null);
+  const [draggingText, setDraggingText] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   // Render PDF page
@@ -161,6 +171,7 @@ export function EditorCanvas({
     const coords = getCanvasCoords(e);
 
     if (activeTool === "text") {
+      // Only add new text when in text mode
       onAddText(coords.x, coords.y);
     } else if (activeTool === "draw" || activeTool === "highlight") {
       setIsDrawing(true);
@@ -180,7 +191,7 @@ export function EditorCanvas({
         }
       }
       
-      // Check if clicking on text
+      // Check if clicking on text for dragging
       for (const text of textAnnotations) {
         const textWidth = text.text.length * text.fontSize * 0.6;
         if (
@@ -189,7 +200,8 @@ export function EditorCanvas({
           coords.y >= text.y &&
           coords.y <= text.y + text.fontSize
         ) {
-          onEditText(text);
+          setDraggingText(text.id);
+          setDragOffset({ x: coords.x - text.x, y: coords.y - text.y });
           return;
         }
       }
@@ -219,6 +231,11 @@ export function EditorCanvas({
         x: coords.x - dragOffset.x,
         y: coords.y - dragOffset.y,
       });
+    } else if (draggingText) {
+      onUpdateText(draggingText, {
+        x: coords.x - dragOffset.x,
+        y: coords.y - dragOffset.y,
+      });
     }
   };
 
@@ -229,6 +246,14 @@ export function EditorCanvas({
     setIsDrawing(false);
     setCurrentPath([]);
     setDraggingImage(null);
+    setDraggingText(null);
+  };
+
+  const handleTextDoubleClick = (e: React.MouseEvent, annotation: TextAnnotation) => {
+    e.stopPropagation();
+    e.preventDefault();
+    // Open editor on double click
+    onEditText(annotation);
   };
 
   const getCursor = () => {
@@ -282,7 +307,9 @@ export function EditorCanvas({
             className={`absolute select-none ${
               editingText?.id === annotation.id
                 ? "ring-2 ring-primary rounded"
-                : "hover:ring-1 hover:ring-primary/50 rounded"
+                : draggingText === annotation.id
+                ? "ring-2 ring-primary/50 rounded cursor-grabbing"
+                : "hover:ring-1 hover:ring-primary/50 rounded cursor-grab"
             }`}
             style={{
               left: annotation.x * zoom * 1.5,
@@ -290,14 +317,12 @@ export function EditorCanvas({
               fontSize: annotation.fontSize * zoom * 1.5,
               color: annotation.color,
               fontWeight: annotation.fontWeight,
-              cursor: activeTool === "select" ? "pointer" : "default",
+              fontFamily: fontFamilyMap[annotation.fontFamily || "Helvetica"],
+              cursor: activeTool === "select" ? (draggingText === annotation.id ? "grabbing" : "grab") : "default",
+              userSelect: "none",
+              whiteSpace: "nowrap",
             }}
-            onClick={(e) => {
-              if (activeTool === "select") {
-                e.stopPropagation();
-                onEditText(annotation);
-              }
-            }}
+            onDoubleClick={(e) => handleTextDoubleClick(e, annotation)}
           >
             {annotation.text}
           </div>
