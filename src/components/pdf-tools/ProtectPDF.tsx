@@ -85,9 +85,9 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
         for (const page of pages) {
           const { width, height } = page.getSize();
           
-          // Add visible protection indicator
-          page.drawText('🔒 PROTECTED', {
-            x: width - 100,
+          // Add visible protection indicator (no emojis - WinAnsi encoding limitation)
+          page.drawText('[PROTECTED]', {
+            x: width - 90,
             y: height - 20,
             size: 10,
             font,
@@ -96,7 +96,7 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
           });
           
           // Add diagonal watermark with password indicator
-          page.drawText(`Protected by PDFTools`, {
+          page.drawText('Protected by PDFTools', {
             x: width / 4,
             y: height / 2,
             size: 30,

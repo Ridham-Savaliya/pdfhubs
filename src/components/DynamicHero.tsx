@@ -182,7 +182,7 @@ export function DynamicHero() {
             className="mt-10 animate-fade-up"
             style={{ animationDelay: "300ms" }}
           >
-            <div ref={searchContainerRef} className="relative mx-auto max-w-xl group z-50">
+            <div ref={searchContainerRef} className="relative mx-auto max-w-xl group" style={{ zIndex: 100 }}>
               <div className="absolute -inset-1 bg-gradient-hero opacity-20 rounded-2xl blur-xl group-focus-within:opacity-30 transition-opacity" />
               <div className="relative">
                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary z-10" />
@@ -199,7 +199,7 @@ export function DynamicHero() {
               
               {/* Search Results Dropdown - No blur overlay, dropdown elevated above content */}
               {showDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-2xl shadow-2xl p-2 z-[100] animate-fade-in backdrop-blur-xl">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-2xl shadow-2xl p-2 animate-fade-in backdrop-blur-xl" style={{ zIndex: 200 }}>
                   {filteredTools.length > 0 ? (
                     filteredTools.map((tool, index) => (
                       <button
