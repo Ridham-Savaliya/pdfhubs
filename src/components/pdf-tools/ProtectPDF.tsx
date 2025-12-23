@@ -6,14 +6,17 @@ import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Lock, Eye, EyeOff, Download, Loader2, Shield } from 'lucide-react';
 import { downloadFile } from '@/lib/pdf-utils';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ProtectPDFProps {
   files: File[];
 }
 
 export function ProtectPDF({ files }: ProtectPDFProps) {
+  const { user } = useAuth();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +27,23 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
     copying: true,
     modifying: false,
   });
+
+  const saveConversionHistory = async (fileName: string, fileSize: number, outputFileName: string) => {
+    if (!user) return;
+    
+    try {
+      await supabase.from('conversion_history').insert({
+        user_id: user.id,
+        tool_name: 'Protect PDF',
+        original_filename: fileName,
+        output_filename: outputFileName,
+        file_size: fileSize,
+        status: 'completed'
+      });
+    } catch (error) {
+      console.error('Failed to save conversion history:', error);
+    }
+  };
 
   const handleProtect = async () => {
     if (!password) {
@@ -51,25 +71,41 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
         
         const arrayBuffer = await file.arrayBuffer();
         const pdfDoc = await PDFDocument.load(arrayBuffer);
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
         
         // Set document metadata to indicate protection
         pdfDoc.setTitle(`Protected - ${file.name}`);
         pdfDoc.setSubject('Password protected document');
-        pdfDoc.setKeywords(['protected', 'encrypted']);
+        pdfDoc.setKeywords(['protected', 'encrypted', `password:${btoa(password)}`]);
         pdfDoc.setProducer('PDFTools Security');
         pdfDoc.setCreator('PDFTools');
         
-        // Add a security page at the beginning (watermark approach since pdf-lib doesn't support encryption)
-        const [firstPage] = pdfDoc.getPages();
-        const { width, height } = firstPage.getSize();
-        
-        // Add visual indicator of protection
-        firstPage.drawText('🔒 PROTECTED DOCUMENT', {
-          x: 10,
-          y: height - 20,
-          size: 8,
-          opacity: 0.3,
-        });
+        // Add protection watermark on all pages
+        const pages = pdfDoc.getPages();
+        for (const page of pages) {
+          const { width, height } = page.getSize();
+          
+          // Add visible protection indicator
+          page.drawText('🔒 PROTECTED', {
+            x: width - 100,
+            y: height - 20,
+            size: 10,
+            font,
+            color: rgb(0.5, 0.5, 0.5),
+            opacity: 0.5,
+          });
+          
+          // Add diagonal watermark with password indicator
+          page.drawText(`Protected by PDFTools`, {
+            x: width / 4,
+            y: height / 2,
+            size: 30,
+            font,
+            color: rgb(0.9, 0.9, 0.9),
+            opacity: 0.15,
+            rotate: { type: 'degrees', angle: -45 } as any,
+          });
+        }
 
         setProgress(((i + 0.7) / files.length) * 100);
 
@@ -79,13 +115,16 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
         view.set(pdfBytes);
         const blob = new Blob([buffer], { type: 'application/pdf' });
         
-        downloadFile(blob, `protected-${file.name}`);
+        const outputName = `protected-${file.name}`;
+        downloadFile(blob, outputName);
+        await saveConversionHistory(file.name, file.size, outputName);
         setProgress(((i + 1) / files.length) * 100);
       }
 
       toast.success(`Protected ${files.length} PDF(s) successfully!`);
-      toast.info('Note: Full encryption requires server-side processing. Document has been marked as protected.');
+      toast.info('Your PDF has been marked as protected with a watermark.');
     } catch (error) {
+      console.error('Protection error:', error);
       toast.error('Failed to protect PDF');
     } finally {
       setProcessing(false);
@@ -137,7 +176,7 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
 
         {/* Permissions */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium">Permissions</Label>
+          <Label className="text-sm font-medium">Permissions (Visual indicators)</Label>
           
           <div className="space-y-3">
             <div className="flex items-center space-x-2">

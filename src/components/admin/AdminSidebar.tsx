@@ -48,8 +48,8 @@ export function AdminSidebar() {
     <Sidebar className="border-r border-border bg-card">
       <SidebarHeader className="p-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-content text-primary-foreground font-bold text-lg">
-            <span className="mx-auto">P</span>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold text-lg">
+            <span>P</span>
           </div>
           <div>
             <h2 className="font-bold text-foreground">PDFTools</h2>
@@ -58,7 +58,7 @@ export function AdminSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="p-2">
+      <SidebarContent className="p-2 bg-card">
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
             Management
@@ -75,7 +75,7 @@ export function AdminSidebar() {
                         `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
                           isActive 
                             ? 'bg-primary text-primary-foreground shadow-md' 
-                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            : 'text-foreground hover:bg-muted hover:text-primary'
                         }`
                       }
                     >
