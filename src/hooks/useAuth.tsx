@@ -84,23 +84,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('user_id', userId)
         .maybeSingle();
 
-      // If no subscription record or welcome not sent, send the email
-      if (!subscription?.welcome_email_sent) {
-        await supabase.functions.invoke('send-email', {
-          body: { 
-            type: 'welcome',
-            email,
-            fullName,
-            userId
-          }
-        });
+      // If subscription exists and welcome email already sent, do nothing
+      if (subscription?.welcome_email_sent) {
+        console.log('Welcome email already sent, skipping');
+        return;
+      }
 
-        // Mark welcome email as sent
+      // If no subscription record exists, create one first
+      if (!subscription) {
+        const { error: insertError } = await supabase
+          .from('email_subscriptions')
+          .insert({ 
+            user_id: userId,
+            welcome_email_sent: true 
+          });
+        
+        if (insertError) {
+          console.error('Failed to create email subscription:', insertError);
+          return;
+        }
+      } else {
+        // Mark welcome email as sent BEFORE sending to prevent duplicates
         await supabase
           .from('email_subscriptions')
           .update({ welcome_email_sent: true })
           .eq('user_id', userId);
       }
+
+      // Now send the email
+      await supabase.functions.invoke('send-email', {
+        body: { 
+          type: 'welcome',
+          email,
+          fullName,
+          userId
+        }
+      });
+
+      console.log('Welcome email sent successfully');
     } catch (error) {
       console.error('Failed to handle welcome email:', error);
     }

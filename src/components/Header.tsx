@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Menu, ChevronDown, FileText, User, Sparkles, Search, LogOut, History, X } from "lucide-react";
+import { Menu, ChevronDown, FileText, User, Sparkles, Search, LogOut, History, X, Shield } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,7 +41,7 @@ const allTools = toolCategories.flatMap(category =>
 );
 
 export function Header() {
-  const { user, signOut, loading } = useAuth();
+  const { user, signOut, loading, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -199,6 +199,17 @@ export function Header() {
                         Conversion History
                       </Link>
                     </DropdownMenuItem>
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin" className="cursor-pointer py-2.5 px-3 rounded-lg hover:bg-accent flex items-center gap-2 text-primary">
+                            <Shield className="h-4 w-4" />
+                            Admin Panel
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={handleSignOut}
@@ -319,6 +330,14 @@ export function Header() {
                           History
                         </Button>
                       </Link>
+                      {isAdmin && (
+                        <Link to="/admin">
+                          <Button variant="outline" className="w-full justify-center text-primary border-primary">
+                            <Shield className="h-4 w-4 mr-2" />
+                            Admin Panel
+                          </Button>
+                        </Link>
+                      )}
                       <Button onClick={handleSignOut} variant="destructive" className="w-full justify-center">
                         <LogOut className="h-4 w-4 mr-2" />
                         Sign Out

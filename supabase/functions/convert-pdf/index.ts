@@ -14,7 +14,7 @@ serve(async (req) => {
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const targetFormat = formData.get('format') as string; // 'docx', 'xlsx', 'pptx'
+    const targetFormat = formData.get('format') as string;
 
     if (!file) {
       return new Response(
@@ -25,32 +25,26 @@ serve(async (req) => {
 
     console.log(`Converting PDF to ${targetFormat}, file size: ${file.size}`);
 
-    // Read PDF file
     const pdfBytes = await file.arrayBuffer();
     
-    // For now, we'll extract text from PDF and create a simple conversion
-    // In production, you'd use a more robust PDF parsing library
-    
     if (targetFormat === 'docx') {
-      // Create a simple DOCX file with extracted content
       const docxContent = await createDocxFromPdf(pdfBytes);
       
       return new Response(docxContent, {
         headers: {
           ...corsHeaders,
           'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'Content-Disposition': `attachment; filename="converted.docx"`,
+          'Content-Disposition': 'attachment; filename="converted.docx"',
         },
       });
     } else if (targetFormat === 'xlsx') {
-      // Create a simple XLSX file
       const xlsxContent = await createXlsxFromPdf(pdfBytes);
       
       return new Response(xlsxContent, {
         headers: {
           ...corsHeaders,
           'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'Content-Disposition': `attachment; filename="converted.xlsx"`,
+          'Content-Disposition': 'attachment; filename="converted.xlsx"',
         },
       });
     } else if (targetFormat === 'pptx') {
@@ -60,7 +54,7 @@ serve(async (req) => {
         headers: {
           ...corsHeaders,
           'Content-Type': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-          'Content-Disposition': `attachment; filename="converted.pptx"`,
+          'Content-Disposition': 'attachment; filename="converted.pptx"',
         },
       });
     }
