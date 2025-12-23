@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { Unlock, Eye, EyeOff, Download, Loader2, AlertCircle } from 'lucide-react';
+import { Unlock, Eye, EyeOff, Download, Loader2, AlertCircle, Server, Laptop } from 'lucide-react';
 import { downloadFile } from '@/lib/pdf-utils';
 import { PDFDocument } from 'pdf-lib';
 import { toast } from 'sonner';
@@ -20,6 +20,7 @@ export function UnlockPDF({ files }: UnlockPDFProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [useServerSide, setUseServerSide] = useState(true);
 
   const saveConversionHistory = async (fileName: string, fileSize: number, outputFileName: string) => {
     if (!user) return;
@@ -38,6 +39,55 @@ export function UnlockPDF({ files }: UnlockPDFProps) {
     }
   };
 
+  const handleServerSideUnlock = async (file: File): Promise<Blob> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('password', password);
+
+    const response = await supabase.functions.invoke('unlock-pdf', {
+      body: formData,
+    });
+
+    if (response.error) {
+      throw new Error(response.error.message || 'Server unlock failed');
+    }
+
+    // The response data is already a Blob or ArrayBuffer
+    if (response.data instanceof Blob) {
+      return response.data;
+    }
+    
+    // If it's an ArrayBuffer or similar, convert to Blob
+    return new Blob([response.data], { type: 'application/pdf' });
+  };
+
+  const handleClientSideUnlock = async (file: File): Promise<Blob> => {
+    const arrayBuffer = await file.arrayBuffer();
+    
+    // Try to load with ignoreEncryption option
+    const pdfDoc = await PDFDocument.load(arrayBuffer, {
+      ignoreEncryption: true,
+    });
+
+    // Create a new clean PDF by copying pages
+    const newPdf = await PDFDocument.create();
+    const pages = await newPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+    pages.forEach(page => newPdf.addPage(page));
+    
+    // Set clean metadata
+    newPdf.setTitle(file.name.replace('.pdf', ''));
+    newPdf.setSubject('');
+    newPdf.setKeywords([]);
+    newPdf.setProducer('PDFTools');
+    newPdf.setCreator('PDFTools');
+
+    const pdfBytes = await newPdf.save();
+    const buffer = new ArrayBuffer(pdfBytes.length);
+    const view = new Uint8Array(buffer);
+    view.set(pdfBytes);
+    return new Blob([buffer], { type: 'application/pdf' });
+  };
+
   const handleUnlock = async () => {
     if (!password) {
       toast.error('Please enter the PDF password');
@@ -54,40 +104,22 @@ export function UnlockPDF({ files }: UnlockPDFProps) {
         const file = files[i];
         setProgress(((i + 0.3) / files.length) * 100);
         
-        const arrayBuffer = await file.arrayBuffer();
-        
         try {
-          // Try to load with ignoreEncryption option
-          const pdfDoc = await PDFDocument.load(arrayBuffer, {
-            ignoreEncryption: true,
-          });
+          let blob: Blob;
           
-          setProgress(((i + 0.6) / files.length) * 100);
+          if (useServerSide) {
+            try {
+              blob = await handleServerSideUnlock(file);
+            } catch (serverError) {
+              console.warn('Server-side unlock failed, falling back to client-side:', serverError);
+              toast.info('Using local unlock...');
+              blob = await handleClientSideUnlock(file);
+            }
+          } else {
+            blob = await handleClientSideUnlock(file);
+          }
 
-          // Remove protection metadata and watermarks
-          pdfDoc.setTitle(file.name.replace('.pdf', ' (Unlocked)'));
-          pdfDoc.setSubject('Unlocked document');
-          pdfDoc.setKeywords(['unlocked']);
-          pdfDoc.setProducer('PDFTools');
-          pdfDoc.setCreator('PDFTools Unlock');
-          
-          // Create a new clean PDF by copying pages
-          const newPdf = await PDFDocument.create();
-          const pages = await newPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
-          pages.forEach(page => newPdf.addPage(page));
-          
-          // Set clean metadata
-          newPdf.setTitle(file.name.replace('.pdf', ''));
-          newPdf.setSubject('');
-          newPdf.setKeywords([]);
-          newPdf.setProducer('PDFTools');
-          newPdf.setCreator('PDFTools');
-
-          const pdfBytes = await newPdf.save();
-          const buffer = new ArrayBuffer(pdfBytes.length);
-          const view = new Uint8Array(buffer);
-          view.set(pdfBytes);
-          const blob = new Blob([buffer], { type: 'application/pdf' });
+          setProgress(((i + 0.7) / files.length) * 100);
           
           const outputName = `unlocked-${file.name}`;
           downloadFile(blob, outputName);
@@ -96,8 +128,9 @@ export function UnlockPDF({ files }: UnlockPDFProps) {
           successCount++;
           
         } catch (loadError) {
-          console.error('Load error:', loadError);
-          toast.error(`Could not process ${file.name}. The file may be corrupted or have strong encryption.`);
+          console.error('Unlock error:', loadError);
+          const errorMsg = loadError instanceof Error ? loadError.message : 'Unknown error';
+          toast.error(`Could not unlock ${file.name}: ${errorMsg}`);
           continue;
         }
       }
@@ -130,6 +163,42 @@ export function UnlockPDF({ files }: UnlockPDFProps) {
               Enter the current password to unlock your PDF. This will create a new unprotected copy of your document.
             </p>
           </div>
+        </div>
+
+        {/* Unlock Mode Toggle */}
+        <div className="p-4 bg-background rounded-xl border border-border space-y-3">
+          <Label className="text-sm font-medium">Unlock Mode</Label>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setUseServerSide(true)}
+              className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${
+                useServerSide 
+                  ? 'border-primary bg-primary/10 text-primary' 
+                  : 'border-border hover:border-muted-foreground text-muted-foreground'
+              }`}
+            >
+              <Server className="h-4 w-4" />
+              <span className="text-sm font-medium">Enhanced (Server)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setUseServerSide(false)}
+              className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${
+                !useServerSide 
+                  ? 'border-primary bg-primary/10 text-primary' 
+                  : 'border-border hover:border-muted-foreground text-muted-foreground'
+              }`}
+            >
+              <Laptop className="h-4 w-4" />
+              <span className="text-sm font-medium">Basic (Local)</span>
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {useServerSide 
+              ? 'Enhanced unlock with password verification for PDFTools-protected files.' 
+              : 'Basic unlock processed locally in your browser.'}
+          </p>
         </div>
 
         {/* Password Field */}

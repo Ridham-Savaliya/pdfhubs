@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.protect-pdf]
 verify_jwt = false
+
+[functions.unlock-pdf]
+verify_jwt = false
