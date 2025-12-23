@@ -6,9 +6,11 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isAdmin: boolean;
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  checkAdminStatus: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,6 +19,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const checkAdminStatus = async (): Promise<boolean> => {
+    if (!user) return false;
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
+      const adminStatus = !!data && !error;
+      setIsAdmin(adminStatus);
+      return adminStatus;
+    } catch {
+      return false;
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -26,10 +48,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Send welcome email on signup (deferred)
+        // Handle sign in - check if welcome email needed and update activity
         if (event === 'SIGNED_IN' && session?.user) {
           setTimeout(() => {
-            sendWelcomeEmail(session.user.email!, session.user.user_metadata?.full_name);
+            handleWelcomeEmail(session.user.id, session.user.email!, session.user.user_metadata?.full_name);
+            updateLastActivity(session.user.id);
+            checkAdminStatus();
           }, 0);
         }
       }
@@ -40,22 +64,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      if (session?.user) {
+        setTimeout(() => {
+          checkAdminStatus();
+        }, 0);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const sendWelcomeEmail = async (email: string, fullName?: string) => {
+  const handleWelcomeEmail = async (userId: string, email: string, fullName?: string) => {
     try {
-      await supabase.functions.invoke('send-email', {
-        body: { 
-          type: 'welcome',
-          email,
-          fullName 
-        }
-      });
+      // Check if welcome email was already sent
+      const { data: subscription } = await supabase
+        .from('email_subscriptions')
+        .select('welcome_email_sent')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      // If no subscription record or welcome not sent, send the email
+      if (!subscription?.welcome_email_sent) {
+        await supabase.functions.invoke('send-email', {
+          body: { 
+            type: 'welcome',
+            email,
+            fullName,
+            userId
+          }
+        });
+
+        // Mark welcome email as sent
+        await supabase
+          .from('email_subscriptions')
+          .update({ welcome_email_sent: true })
+          .eq('user_id', userId);
+      }
     } catch (error) {
-      console.error('Failed to send welcome email:', error);
+      console.error('Failed to handle welcome email:', error);
+    }
+  };
+
+  const updateLastActivity = async (userId: string) => {
+    try {
+      await supabase
+        .from('email_subscriptions')
+        .update({ last_activity_at: new Date().toISOString() })
+        .eq('user_id', userId);
+    } catch (error) {
+      console.error('Failed to update last activity:', error);
     }
   };
 
@@ -86,11 +144,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    setIsAdmin(false);
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, isAdmin, signUp, signIn, signOut, checkAdminStatus }}>
       {children}
     </AuthContext.Provider>
   );
