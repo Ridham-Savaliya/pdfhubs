@@ -83,7 +83,7 @@ export default function AdminBanners() {
     try {
       const { error } = await supabase
         .from('site_settings')
-        .update({ value: heroBanner as unknown as Record<string, unknown> })
+        .update({ value: JSON.parse(JSON.stringify(heroBanner)) })
         .eq('key', 'hero_banner');
 
       if (error) throw error;
@@ -100,7 +100,7 @@ export default function AdminBanners() {
     try {
       const { error } = await supabase
         .from('site_settings')
-        .update({ value: announcementBar as unknown as Record<string, unknown> })
+        .update({ value: JSON.parse(JSON.stringify(announcementBar)) })
         .eq('key', 'announcement_bar');
 
       if (error) throw error;
