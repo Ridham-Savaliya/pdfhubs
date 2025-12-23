@@ -60,7 +60,7 @@ export default function AdminSEO() {
     try {
       const { error } = await supabase
         .from('site_settings')
-        .update({ value: seoSettings as unknown as Record<string, unknown> })
+        .update({ value: JSON.parse(JSON.stringify(seoSettings)) })
         .eq('key', 'seo');
 
       if (error) throw error;
