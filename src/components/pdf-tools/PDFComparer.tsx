@@ -1,0 +1,189 @@
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { FileText, AlertTriangle, CheckCircle, Loader2, ArrowLeftRight } from 'lucide-react';
+import { comparePDFs } from '@/lib/pdf-utils';
+import { toast } from 'sonner';
+
+interface PDFComparerProps {
+  files: File[];
+}
+
+interface ComparisonResult {
+  differences: {
+    page: number;
+    type: "text" | "layout";
+    description: string;
+    file1Text?: string;
+    file2Text?: string;
+  }[];
+  summary: string;
+}
+
+export function PDFComparer({ files }: PDFComparerProps) {
+  const [comparing, setComparing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [result, setResult] = useState<ComparisonResult | null>(null);
+
+  const handleCompare = async () => {
+    if (files.length !== 2) {
+      toast.error('Please upload exactly 2 PDF files to compare');
+      return;
+    }
+
+    setComparing(true);
+    setProgress(0);
+    setResult(null);
+
+    try {
+      const comparisonResult = await comparePDFs(files[0], files[1], (p) => setProgress(p));
+      setResult(comparisonResult);
+      
+      if (comparisonResult.differences.length === 0) {
+        toast.success('Documents are identical!');
+      } else {
+        toast.info(`Found ${comparisonResult.differences.length} difference(s)`);
+      }
+    } catch (error) {
+      toast.error('Failed to compare PDFs');
+    } finally {
+      setComparing(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* File Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {files.map((file, index) => (
+          <div key={index} className="p-4 bg-secondary/50 rounded-xl flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <FileText className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-foreground truncate">{file.name}</p>
+              <p className="text-sm text-muted-foreground">
+                {(file.size / 1024).toFixed(1)} KB
+              </p>
+            </div>
+            <span className="text-xs font-medium text-muted-foreground">
+              Document {index + 1}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Compare Button */}
+      {!result && (
+        <div className="text-center">
+          <Button 
+            onClick={handleCompare} 
+            disabled={comparing || files.length !== 2}
+            size="lg"
+            className="bg-gradient-primary"
+          >
+            {comparing ? (
+              <>
+                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                Comparing...
+              </>
+            ) : (
+              <>
+                <ArrowLeftRight className="h-5 w-5 mr-2" />
+                Compare Documents
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
+      {/* Progress */}
+      {comparing && (
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>Analyzing documents...</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
+      )}
+
+      {/* Results */}
+      {result && (
+        <div className="space-y-4">
+          {/* Summary */}
+          <div className={`p-4 rounded-xl flex items-center gap-3 ${
+            result.differences.length === 0 
+              ? 'bg-success/10 border border-success/30' 
+              : 'bg-warning/10 border border-warning/30'
+          }`}>
+            {result.differences.length === 0 ? (
+              <CheckCircle className="h-6 w-6 text-success" />
+            ) : (
+              <AlertTriangle className="h-6 w-6 text-warning" />
+            )}
+            <div>
+              <p className="font-medium text-foreground">{result.summary}</p>
+              {result.differences.length > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  Review the differences below
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Difference List */}
+          {result.differences.length > 0 && (
+            <div className="space-y-3">
+              <h4 className="font-medium text-foreground">Differences Found:</h4>
+              {result.differences.map((diff, index) => (
+                <div 
+                  key={index}
+                  className="p-4 bg-card rounded-xl border border-border"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`px-2 py-0.5 text-xs font-medium rounded ${
+                      diff.type === 'text' ? 'bg-primary/10 text-primary' : 'bg-warning/10 text-warning'
+                    }`}>
+                      {diff.type.toUpperCase()}
+                    </span>
+                    <span className="text-sm font-medium text-foreground">
+                      {diff.description}
+                    </span>
+                  </div>
+                  
+                  {(diff.file1Text || diff.file2Text) && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                      {diff.file1Text && (
+                        <div className="p-3 bg-secondary/50 rounded-lg">
+                          <p className="text-xs font-medium text-muted-foreground mb-1">Document 1:</p>
+                          <p className="text-sm text-foreground line-clamp-3">{diff.file1Text}...</p>
+                        </div>
+                      )}
+                      {diff.file2Text && (
+                        <div className="p-3 bg-secondary/50 rounded-lg">
+                          <p className="text-xs font-medium text-muted-foreground mb-1">Document 2:</p>
+                          <p className="text-sm text-foreground line-clamp-3">{diff.file2Text}...</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Compare Again */}
+          <div className="text-center pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setResult(null)}
+            >
+              Compare Again
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

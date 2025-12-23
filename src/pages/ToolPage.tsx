@@ -11,6 +11,7 @@ import { ArrowLeft, Download, FileText, RotateCw, Loader2, Sparkles, Shield, Zap
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { PDFEditor } from "@/components/pdf-editor";
+import { PageOrganizer, PDFComparer, PDFSigner, ProtectPDF, UnlockPDF } from "@/components/pdf-tools";
 import {
   mergePDFs,
   splitPDF,
@@ -143,7 +144,7 @@ const toolInfo: Record<string, {
   },
   "protect-pdf": {
     title: "Protect PDF",
-    description: "Add password protection to your PDFs. (Coming soon)",
+    description: "Add password protection to secure your PDF documents.",
     color: "bg-tool-protect",
     acceptedFiles: ".pdf",
     minFiles: 1,
@@ -151,7 +152,7 @@ const toolInfo: Record<string, {
   },
   "unlock-pdf": {
     title: "Unlock PDF",
-    description: "Remove password protection from PDFs. (Coming soon)",
+    description: "Remove password protection from your PDFs.",
     color: "bg-tool-unlock",
     acceptedFiles: ".pdf",
     minFiles: 1,
@@ -159,7 +160,7 @@ const toolInfo: Record<string, {
   },
   "organize-pages": {
     title: "Organize Pages",
-    description: "Reorder and delete pages with drag & drop. (Coming soon)",
+    description: "Reorder, rotate, and delete pages with drag & drop.",
     color: "bg-tool-organize",
     acceptedFiles: ".pdf",
     minFiles: 1,
@@ -167,7 +168,7 @@ const toolInfo: Record<string, {
   },
   "sign-pdf": {
     title: "Sign PDF",
-    description: "Add digital signatures to your documents. (Coming soon)",
+    description: "Draw, type, or upload your signature and place it on any page.",
     color: "bg-tool-protect",
     acceptedFiles: ".pdf",
     minFiles: 1,
@@ -175,7 +176,7 @@ const toolInfo: Record<string, {
   },
   "compare-pdf": {
     title: "Compare PDFs",
-    description: "Find differences between two PDF documents. (Coming soon)",
+    description: "Find text and layout differences between two PDF documents.",
     color: "bg-tool-organize",
     acceptedFiles: ".pdf",
     minFiles: 2,
@@ -420,16 +421,8 @@ export default function ToolPage() {
 
         case "protect-pdf":
         case "unlock-pdf":
-          toast.info("Password protection features are coming soon!");
-          break;
-
         case "edit-pdf":
-          // Handled by PDFEditor component
-          break;
-
         case "sign-pdf":
-          toast.info("Signature feature is coming soon!");
-
         case "organize-pages":
         case "compare-pdf":
           toast.info("This feature is coming soon!");
@@ -513,9 +506,43 @@ export default function ToolPage() {
         {/* Main content */}
         <div className="container py-12">
           <div className="max-w-4xl mx-auto">
-            {/* PDF Editor for edit-pdf tool */}
+            {/* Special tool interfaces */}
             {toolId === "edit-pdf" && files.length > 0 ? (
               <PDFEditor file={files[0]} />
+            ) : toolId === "organize-pages" && files.length > 0 ? (
+              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
+                <PageOrganizer file={files[0]} />
+              </div>
+            ) : toolId === "sign-pdf" && files.length > 0 ? (
+              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
+                <PDFSigner file={files[0]} />
+              </div>
+            ) : toolId === "compare-pdf" && files.length === 2 ? (
+              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
+                <PDFComparer files={files} />
+              </div>
+            ) : toolId === "protect-pdf" && files.length > 0 ? (
+              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
+                <FileUploader
+                  onFilesSelected={handleFilesSelected}
+                  accept={tool.acceptedFiles}
+                  maxFiles={tool.maxFiles}
+                />
+                <div className="mt-6">
+                  <ProtectPDF files={files} />
+                </div>
+              </div>
+            ) : toolId === "unlock-pdf" && files.length > 0 ? (
+              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
+                <FileUploader
+                  onFilesSelected={handleFilesSelected}
+                  accept={tool.acceptedFiles}
+                  maxFiles={tool.maxFiles}
+                />
+                <div className="mt-6">
+                  <UnlockPDF files={files} />
+                </div>
+              </div>
             ) : (
               <div className="bg-card rounded-3xl shadow-xl border border-border p-8 md:p-10 animate-fade-in">
                 <FileUploader
