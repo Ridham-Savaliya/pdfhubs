@@ -1,0 +1,4 @@
+project_id = "flbkqehloxlvizwocdsv"
+
+[functions.convert-pdf]
+verify_jwt = false
