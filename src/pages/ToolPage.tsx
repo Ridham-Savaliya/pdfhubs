@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Download, FileText, RotateCw, Loader2, Sparkles, Shield, Zap } from "lucide-react";
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
+import { PDFEditor } from "@/components/pdf-editor";
 import {
   mergePDFs,
   splitPDF,
@@ -134,7 +135,7 @@ const toolInfo: Record<string, {
   },
   "edit-pdf": {
     title: "Edit PDF",
-    description: "Add text, images, and annotations to your PDFs. (Interactive editor coming soon)",
+    description: "Add text, images, drawings, and annotations to your PDFs with our interactive editor.",
     color: "bg-tool-edit",
     acceptedFiles: ".pdf",
     minFiles: 1,
@@ -423,9 +424,11 @@ export default function ToolPage() {
           break;
 
         case "edit-pdf":
-        case "sign-pdf":
-          toast.info("Interactive PDF editing is coming soon!");
+          // Handled by PDFEditor component
           break;
+
+        case "sign-pdf":
+          toast.info("Signature feature is coming soon!");
 
         case "organize-pages":
         case "compare-pdf":
@@ -510,12 +513,16 @@ export default function ToolPage() {
         {/* Main content */}
         <div className="container py-12">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-card rounded-3xl shadow-xl border border-border p-8 md:p-10 animate-fade-in">
-              <FileUploader
-                onFilesSelected={handleFilesSelected}
-                accept={tool.acceptedFiles}
-                maxFiles={tool.maxFiles}
-              />
+            {/* PDF Editor for edit-pdf tool */}
+            {toolId === "edit-pdf" && files.length > 0 ? (
+              <PDFEditor file={files[0]} />
+            ) : (
+              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 md:p-10 animate-fade-in">
+                <FileUploader
+                  onFilesSelected={handleFilesSelected}
+                  accept={tool.acceptedFiles}
+                  maxFiles={tool.maxFiles}
+                />
 
               {pdfInfo && (
                 <div className="mt-6 p-4 bg-secondary/50 rounded-2xl flex items-center gap-3 animate-fade-in">
@@ -695,6 +702,7 @@ export default function ToolPage() {
                 </div>
               )}
             </div>
+            )}
 
             {/* Security notice */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground animate-fade-in">
