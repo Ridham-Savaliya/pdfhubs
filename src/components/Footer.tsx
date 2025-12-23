@@ -1,31 +1,31 @@
 import { Link } from "react-router-dom";
-import { FileText, Twitter, Github, Linkedin } from "lucide-react";
+import { FileText, Twitter, Github, Linkedin, Heart } from "lucide-react";
 
 const footerLinks = {
-  Product: [
+  product: [
     { name: "Merge PDF", href: "/tool/merge-pdf" },
     { name: "Split PDF", href: "/tool/split-pdf" },
     { name: "Compress PDF", href: "/tool/compress-pdf" },
+    { name: "Convert PDF", href: "/tool/pdf-to-word" },
     { name: "Edit PDF", href: "/tool/edit-pdf" },
-    { name: "All Tools", href: "/#tools" },
   ],
-  Convert: [
+  tools: [
     { name: "PDF to Word", href: "/tool/pdf-to-word" },
     { name: "PDF to Excel", href: "/tool/pdf-to-excel" },
     { name: "PDF to JPG", href: "/tool/pdf-to-jpg" },
-    { name: "Word to PDF", href: "/tool/word-to-pdf" },
     { name: "JPG to PDF", href: "/tool/jpg-to-pdf" },
+    { name: "Add Watermark", href: "/tool/add-watermark" },
   ],
-  Company: [
-    { name: "About Us", href: "/about" },
-    { name: "Pricing", href: "/pricing" },
-    { name: "Contact", href: "/contact" },
-    { name: "Blog", href: "/blog" },
+  company: [
+    { name: "About Us", href: "#" },
+    { name: "Blog", href: "#" },
+    { name: "Careers", href: "#" },
+    { name: "Contact", href: "#" },
   ],
-  Legal: [
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Terms of Service", href: "/terms" },
-    { name: "Cookie Policy", href: "/cookies" },
+  legal: [
+    { name: "Privacy Policy", href: "#" },
+    { name: "Terms of Service", href: "#" },
+    { name: "Cookie Policy", href: "#" },
   ],
 };
 
@@ -37,60 +37,112 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-foreground text-primary-foreground">
+    <footer className="bg-card border-t border-border">
       <div className="container py-16">
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-6">
+        <div className="grid gap-12 lg:grid-cols-6">
+          {/* Brand */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-md">
                 <FileText className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="font-heading text-xl font-bold">
+              <span className="font-heading text-xl font-bold text-foreground">
                 PDF<span className="text-primary">Tools</span>
               </span>
             </Link>
-            <p className="mt-4 text-primary-foreground/70 max-w-sm">
-              Your all-in-one PDF solution. Edit, convert, and manage PDFs online with ease. Free and secure.
+            <p className="mt-4 text-muted-foreground leading-relaxed max-w-sm">
+              Free online PDF tools to merge, split, compress, convert, and edit PDF files. 
+              No installation, no registration, instant results.
             </p>
-            <div className="mt-6 flex gap-4">
+            
+            {/* Social links */}
+            <div className="flex gap-3 mt-6">
               {socialLinks.map((social) => (
                 <a
                   key={social.name}
                   href={social.href}
-                  className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-foreground/10 hover:bg-primary transition-colors"
+                  className="p-2.5 rounded-xl bg-secondary hover:bg-primary hover:text-primary-foreground text-muted-foreground transition-all duration-300 hover:scale-110"
                   aria-label={social.name}
                 >
-                  <social.icon className="h-5 w-5" />
+                  <social.icon className="h-4 w-4" />
                 </a>
               ))}
             </div>
           </div>
 
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h3 className="font-heading font-semibold mb-4">{category}</h3>
-              <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      to={link.href}
-                      className="text-primary-foreground/70 hover:text-primary transition-colors"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* Links */}
+          <div>
+            <h3 className="font-heading font-semibold text-foreground mb-4">Product</h3>
+            <ul className="space-y-3">
+              {footerLinks.product.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    to={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-heading font-semibold text-foreground mb-4">Tools</h3>
+            <ul className="space-y-3">
+              {footerLinks.tools.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    to={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-heading font-semibold text-foreground mb-4">Company</h3>
+            <ul className="space-y-3">
+              {footerLinks.company.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    to={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-heading font-semibold text-foreground mb-4">Legal</h3>
+            <ul className="space-y-3">
+              {footerLinks.legal.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    to={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-primary-foreground/60 text-sm">
+        {/* Bottom bar */}
+        <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} PDFTools. All rights reserved.
           </p>
-          <p className="text-primary-foreground/60 text-sm">
-            Made with ❤️ for productivity
+          <p className="text-sm text-muted-foreground flex items-center gap-1">
+            Made with <Heart className="h-4 w-4 text-primary fill-primary" /> for productivity
           </p>
         </div>
       </div>
