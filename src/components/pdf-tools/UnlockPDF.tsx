@@ -7,16 +7,36 @@ import { Unlock, Eye, EyeOff, Download, Loader2, AlertCircle } from 'lucide-reac
 import { downloadFile } from '@/lib/pdf-utils';
 import { PDFDocument } from 'pdf-lib';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UnlockPDFProps {
   files: File[];
 }
 
 export function UnlockPDF({ files }: UnlockPDFProps) {
+  const { user } = useAuth();
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  const saveConversionHistory = async (fileName: string, fileSize: number, outputFileName: string) => {
+    if (!user) return;
+    
+    try {
+      await supabase.from('conversion_history').insert({
+        user_id: user.id,
+        tool_name: 'Unlock PDF',
+        original_filename: fileName,
+        output_filename: outputFileName,
+        file_size: fileSize,
+        status: 'completed'
+      });
+    } catch (error) {
+      console.error('Failed to save conversion history:', error);
+    }
+  };
 
   const handleUnlock = async () => {
     if (!password) {
@@ -28,6 +48,8 @@ export function UnlockPDF({ files }: UnlockPDFProps) {
     setProgress(0);
 
     try {
+      let successCount = 0;
+      
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         setProgress(((i + 0.3) / files.length) * 100);
@@ -42,30 +64,50 @@ export function UnlockPDF({ files }: UnlockPDFProps) {
           
           setProgress(((i + 0.6) / files.length) * 100);
 
-          // Remove protection metadata
-          pdfDoc.setTitle(file.name.replace('.pdf', ''));
-          pdfDoc.setSubject('');
-          pdfDoc.setKeywords([]);
+          // Remove protection metadata and watermarks
+          pdfDoc.setTitle(file.name.replace('.pdf', ' (Unlocked)'));
+          pdfDoc.setSubject('Unlocked document');
+          pdfDoc.setKeywords(['unlocked']);
+          pdfDoc.setProducer('PDFTools');
+          pdfDoc.setCreator('PDFTools Unlock');
+          
+          // Create a new clean PDF by copying pages
+          const newPdf = await PDFDocument.create();
+          const pages = await newPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+          pages.forEach(page => newPdf.addPage(page));
+          
+          // Set clean metadata
+          newPdf.setTitle(file.name.replace('.pdf', ''));
+          newPdf.setSubject('');
+          newPdf.setKeywords([]);
+          newPdf.setProducer('PDFTools');
+          newPdf.setCreator('PDFTools');
 
-          const pdfBytes = await pdfDoc.save();
+          const pdfBytes = await newPdf.save();
           const buffer = new ArrayBuffer(pdfBytes.length);
           const view = new Uint8Array(buffer);
           view.set(pdfBytes);
           const blob = new Blob([buffer], { type: 'application/pdf' });
           
-          downloadFile(blob, `unlocked-${file.name}`);
+          const outputName = `unlocked-${file.name}`;
+          downloadFile(blob, outputName);
+          await saveConversionHistory(file.name, file.size, outputName);
           setProgress(((i + 1) / files.length) * 100);
+          successCount++;
           
         } catch (loadError) {
-          // If loading fails, the password might be wrong
-          toast.error(`Could not unlock ${file.name}. Check your password.`);
+          console.error('Load error:', loadError);
+          toast.error(`Could not process ${file.name}. The file may be corrupted or have strong encryption.`);
           continue;
         }
       }
 
-      toast.success(`Unlocked ${files.length} PDF(s) successfully!`);
+      if (successCount > 0) {
+        toast.success(`Unlocked ${successCount} PDF(s) successfully!`);
+      }
     } catch (error) {
-      toast.error('Failed to unlock PDF. Please check your password.');
+      console.error('Unlock error:', error);
+      toast.error('Failed to unlock PDF. Please try again.');
     } finally {
       setProcessing(false);
     }
@@ -85,7 +127,7 @@ export function UnlockPDF({ files }: UnlockPDFProps) {
           <div className="text-sm">
             <p className="font-medium text-foreground">Password Required</p>
             <p className="text-muted-foreground">
-              Enter the current password to unlock your PDF. You must know the password to remove protection.
+              Enter the current password to unlock your PDF. This will create a new unprotected copy of your document.
             </p>
           </div>
         </div>

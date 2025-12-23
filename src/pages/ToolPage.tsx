@@ -12,6 +12,8 @@ import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { PDFEditor } from "@/components/pdf-editor";
 import { PageOrganizer, PDFComparer, PDFSigner, ProtectPDF, UnlockPDF } from "@/components/pdf-tools";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import {
   mergePDFs,
   splitPDF,
@@ -207,6 +209,7 @@ const toolIcons: Record<string, React.ReactNode> = {
 
 export default function ToolPage() {
   const { toolId } = useParams<{ toolId: string }>();
+  const { user } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -221,6 +224,24 @@ export default function ToolPage() {
   const [imageFormat, setImageFormat] = useState<"jpeg" | "png">("jpeg");
 
   const tool = toolId ? toolInfo[toolId] : null;
+
+  // Save conversion history
+  const saveConversionHistory = async (fileName: string, fileSize: number, outputFileName: string) => {
+    if (!user || !toolId || !tool) return;
+    
+    try {
+      await supabase.from('conversion_history').insert({
+        user_id: user.id,
+        tool_name: tool.title,
+        original_filename: fileName,
+        output_filename: outputFileName,
+        file_size: fileSize,
+        status: 'completed'
+      });
+    } catch (error) {
+      console.error('Failed to save conversion history:', error);
+    }
+  };
 
   const handleFilesSelected = useCallback(async (newFiles: File[]) => {
     setFiles(newFiles);
@@ -283,7 +304,9 @@ export default function ToolPage() {
           setProgress(20);
           const blob = await mergePDFs(files);
           setProgress(100);
-          downloadFile(blob, "merged.pdf");
+          const outputName = "merged.pdf";
+          downloadFile(blob, outputName);
+          await saveConversionHistory(files.map(f => f.name).join(', '), files.reduce((a, f) => a + f.size, 0), outputName);
           toast.success(`Successfully merged ${files.length} PDFs!`);
           break;
         }
@@ -296,6 +319,7 @@ export default function ToolPage() {
           const filenames = blobs.map((_, i) => `${baseName}-page-${i + 1}.pdf`);
           downloadFiles(blobs, filenames);
           setProgress(100);
+          await saveConversionHistory(files[0].name, files[0].size, `${blobs.length} pages`);
           toast.success(`Split into ${blobs.length} separate PDF files!`);
           break;
         }
@@ -311,8 +335,10 @@ export default function ToolPage() {
             
             const newSize = blob.size;
             const reduction = ((originalSize - newSize) / originalSize * 100);
+            const outputName = `compressed-${file.name}`;
             
-            downloadFile(blob, `compressed-${file.name}`);
+            downloadFile(blob, outputName);
+            await saveConversionHistory(file.name, file.size, outputName);
             toast.success(
               `${file.name}: ${formatFileSize(originalSize)} → ${formatFileSize(newSize)} (${reduction.toFixed(0)}% smaller)`
             );
@@ -324,8 +350,10 @@ export default function ToolPage() {
           const rotationAngle = parseInt(rotation) as 90 | 180 | 270;
           setProgress(20);
           for (const file of files) {
+            const outputName = `rotated-${file.name}`;
             const blob = await rotatePDF(file, rotationAngle);
-            downloadFile(blob, `rotated-${file.name}`);
+            downloadFile(blob, outputName);
+            await saveConversionHistory(file.name, file.size, outputName);
           }
           setProgress(100);
           toast.success(`Rotated ${files.length} PDF(s) by ${rotation}°`);
@@ -340,8 +368,10 @@ export default function ToolPage() {
           }
           setProgress(20);
           for (const file of files) {
+            const outputName = `watermarked-${file.name}`;
             const blob = await addWatermark(file, watermarkText, { position: watermarkPosition });
-            downloadFile(blob, `watermarked-${file.name}`);
+            downloadFile(blob, outputName);
+            await saveConversionHistory(file.name, file.size, outputName);
           }
           setProgress(100);
           toast.success("Watermark added successfully!");
@@ -351,8 +381,10 @@ export default function ToolPage() {
         case "add-page-numbers": {
           setProgress(20);
           for (const file of files) {
+            const outputName = `numbered-${file.name}`;
             const blob = await addPageNumbers(file, { position: pageNumberPosition });
-            downloadFile(blob, `numbered-${file.name}`);
+            downloadFile(blob, outputName);
+            await saveConversionHistory(file.name, file.size, outputName);
           }
           setProgress(100);
           toast.success("Page numbers added!");
@@ -363,7 +395,9 @@ export default function ToolPage() {
           setProgress(20);
           const blob = await imagesToPDF(files);
           setProgress(100);
-          downloadFile(blob, "images-converted.pdf");
+          const outputName = "images-converted.pdf";
+          downloadFile(blob, outputName);
+          await saveConversionHistory(files.map(f => f.name).join(', '), files.reduce((a, f) => a + f.size, 0), outputName);
           toast.success(`Converted ${files.length} image(s) to PDF!`);
           break;
         }
@@ -380,6 +414,7 @@ export default function ToolPage() {
             const ext = imageFormat === "png" ? "png" : "jpg";
             const filenames = blobs.map((_, j) => `${baseName}-page-${j + 1}.${ext}`);
             downloadFiles(blobs, filenames);
+            await saveConversionHistory(file.name, file.size, `${blobs.length} images`);
             toast.success(`Converted ${blobs.length} pages to ${imageFormat.toUpperCase()}!`);
           }
           break;
@@ -390,7 +425,9 @@ export default function ToolPage() {
           toast.info("Converting PDF to Word...");
           const blob = await handleServerSideConversion(files[0], 'docx');
           setProgress(100);
-          downloadFile(blob, files[0].name.replace('.pdf', '.docx'));
+          const outputName = files[0].name.replace('.pdf', '.docx');
+          downloadFile(blob, outputName);
+          await saveConversionHistory(files[0].name, files[0].size, outputName);
           toast.success("PDF converted to Word successfully!");
           break;
         }
@@ -400,7 +437,9 @@ export default function ToolPage() {
           toast.info("Converting PDF to Excel...");
           const blob = await handleServerSideConversion(files[0], 'xlsx');
           setProgress(100);
-          downloadFile(blob, files[0].name.replace('.pdf', '.xlsx'));
+          const outputName = files[0].name.replace('.pdf', '.xlsx');
+          downloadFile(blob, outputName);
+          await saveConversionHistory(files[0].name, files[0].size, outputName);
           toast.success("PDF converted to Excel successfully!");
           break;
         }
@@ -410,7 +449,9 @@ export default function ToolPage() {
           toast.info("Converting PDF to PowerPoint...");
           const blob = await handleServerSideConversion(files[0], 'pptx');
           setProgress(100);
-          downloadFile(blob, files[0].name.replace('.pdf', '.pptx'));
+          const outputName = files[0].name.replace('.pdf', '.pptx');
+          downloadFile(blob, outputName);
+          await saveConversionHistory(files[0].name, files[0].size, outputName);
           toast.success("PDF converted to PowerPoint successfully!");
           break;
         }
@@ -419,13 +460,14 @@ export default function ToolPage() {
           toast.info("Word to PDF conversion is coming soon!");
           break;
 
+        // These tools use their own specialized components
         case "protect-pdf":
         case "unlock-pdf":
         case "edit-pdf":
         case "sign-pdf":
         case "organize-pages":
         case "compare-pdf":
-          toast.info("This feature is coming soon!");
+          // These are handled by specialized components, no action needed here
           break;
 
         default:
@@ -521,27 +563,31 @@ export default function ToolPage() {
               <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
                 <PDFComparer files={files} />
               </div>
-            ) : toolId === "protect-pdf" && files.length > 0 ? (
+            ) : toolId === "protect-pdf" ? (
               <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
                 <FileUploader
                   onFilesSelected={handleFilesSelected}
                   accept={tool.acceptedFiles}
                   maxFiles={tool.maxFiles}
                 />
-                <div className="mt-6">
-                  <ProtectPDF files={files} />
-                </div>
+                {files.length > 0 && (
+                  <div className="mt-6">
+                    <ProtectPDF files={files} />
+                  </div>
+                )}
               </div>
-            ) : toolId === "unlock-pdf" && files.length > 0 ? (
+            ) : toolId === "unlock-pdf" ? (
               <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
                 <FileUploader
                   onFilesSelected={handleFilesSelected}
                   accept={tool.acceptedFiles}
                   maxFiles={tool.maxFiles}
                 />
-                <div className="mt-6">
-                  <UnlockPDF files={files} />
-                </div>
+                {files.length > 0 && (
+                  <div className="mt-6">
+                    <UnlockPDF files={files} />
+                  </div>
+                )}
               </div>
             ) : (
               <div className="bg-card rounded-3xl shadow-xl border border-border p-8 md:p-10 animate-fade-in">
