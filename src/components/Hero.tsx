@@ -1,8 +1,28 @@
 import { Search, Sparkles, ArrowRight, Shield, Zap, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
+const allTools = [
+  { name: "Merge PDF", href: "/tool/merge-pdf", category: "Organize" },
+  { name: "Split PDF", href: "/tool/split-pdf", category: "Organize" },
+  { name: "Compress PDF", href: "/tool/compress-pdf", category: "Optimize" },
+  { name: "PDF to Word", href: "/tool/pdf-to-word", category: "Convert" },
+  { name: "PDF to Excel", href: "/tool/pdf-to-excel", category: "Convert" },
+  { name: "PDF to PowerPoint", href: "/tool/pdf-to-powerpoint", category: "Convert" },
+  { name: "PDF to JPG", href: "/tool/pdf-to-jpg", category: "Convert" },
+  { name: "JPG to PDF", href: "/tool/jpg-to-pdf", category: "Convert" },
+  { name: "Word to PDF", href: "/tool/word-to-pdf", category: "Convert" },
+  { name: "Rotate PDF", href: "/tool/rotate-pdf", category: "Organize" },
+  { name: "Add Watermark", href: "/tool/add-watermark", category: "Edit" },
+  { name: "Add Page Numbers", href: "/tool/add-page-numbers", category: "Edit" },
+  { name: "Edit PDF", href: "/tool/edit-pdf", category: "Edit" },
+  { name: "Sign PDF", href: "/tool/sign-pdf", category: "Edit" },
+  { name: "Protect PDF", href: "/tool/protect-pdf", category: "Security" },
+  { name: "Unlock PDF", href: "/tool/unlock-pdf", category: "Security" },
+  { name: "Compare PDFs", href: "/tool/compare-pdf", category: "Tools" },
+  { name: "Organize Pages", href: "/tool/organize-pages", category: "Organize" },
+];
 
 const popularTools = [
   { name: "Merge PDF", href: "/tool/merge-pdf" },
@@ -19,6 +39,29 @@ const features = [
 
 export function Hero() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const navigate = useNavigate();
+
+  const filteredTools = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase();
+    return allTools.filter(tool => 
+      tool.name.toLowerCase().includes(query) ||
+      tool.category.toLowerCase().includes(query)
+    ).slice(0, 6);
+  }, [searchQuery]);
+
+  const handleToolClick = (href: string) => {
+    navigate(href);
+    setSearchQuery("");
+    setIsSearchFocused(false);
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && filteredTools.length > 0) {
+      handleToolClick(filteredTools[0].href);
+    }
+  };
 
   return (
     <section className="relative overflow-hidden">
@@ -89,19 +132,54 @@ export function Hero() {
                   placeholder="Search for any PDF tool..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onKeyDown={handleSearchKeyDown}
                   className="h-16 pl-14 pr-5 text-lg rounded-2xl border-2 border-border bg-background shadow-lg focus-visible:ring-0 focus-visible:border-primary transition-all duration-300"
                 />
               </div>
+              
+              {/* Search Results Dropdown */}
+              {isSearchFocused && filteredTools.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-2xl shadow-xl p-2 z-50 animate-fade-in">
+                  {filteredTools.map((tool, index) => (
+                    <button
+                      key={tool.href}
+                      onClick={() => handleToolClick(tool.href)}
+                      className={`w-full text-left px-4 py-3 rounded-xl hover:bg-accent transition-colors flex items-center justify-between ${index === 0 ? 'bg-accent/50' : ''}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="font-medium text-foreground">{tool.name}</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground px-2 py-1 rounded-full bg-muted">{tool.category}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {isSearchFocused && searchQuery && filteredTools.length === 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-2xl shadow-xl p-6 z-50 text-center text-muted-foreground animate-fade-in">
+                  <p>No tools found for "<span className="text-foreground font-medium">{searchQuery}</span>"</p>
+                  <p className="text-sm mt-1">Try searching for "merge", "compress", or "convert"</p>
+                </div>
+              )}
             </div>
           </div>
 
+          {/* Click outside to close search */}
+          {isSearchFocused && (
+            <div 
+              className="fixed inset-0 z-40" 
+              onClick={() => setIsSearchFocused(false)}
+            />
+          )}
+
           {/* Popular Tools */}
           <div 
-            className="mt-8 flex flex-wrap items-center justify-center gap-3 animate-fade-up"
+            className="mt-8 flex flex-wrap items-center justify-center gap-3 animate-fade-up relative z-10"
             style={{ animationDelay: "400ms" }}
           >
             <span className="text-sm text-muted-foreground">Popular:</span>
-            {popularTools.map((tool, i) => (
+            {popularTools.map((tool) => (
               <Link
                 key={tool.name}
                 to={tool.href}
