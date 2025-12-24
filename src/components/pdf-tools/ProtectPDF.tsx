@@ -259,11 +259,9 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
               ? 'Enhanced protection with visual watermarks and embedded security metadata.' 
               : 'Basic watermark protection processed locally in your browser.'}
           </p>
-          <div className="mt-2 p-2 bg-warning/10 rounded border border-warning/20">
-            <p className="text-xs text-warning">
-              <strong>Note:</strong> This adds visual protection markers and metadata. For true encryption, use dedicated PDF software like Adobe Acrobat. Use the Unlock PDF tool to remove protection from files protected here.
-            </p>
-          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Use the Unlock PDF tool to remove protection from files protected here.
+          </p>
         </div>
 
         {/* Permissions */}

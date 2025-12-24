@@ -156,38 +156,29 @@ export function Hero() {
                 />
               </div>
               
-              {/* Search Results Dropdown - Always on top */}
+              {/* Search Results Dropdown */}
               {showDropdown && (
-                <>
-                  {/* Backdrop overlay */}
-                  <div 
-                    className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40"
-                    onClick={() => setIsSearchFocused(false)}
-                  />
-                  
-                  {/* Dropdown */}
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-2xl shadow-2xl p-2 z-50 animate-fade-in">
-                    {filteredTools.length > 0 ? (
-                      filteredTools.map((tool, index) => (
-                        <button
-                          key={tool.href}
-                          onClick={() => handleToolClick(tool.href)}
-                          className={`w-full text-left px-4 py-3 rounded-xl hover:bg-accent transition-colors flex items-center justify-between ${index === 0 ? 'bg-accent/50' : ''}`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="font-medium text-foreground">{tool.name}</span>
-                          </div>
-                          <span className="text-xs text-muted-foreground px-2 py-1 rounded-full bg-muted">{tool.category}</span>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="p-6 text-center text-muted-foreground">
-                        <p>No tools found for "<span className="text-foreground font-medium">{searchQuery}</span>"</p>
-                        <p className="text-sm mt-1">Try searching for "merge", "compress", or "convert"</p>
-                      </div>
-                    )}
-                  </div>
-                </>
+                <div className="absolute top-full left-0 right-0 mt-2 bg-popover/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-2 animate-fade-in" style={{ zIndex: 100 }}>
+                  {filteredTools.length > 0 ? (
+                    filteredTools.map((tool, index) => (
+                      <button
+                        key={tool.href}
+                        onClick={() => handleToolClick(tool.href)}
+                        className={`w-full text-left px-4 py-3 rounded-xl hover:bg-accent transition-colors flex items-center justify-between ${index === 0 ? 'bg-accent/50' : ''}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="font-medium text-foreground">{tool.name}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground px-2 py-1 rounded-full bg-muted">{tool.category}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="p-6 text-center text-muted-foreground">
+                      <p>No tools found for "<span className="text-foreground font-medium">{searchQuery}</span>"</p>
+                      <p className="text-sm mt-1">Try searching for "merge", "compress", or "convert"</p>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
