@@ -1,13 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { getDocument, GlobalWorkerOptions } from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/+esm";
+import { getDocumentProxy } from "https://esm.sh/unpdf@0.12.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-// Initialize PDF.js worker
-GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs";
 
 interface Difference {
   page: number;
@@ -17,16 +14,16 @@ interface Difference {
   file2Text?: string;
 }
 
-async function extractTextFromPDF(pdfBytes: ArrayBuffer): Promise<{ pages: string[]; pageCount: number }> {
+async function extractTextFromPDF(pdfBytes: Uint8Array): Promise<{ pages: string[]; pageCount: number }> {
   try {
-    const loadingTask = getDocument({ data: new Uint8Array(pdfBytes) });
-    const pdf = await loadingTask.promise;
+    console.log('Extracting text from PDF...');
+    const document = await getDocumentProxy(pdfBytes);
     const pages: string[] = [];
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
+    for (let i = 1; i <= document.numPages; i++) {
+      const page = await document.getPage(i);
       const textContent = await page.getTextContent();
-      const pageText = textContent.items
+      const pageText = (textContent.items as any[])
         .map((item: any) => item.str)
         .join(' ')
         .replace(/\s+/g, ' ')
@@ -34,7 +31,8 @@ async function extractTextFromPDF(pdfBytes: ArrayBuffer): Promise<{ pages: strin
       pages.push(pageText);
     }
 
-    return { pages, pageCount: pdf.numPages };
+    console.log(`Extracted ${pages.length} pages`);
+    return { pages, pageCount: document.numPages };
   } catch (error) {
     console.error('Error extracting text:', error);
     throw new Error('Failed to extract text from PDF');
@@ -148,8 +146,8 @@ serve(async (req) => {
     ]);
 
     const [text1, text2] = await Promise.all([
-      extractTextFromPDF(pdf1Bytes),
-      extractTextFromPDF(pdf2Bytes)
+      extractTextFromPDF(new Uint8Array(pdf1Bytes)),
+      extractTextFromPDF(new Uint8Array(pdf2Bytes))
     ]);
 
     console.log(`Extracted text - PDF1: ${text1.pageCount} pages, PDF2: ${text2.pageCount} pages`);
