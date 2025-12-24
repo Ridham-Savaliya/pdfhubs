@@ -268,7 +268,7 @@ export default function ToolPage() {
   const handleServerSideConversion = async (file: File, format: string) => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('format', format);
+    formData.append('targetFormat', format);
 
     const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/convert-pdf`, {
       method: 'POST',
@@ -276,7 +276,7 @@ export default function ToolPage() {
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json().catch(() => ({ error: 'Conversion failed' }));
       throw new Error(error.error || 'Conversion failed');
     }
 
