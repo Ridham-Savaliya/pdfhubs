@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { Search, Sparkles, ArrowRight, Shield, Zap, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
 
 const allTools = [
@@ -38,13 +39,15 @@ const defaultFeatures = [
   { icon: Globe, text: "Works offline" },
 ];
 
+// Interface matches admin panel field names exactly
 interface HeroBannerSettings {
   enabled: boolean;
   title: string;
-  subtitle: string;
-  ctaText: string;
-  ctaLink: string;
-  backgroundStyle: string;
+  description: string;
+  cta_text: string;
+  cta_link: string;
+  image_url: string;
+  background_color: string;
 }
 
 export function DynamicHero() {
@@ -56,6 +59,29 @@ export function DynamicHero() {
 
   useEffect(() => {
     fetchHeroSettings();
+
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel('hero-settings-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'site_settings',
+          filter: 'key=eq.hero_banner'
+        },
+        (payload) => {
+          if (payload.new && typeof payload.new === 'object' && 'value' in payload.new) {
+            setHeroSettings(payload.new.value as unknown as HeroBannerSettings);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchHeroSettings = async () => {
@@ -108,19 +134,32 @@ export function DynamicHero() {
   }, []);
 
   // Use admin settings if enabled, otherwise use defaults
-  const title = heroSettings?.enabled && heroSettings?.title 
+  const isEnabled = heroSettings?.enabled;
+  const title = isEnabled && heroSettings?.title 
     ? heroSettings.title 
     : "Every tool you need to work with PDFs";
   
-  const subtitle = heroSettings?.enabled && heroSettings?.subtitle 
-    ? heroSettings.subtitle 
+  const subtitle = isEnabled && heroSettings?.description 
+    ? heroSettings.description 
     : "Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits, works in your browser.";
 
+  const ctaText = isEnabled ? heroSettings?.cta_text : null;
+  const ctaLink = isEnabled ? heroSettings?.cta_link : null;
+  const imageUrl = isEnabled ? heroSettings?.image_url : null;
+  const bgColor = isEnabled ? heroSettings?.background_color : null;
+
   return (
-    <section className="relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-gradient-hero-soft" />
-      <div className="absolute inset-0 bg-gradient-mesh" />
+    <section 
+      className="relative overflow-hidden"
+      style={bgColor ? { backgroundColor: bgColor } : undefined}
+    >
+      {/* Animated background - only show if no custom bg color */}
+      {!bgColor && (
+        <>
+          <div className="absolute inset-0 bg-gradient-hero-soft" />
+          <div className="absolute inset-0 bg-gradient-mesh" />
+        </>
+      )}
       
       {/* Floating decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -176,6 +215,43 @@ export function DynamicHero() {
               __html: subtitle.replace('100% free', '<span class="text-foreground font-medium">100% free</span>') 
             }}
           />
+
+          {/* CTA Button from admin settings */}
+          {ctaText && ctaLink && (
+            <div 
+              className="mt-8 animate-fade-up"
+              style={{ animationDelay: "250ms" }}
+            >
+              <Button 
+                size="lg" 
+                className="text-lg px-8 py-6"
+                onClick={() => {
+                  if (ctaLink.startsWith('http')) {
+                    window.open(ctaLink, '_blank');
+                  } else {
+                    navigate(ctaLink);
+                  }
+                }}
+              >
+                {ctaText}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          )}
+
+          {/* Hero Image from admin settings */}
+          {imageUrl && (
+            <div 
+              className="mt-10 animate-fade-up"
+              style={{ animationDelay: "280ms" }}
+            >
+              <img 
+                src={imageUrl} 
+                alt="Hero" 
+                className="mx-auto max-w-full h-auto rounded-xl shadow-2xl"
+              />
+            </div>
+          )}
 
           {/* Search Bar */}
           <div 
