@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { FileText, AlertTriangle, CheckCircle, Loader2, ArrowLeftRight, Server, Monitor } from 'lucide-react';
+import { FileText, AlertTriangle, CheckCircle, Loader2, ArrowLeftRight, Server, Monitor, Eye, FileCheck, FileDiff } from 'lucide-react';
 import { comparePDFs } from '@/lib/pdf-utils';
 import { toast } from 'sonner';
 
@@ -27,6 +27,7 @@ export function PDFComparer({ files }: PDFComparerProps) {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<ComparisonResult | null>(null);
   const [useServerSide, setUseServerSide] = useState(true);
+  const [expandedDiff, setExpandedDiff] = useState<number | null>(null);
 
   const handleServerSideCompare = async (): Promise<ComparisonResult> => {
     const formData = new FormData();
@@ -55,6 +56,7 @@ export function PDFComparer({ files }: PDFComparerProps) {
     setComparing(true);
     setProgress(0);
     setResult(null);
+    setExpandedDiff(null);
 
     try {
       let comparisonResult: ComparisonResult;
@@ -101,6 +103,15 @@ export function PDFComparer({ files }: PDFComparerProps) {
       setComparing(false);
     }
   };
+
+  const getComparisonStats = () => {
+    if (!result) return null;
+    const textDiffs = result.differences.filter(d => d.type === 'text').length;
+    const layoutDiffs = result.differences.filter(d => d.type === 'layout').length;
+    return { textDiffs, layoutDiffs, total: result.differences.length };
+  };
+
+  const stats = getComparisonStats();
 
   return (
     <div className="space-y-6">
@@ -182,23 +193,32 @@ export function PDFComparer({ files }: PDFComparerProps) {
       {/* Results */}
       {result && (
         <div className="space-y-4">
-          {/* Summary */}
+          {/* Summary with Stats */}
           <div className={`p-4 rounded-xl flex items-center gap-3 ${
             result.differences.length === 0 
               ? 'bg-success/10 border border-success/30' 
               : 'bg-warning/10 border border-warning/30'
           }`}>
             {result.differences.length === 0 ? (
-              <CheckCircle className="h-6 w-6 text-success" />
+              <FileCheck className="h-6 w-6 text-success" />
             ) : (
-              <AlertTriangle className="h-6 w-6 text-warning" />
+              <FileDiff className="h-6 w-6 text-warning" />
             )}
-            <div>
+            <div className="flex-1">
               <p className="font-medium text-foreground">{result.summary}</p>
-              {result.differences.length > 0 && (
-                <p className="text-sm text-muted-foreground">
-                  Review the differences below
-                </p>
+              {stats && stats.total > 0 && (
+                <div className="flex gap-4 mt-1">
+                  {stats.textDiffs > 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      {stats.textDiffs} text difference{stats.textDiffs > 1 ? 's' : ''}
+                    </span>
+                  )}
+                  {stats.layoutDiffs > 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      {stats.layoutDiffs} layout difference{stats.layoutDiffs > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -206,41 +226,52 @@ export function PDFComparer({ files }: PDFComparerProps) {
           {/* Difference List */}
           {result.differences.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-medium text-foreground">Differences Found:</h4>
-              {result.differences.map((diff, index) => (
-                <div 
-                  key={index}
-                  className="p-4 bg-card rounded-xl border border-border"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded ${
-                      diff.type === 'text' ? 'bg-primary/10 text-primary' : 'bg-warning/10 text-warning'
-                    }`}>
-                      {diff.type.toUpperCase()}
-                    </span>
-                    <span className="text-sm font-medium text-foreground">
-                      {diff.description}
-                    </span>
-                  </div>
-                  
-                  {(diff.file1Text || diff.file2Text) && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                      {diff.file1Text && (
-                        <div className="p-3 bg-secondary/50 rounded-lg">
-                          <p className="text-xs font-medium text-muted-foreground mb-1">Document 1:</p>
-                          <p className="text-sm text-foreground line-clamp-3">{diff.file1Text}...</p>
-                        </div>
-                      )}
-                      {diff.file2Text && (
-                        <div className="p-3 bg-secondary/50 rounded-lg">
-                          <p className="text-xs font-medium text-muted-foreground mb-1">Document 2:</p>
-                          <p className="text-sm text-foreground line-clamp-3">{diff.file2Text}...</p>
-                        </div>
-                      )}
+              <h4 className="font-medium text-foreground flex items-center gap-2">
+                <Eye className="h-4 w-4" />
+                Differences Found:
+              </h4>
+              <div className="max-h-96 overflow-y-auto space-y-3 pr-2">
+                {result.differences.map((diff, index) => (
+                  <div 
+                    key={index}
+                    className={`p-4 bg-card rounded-xl border transition-all cursor-pointer ${
+                      expandedDiff === index ? 'border-primary shadow-md' : 'border-border hover:border-primary/50'
+                    }`}
+                    onClick={() => setExpandedDiff(expandedDiff === index ? null : index)}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded ${
+                        diff.type === 'text' ? 'bg-primary/10 text-primary' : 'bg-warning/10 text-warning'
+                      }`}>
+                        {diff.type.toUpperCase()}
+                      </span>
+                      <span className="text-sm font-medium text-foreground flex-1">
+                        {diff.description}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        Page {diff.page}
+                      </span>
                     </div>
-                  )}
-                </div>
-              ))}
+                    
+                    {expandedDiff === index && (diff.file1Text || diff.file2Text) && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 animate-fade-in">
+                        {diff.file1Text && (
+                          <div className="p-3 bg-destructive/5 rounded-lg border border-destructive/20">
+                            <p className="text-xs font-medium text-destructive mb-1">Document 1:</p>
+                            <p className="text-sm text-foreground">{diff.file1Text}...</p>
+                          </div>
+                        )}
+                        {diff.file2Text && (
+                          <div className="p-3 bg-success/5 rounded-lg border border-success/20">
+                            <p className="text-xs font-medium text-success mb-1">Document 2:</p>
+                            <p className="text-sm text-foreground">{diff.file2Text}...</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -248,8 +279,12 @@ export function PDFComparer({ files }: PDFComparerProps) {
           <div className="text-center pt-4">
             <Button 
               variant="outline" 
-              onClick={() => setResult(null)}
+              onClick={() => {
+                setResult(null);
+                setExpandedDiff(null);
+              }}
             >
+              <ArrowLeftRight className="h-4 w-4 mr-2" />
               Compare Again
             </Button>
           </div>
