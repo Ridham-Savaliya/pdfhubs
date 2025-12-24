@@ -1,13 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { getDocument, GlobalWorkerOptions } from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/+esm";
+import { getDocumentProxy } from "https://unpkg.com/unpdf@0.12.1/dist/index.mjs";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-// Initialize PDF.js worker
-GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs";
 
 interface ExtractedPage {
   pageNum: number;
@@ -15,34 +12,43 @@ interface ExtractedPage {
   lines: string[];
 }
 
-// Extract text from PDF with line-by-line structure
-async function extractTextFromPDF(pdfBytes: ArrayBuffer): Promise<ExtractedPage[]> {
-  const loadingTask = getDocument({ data: new Uint8Array(pdfBytes) });
-  const pdf = await loadingTask.promise;
+// Extract text from PDF using pdfjs-serverless (works in Deno)
+async function extractTextFromPDF(pdfBytes: Uint8Array): Promise<ExtractedPage[]> {
+  console.log('Starting PDF text extraction with pdfjs-serverless...');
+  
+  const document = await getDocumentProxy(pdfBytes);
+  
   const pages: ExtractedPage[] = [];
+  const numPages = document.numPages;
+  console.log(`PDF has ${numPages} pages`);
 
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
+  for (let i = 1; i <= numPages; i++) {
+    const page = await document.getPage(i);
     const textContent = await page.getTextContent();
     
     // Group text items by Y position to detect lines
-    const lineMap = new Map<number, string[]>();
+    const lineMap = new Map<number, { x: number; text: string }[]>();
     
     for (const item of textContent.items as any[]) {
-      if (item.str) {
+      if (item.str && item.str.trim()) {
         // Round Y to group items on same line (within 5 units)
         const yPos = Math.round(item.transform[5] / 5) * 5;
+        const xPos = item.transform[4];
+        
         if (!lineMap.has(yPos)) {
           lineMap.set(yPos, []);
         }
-        lineMap.get(yPos)!.push(item.str);
+        lineMap.get(yPos)!.push({ x: xPos, text: item.str });
       }
     }
 
     // Sort lines by Y position (descending, since PDF Y is bottom-up)
+    // Then sort items within each line by X position
     const sortedLines = Array.from(lineMap.entries())
       .sort((a, b) => b[0] - a[0])
-      .map(([_, items]) => items.join(' ').trim())
+      .map(([_, items]) => {
+        return items.sort((a, b) => a.x - b.x).map(i => i.text).join(' ').trim();
+      })
       .filter(line => line.length > 0);
 
     pages.push({
@@ -52,6 +58,7 @@ async function extractTextFromPDF(pdfBytes: ArrayBuffer): Promise<ExtractedPage[
     });
   }
 
+  console.log(`Extracted text from ${pages.length} pages`);
   return pages;
 }
 
@@ -66,7 +73,7 @@ function escapeXml(text: string): string {
 }
 
 // Create DOCX with extracted text content
-async function createDocxFromPdf(pdfBytes: ArrayBuffer): Promise<ArrayBuffer> {
+async function createDocxFromPdf(pdfBytes: Uint8Array): Promise<ArrayBuffer> {
   console.log('Extracting text from PDF for DOCX conversion...');
   const pages = await extractTextFromPDF(pdfBytes);
   
@@ -180,7 +187,7 @@ function detectTables(pages: ExtractedPage[]): { rows: string[][]; pageNum: numb
 }
 
 // Create XLSX with extracted tabular data
-async function createXlsxFromPdf(pdfBytes: ArrayBuffer): Promise<ArrayBuffer> {
+async function createXlsxFromPdf(pdfBytes: Uint8Array): Promise<ArrayBuffer> {
   console.log('Extracting text from PDF for XLSX conversion...');
   const pages = await extractTextFromPDF(pdfBytes);
   const tables = detectTables(pages);
@@ -282,7 +289,7 @@ async function createXlsxFromPdf(pdfBytes: ArrayBuffer): Promise<ArrayBuffer> {
 }
 
 // Create PPTX with one slide per page containing the text content
-async function createPptxFromPdf(pdfBytes: ArrayBuffer): Promise<ArrayBuffer> {
+async function createPptxFromPdf(pdfBytes: Uint8Array): Promise<ArrayBuffer> {
   console.log('Extracting text from PDF for PPTX conversion...');
   const pages = await extractTextFromPDF(pdfBytes);
   
@@ -392,7 +399,7 @@ async function createPptxFromPdf(pdfBytes: ArrayBuffer): Promise<ArrayBuffer> {
       <p:sp>
         <p:nvSpPr><p:cNvPr id="2" name="Title"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr>
         <p:spPr>
-          <a:xfrm><a:off x="457200" y="274638"/><a:ext cx="8229600" cy="609600"/></a:xfrm>
+          <a:xfrm><a:off x="457200" y="274638"/><a:ext cx="8229600" cy="857250"/></a:xfrm>
           <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
         </p:spPr>
         <p:txBody>
@@ -404,7 +411,7 @@ async function createPptxFromPdf(pdfBytes: ArrayBuffer): Promise<ArrayBuffer> {
       <p:sp>
         <p:nvSpPr><p:cNvPr id="3" name="Content"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr>
         <p:spPr>
-          <a:xfrm><a:off x="457200" y="1000000"/><a:ext cx="8229600" cy="5400000"/></a:xfrm>
+          <a:xfrm><a:off x="457200" y="1200000"/><a:ext cx="8229600" cy="5000000"/></a:xfrm>
           <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
         </p:spPr>
         <p:txBody>
@@ -419,13 +426,14 @@ async function createPptxFromPdf(pdfBytes: ArrayBuffer): Promise<ArrayBuffer> {
     await zipWriter.add(`ppt/slides/_rels/slide${i + 1}.xml.rels`, new TextReader(slideRels));
     await zipWriter.add(`ppt/slides/slide${i + 1}.xml`, new TextReader(slide));
   }
-  
+
   const blob = await zipWriter.close();
   console.log(`PPTX created with ${pages.length} slides`);
   return await blob.arrayBuffer();
 }
 
 serve(async (req) => {
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -433,55 +441,61 @@ serve(async (req) => {
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const targetFormat = formData.get('format') as string;
+    const targetFormat = formData.get('targetFormat') as string;
 
     if (!file) {
+      console.error('No file provided');
       return new Response(
         JSON.stringify({ error: 'No file provided' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Converting PDF to ${targetFormat}, file: ${file.name}, size: ${file.size} bytes`);
-
-    const pdfBytes = await file.arrayBuffer();
-    
-    if (targetFormat === 'docx') {
-      const docxContent = await createDocxFromPdf(pdfBytes);
-      
-      return new Response(docxContent, {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'Content-Disposition': 'attachment; filename="converted.docx"',
-        },
-      });
-    } else if (targetFormat === 'xlsx') {
-      const xlsxContent = await createXlsxFromPdf(pdfBytes);
-      
-      return new Response(xlsxContent, {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'Content-Disposition': 'attachment; filename="converted.xlsx"',
-        },
-      });
-    } else if (targetFormat === 'pptx') {
-      const pptxContent = await createPptxFromPdf(pdfBytes);
-      
-      return new Response(pptxContent, {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-          'Content-Disposition': 'attachment; filename="converted.pptx"',
-        },
-      });
+    if (!targetFormat || !['docx', 'xlsx', 'pptx'].includes(targetFormat)) {
+      console.error('Invalid target format:', targetFormat);
+      return new Response(
+        JSON.stringify({ error: 'Invalid target format. Supported: docx, xlsx, pptx' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    return new Response(
-      JSON.stringify({ error: 'Unsupported format. Supported: docx, xlsx, pptx' }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    console.log(`Converting PDF to ${targetFormat}, file: ${file.name}, size: ${file.size} bytes`);
+
+    const pdfBytes = new Uint8Array(await file.arrayBuffer());
+    let outputBytes: ArrayBuffer;
+    let contentType: string;
+    let extension: string;
+
+    switch (targetFormat) {
+      case 'docx':
+        outputBytes = await createDocxFromPdf(pdfBytes);
+        contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        extension = 'docx';
+        break;
+      case 'xlsx':
+        outputBytes = await createXlsxFromPdf(pdfBytes);
+        contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        extension = 'xlsx';
+        break;
+      case 'pptx':
+        outputBytes = await createPptxFromPdf(pdfBytes);
+        contentType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+        extension = 'pptx';
+        break;
+      default:
+        throw new Error('Unsupported format');
+    }
+
+    const outputFilename = file.name.replace(/\.pdf$/i, `.${extension}`);
+    console.log(`Conversion complete, output size: ${outputBytes.byteLength} bytes`);
+
+    return new Response(outputBytes, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': contentType,
+        'Content-Disposition': `attachment; filename="${outputFilename}"`,
+      },
+    });
 
   } catch (error) {
     console.error('Conversion error:', error);
