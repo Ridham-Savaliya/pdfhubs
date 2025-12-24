@@ -193,7 +193,7 @@ serve(async (req) => {
 
     console.log(`PDF protected successfully, output size: ${protectedBytes.length} bytes`);
 
-    return new Response(protectedBytes.buffer, {
+    return new Response(new Uint8Array(protectedBytes).buffer as ArrayBuffer, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/pdf',
