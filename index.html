@@ -35,12 +35,23 @@
     <!-- Performance: Preconnect to critical origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://flbkqehloxlvizwocdsv.supabase.co" />
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://flbkqehloxlvizwocdsv.supabase.co" />
     
     <!-- Preload critical fonts -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" as="style" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" />
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" /></noscript>
+    
+    <!-- Critical CSS - inline to eliminate render blocking -->
+    <style>
+      :root{--background:0 0% 100%;--foreground:0 0% 3.9%;--primary:0 72% 51%;--muted:0 0% 96.1%;--muted-foreground:0 0% 45.1%}
+      .dark{--background:0 0% 6%;--foreground:0 0% 98%;--muted:0 0% 15%;--muted-foreground:0 0% 65%}
+      *,::before,::after{box-sizing:border-box;border-width:0;border-style:solid}
+      html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:Outfit,system-ui,sans-serif}
+      body{margin:0;background-color:hsl(var(--background));color:hsl(var(--foreground))}
+      #root{min-height:100vh;display:flex;flex-direction:column}
+    </style>
     
     <!-- Canonical -->
     <link rel="canonical" href="https://pdftools.app/" />
