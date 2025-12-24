@@ -1,12 +1,21 @@
-import pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfMakeModule from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import * as pdfjsLib from 'pdfjs-dist';
 
+// Get pdfMake instance (handle both default and module exports)
+const pdfMake = (pdfMakeModule as any).default || pdfMakeModule;
+
 // Initialize pdfmake with virtual file system fonts
-if (pdfFonts && (pdfFonts as any).pdfMake) {
-  pdfMake.vfs = (pdfFonts as any).pdfMake.vfs;
-} else if ((pdfFonts as any).default?.pdfMake) {
-  pdfMake.vfs = (pdfFonts as any).default.pdfMake.vfs;
+try {
+  if (typeof pdfMake.setVfs === 'function') {
+    pdfMake.setVfs(pdfFonts);
+  } else if ((pdfFonts as any).pdfMake?.vfs) {
+    pdfMake.vfs = (pdfFonts as any).pdfMake.vfs;
+  } else if ((pdfFonts as any).default?.pdfMake?.vfs) {
+    pdfMake.vfs = (pdfFonts as any).default.pdfMake.vfs;
+  }
+} catch (e) {
+  console.warn('Failed to initialize pdfMake fonts:', e);
 }
 
 // Set up PDF.js worker
