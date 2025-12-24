@@ -45,51 +45,48 @@ export function AdminSidebar() {
   };
 
   return (
-    <Sidebar className="border-r border-gray-200 bg-white">
-      <SidebarHeader className="p-4 border-b border-gray-200 bg-white">
+    <Sidebar className="border-r border-border">
+      <SidebarHeader className="p-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold text-lg">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold text-lg">
             <span>P</span>
           </div>
           <div>
-            <h2 className="font-bold text-gray-900">PDFTools</h2>
-            <p className="text-xs text-gray-500">Admin Panel</p>
+            <h2 className="font-bold text-foreground">PDFTools</h2>
+            <p className="text-xs text-muted-foreground">Admin Panel</p>
           </div>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="p-2 bg-white">
+      <SidebarContent className="p-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs uppercase tracking-wider text-gray-500 mb-2">
+          <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
             Management
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end={item.url === "/admin"}
-                      className={({ isActive }) => 
-                        `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
-                          isActive 
-                            ? 'bg-primary text-white shadow-md' 
-                            : 'text-gray-700 hover:bg-gray-100 hover:text-primary'
-                        }`
-                      }
-                    >
-                      <item.icon className="h-4 w-4" />
-                      <span className="font-medium">{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
+                  <NavLink 
+                    to={item.url} 
+                    end={item.url === "/admin"}
+                    className={({ isActive }) => 
+                      `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                        isActive 
+                          ? 'bg-primary text-primary-foreground shadow-md' 
+                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                      }`
+                    }
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className="font-medium">{item.title}</span>
+                  </NavLink>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
       <SidebarFooter className="p-4 border-t border-border space-y-2">
         <Button 
           variant="outline" 
