@@ -75,8 +75,8 @@ async function createProtectedPDF(
       opacity: 0.95,
     });
     
-    page.drawText('🔒 PROTECTED', {
-      x: width - 120,
+    page.drawText('PROTECTED', {
+      x: width - 115,
       y: height - 28,
       size: 11,
       font: boldFont,

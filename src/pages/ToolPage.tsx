@@ -184,6 +184,14 @@ const toolInfo: Record<string, {
     minFiles: 2,
     maxFiles: 2,
   },
+  "compare-pdfs": {
+    title: "Compare PDFs",
+    description: "Find text and layout differences between two PDF documents.",
+    color: "bg-tool-organize",
+    acceptedFiles: ".pdf",
+    minFiles: 2,
+    maxFiles: 2,
+  },
 };
 
 const toolIcons: Record<string, React.ReactNode> = {
@@ -205,6 +213,7 @@ const toolIcons: Record<string, React.ReactNode> = {
   "organize-pages": "📑",
   "sign-pdf": "✍️",
   "compare-pdf": "⚖️",
+  "compare-pdfs": "⚖️",
 };
 
 export default function ToolPage() {
@@ -467,6 +476,7 @@ export default function ToolPage() {
         case "sign-pdf":
         case "organize-pages":
         case "compare-pdf":
+        case "compare-pdfs":
           // These are handled by specialized components, no action needed here
           break;
 
