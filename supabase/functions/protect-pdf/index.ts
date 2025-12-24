@@ -6,15 +6,21 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Create a protected PDF with watermarks and permission metadata
-// Note: True PDF encryption requires native PDF spec implementation
-// This creates visual protection with embedded metadata
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password + 'pdtools-salt-2024');
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Note: True PDF encryption (AES/RC4) requires native implementations not available in Deno
+// This creates visual protection with embedded verification data
 async function createProtectedPDF(
   pdfBytes: Uint8Array, 
   password: string,
   permissions: { printing?: boolean; copying?: boolean; modifying?: boolean }
 ): Promise<Uint8Array> {
-  // Load the original PDF
   const pdfDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -23,8 +29,8 @@ async function createProtectedPDF(
   const passwordHash = await hashPassword(password);
   const timestamp = new Date().toISOString();
   
-  // Create encryption metadata
-  const encryptionData = {
+  // Create verification metadata
+  const verificationData = {
     version: '3.0',
     algorithm: 'SHA-256',
     passwordHash: passwordHash,
@@ -36,8 +42,7 @@ async function createProtectedPDF(
     }
   };
   
-  // Encode encryption data in base64
-  const encryptedMetadata = btoa(JSON.stringify(encryptionData));
+  const encodedMetadata = btoa(JSON.stringify(verificationData));
   
   // Set security metadata
   pdfDoc.setTitle('Password Protected Document');
@@ -45,17 +50,16 @@ async function createProtectedPDF(
   pdfDoc.setSubject('This document is password protected');
   pdfDoc.setKeywords([
     'protected',
-    'encrypted',
     'pdtools-secured',
     `hash:${passwordHash}`,
-    `meta:${encryptedMetadata}`
+    `meta:${encodedMetadata}`
   ]);
   pdfDoc.setProducer('PDFTools Security Engine v3.0');
   pdfDoc.setCreator('PDFTools');
   pdfDoc.setCreationDate(new Date());
   pdfDoc.setModificationDate(new Date());
   
-  // Add protection watermark on all pages
+  // Add protection indicators on all pages
   const pages = pdfDoc.getPages();
   for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
     const page = pages[pageIndex];
@@ -71,20 +75,11 @@ async function createProtectedPDF(
       opacity: 0.95,
     });
     
-    page.drawText('PROTECTED', {
-      x: width - 115,
+    page.drawText('🔒 PROTECTED', {
+      x: width - 120,
       y: height - 28,
-      size: 12,
+      size: 11,
       font: boldFont,
-      color: rgb(1, 1, 1),
-    });
-    
-    // Add lock icon placeholder
-    page.drawText('[LOCK]', {
-      x: width - 128,
-      y: height - 28,
-      size: 10,
-      font,
       color: rgb(1, 1, 1),
     });
     
@@ -95,7 +90,7 @@ async function createProtectedPDF(
       size: 45,
       font,
       color: rgb(0.85, 0.85, 0.85),
-      opacity: 0.15,
+      opacity: 0.12,
       rotate: { type: 'degrees', angle: -45 } as any,
     });
     
@@ -124,7 +119,7 @@ async function createProtectedPDF(
       });
     }
     
-    // Add page footer with encryption info
+    // Add page footer
     page.drawText(`Page ${pageIndex + 1} of ${pages.length} | Protected: ${timestamp.split('T')[0]}`, {
       x: width - 220,
       y: 8,
@@ -134,22 +129,11 @@ async function createProtectedPDF(
     });
   }
   
-  // Save with compression disabled for better compatibility
-  const protectedBytes = await pdfDoc.save({
-    useObjectStreams: false,
-  });
+  const protectedBytes = await pdfDoc.save({ useObjectStreams: false });
   
   console.log(`PDF protected with visual watermarks. Password hash: ${passwordHash.substring(0, 8)}...`);
   
   return protectedBytes;
-}
-
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password + 'pdtools-salt-2024');
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 serve(async (req) => {

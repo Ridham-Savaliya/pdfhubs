@@ -197,9 +197,9 @@ export function DynamicHero() {
                 />
               </div>
               
-              {/* Search Results Dropdown - No blur overlay, dropdown elevated above content */}
+              {/* Search Results Dropdown */}
               {showDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-2xl shadow-2xl p-2 animate-fade-in backdrop-blur-xl" style={{ zIndex: 200 }}>
+                <div className="absolute top-full left-0 right-0 mt-2 bg-popover/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-2 animate-fade-in" style={{ zIndex: 200 }}>
                   {filteredTools.length > 0 ? (
                     filteredTools.map((tool, index) => (
                       <button
