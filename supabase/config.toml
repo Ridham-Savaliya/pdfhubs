@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.unlock-pdf]
 verify_jwt = false
+
+[functions.compare-pdf]
+verify_jwt = false
