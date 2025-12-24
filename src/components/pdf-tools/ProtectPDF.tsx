@@ -52,21 +52,17 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
     formData.append('password', password);
     formData.append('permissions', JSON.stringify(permissions));
 
-    const response = await supabase.functions.invoke('protect-pdf', {
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/protect-pdf`, {
+      method: 'POST',
       body: formData,
     });
 
-    if (response.error) {
-      throw new Error(response.error.message || 'Server protection failed');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Server protection failed' }));
+      throw new Error(errorData.error || 'Server protection failed');
     }
 
-    // The response data is already a Blob or ArrayBuffer
-    if (response.data instanceof Blob) {
-      return response.data;
-    }
-    
-    // If it's an ArrayBuffer or similar, convert to Blob
-    return new Blob([response.data], { type: 'application/pdf' });
+    return response.blob();
   };
 
   const handleClientSideProtection = async (file: File): Promise<Blob> => {
@@ -155,6 +151,7 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
         
         if (useServerSide) {
           try {
+            toast.info('Processing with enhanced security...');
             blob = await handleServerSideProtection(file);
           } catch (serverError) {
             console.warn('Server-side protection failed, falling back to client-side:', serverError);
