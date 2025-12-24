@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
+// Interface matches admin panel field names exactly
 interface AnnouncementBarSettings {
   enabled: boolean;
-  message: string;
+  text: string;
   link: string;
-  backgroundColor: string;
-  textColor: string;
+  background_color: string;
 }
 
 export function AnnouncementBar() {
@@ -16,6 +16,30 @@ export function AnnouncementBar() {
 
   useEffect(() => {
     fetchSettings();
+
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel('announcement-settings-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'site_settings',
+          filter: 'key=eq.announcement_bar'
+        },
+        (payload) => {
+          if (payload.new && typeof payload.new === 'object' && 'value' in payload.new) {
+            setSettings(payload.new.value as unknown as AnnouncementBarSettings);
+            setDismissed(false); // Show again when updated
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchSettings = async () => {
@@ -30,18 +54,18 @@ export function AnnouncementBar() {
     }
   };
 
-  if (!settings?.enabled || dismissed) return null;
+  if (!settings?.enabled || dismissed || !settings?.text) return null;
 
   return (
     <div 
       className="relative py-2.5 px-4 text-center text-sm font-medium"
       style={{ 
-        backgroundColor: settings.backgroundColor || '#ef4444',
-        color: settings.textColor || '#ffffff'
+        backgroundColor: settings.background_color || '#ef4444',
+        color: '#ffffff'
       }}
     >
       <div className="container flex items-center justify-center gap-2">
-        <span>{settings.message}</span>
+        <span>{settings.text}</span>
         {settings.link && (
           <a 
             href={settings.link} 
