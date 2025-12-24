@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FileText, Twitter, Github, Linkedin, Heart } from "lucide-react";
+import { Twitter, Github, Linkedin, Heart } from "lucide-react";
 
 const footerLinks = {
   product: [
@@ -43,9 +43,14 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-md">
-                <FileText className="h-5 w-5 text-primary-foreground" />
-              </div>
+              <img 
+                src="/favicon.png" 
+                alt="PDFTools Logo" 
+                className="h-10 w-10 rounded-xl shadow-md"
+                width="40"
+                height="40"
+                loading="lazy"
+              />
               <span className="font-heading text-xl font-bold text-foreground">
                 PDF<span className="text-primary">Tools</span>
               </span>
