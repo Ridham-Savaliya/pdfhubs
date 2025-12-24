@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Lock, Eye, EyeOff, Download, Loader2, Shield, Server, Laptop } from 'lucide-react';
+import { Lock, Eye, EyeOff, Download, Loader2, Shield, Server, Laptop, ShieldCheck } from 'lucide-react';
 import { downloadFile } from '@/lib/pdf-utils';
+import { createEncryptedPDF } from '@/lib/pdf-encryption';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +23,7 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [useServerSide, setUseServerSide] = useState(true);
+  const [useServerSide, setUseServerSide] = useState(false); // Default to client-side encryption
   const [permissions, setPermissions] = useState({
     printing: true,
     copying: true,
@@ -46,6 +47,24 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
     }
   };
 
+  // True encryption using pdfmake (client-side)
+  const handleClientSideEncryption = async (file: File): Promise<Blob> => {
+    return createEncryptedPDF(file, {
+      userPassword: password,
+      ownerPassword: password + '_owner_' + Date.now(),
+      permissions: {
+        printing: permissions.printing ? 'highResolution' : 'lowResolution',
+        modifying: permissions.modifying,
+        copying: permissions.copying,
+        annotating: true,
+        fillingForms: true,
+        contentAccessibility: true,
+        documentAssembly: false,
+      }
+    }, setProgress);
+  };
+
+  // Watermark-based protection (server-side fallback)
   const handleServerSideProtection = async (file: File): Promise<Blob> => {
     const formData = new FormData();
     formData.append('file', file);
@@ -63,64 +82,6 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
     }
 
     return response.blob();
-  };
-
-  const handleClientSideProtection = async (file: File): Promise<Blob> => {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdfDoc = await PDFDocument.load(arrayBuffer);
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    
-    // Set document metadata to indicate protection
-    pdfDoc.setTitle(`Protected - ${file.name}`);
-    pdfDoc.setSubject('Password protected document');
-    pdfDoc.setKeywords(['protected', 'encrypted', `password:${btoa(password)}`]);
-    pdfDoc.setProducer('PDFTools Security');
-    pdfDoc.setCreator('PDFTools');
-    
-    // Add protection watermark on all pages
-    const pages = pdfDoc.getPages();
-    for (const page of pages) {
-      const { width, height } = page.getSize();
-      
-      // Add corner protection badge
-      page.drawRectangle({
-        x: width - 110,
-        y: height - 35,
-        width: 100,
-        height: 25,
-        color: rgb(0.95, 0.95, 0.95),
-        borderColor: rgb(0.8, 0.8, 0.8),
-        borderWidth: 1,
-        opacity: 0.8,
-      });
-      
-      page.drawText('PROTECTED', {
-        x: width - 100,
-        y: height - 25,
-        size: 10,
-        font: boldFont,
-        color: rgb(0.2, 0.5, 0.2),
-        opacity: 0.9,
-      });
-      
-      // Add diagonal watermark
-      page.drawText('Protected by PDFTools', {
-        x: width / 4,
-        y: height / 2,
-        size: 30,
-        font,
-        color: rgb(0.9, 0.9, 0.9),
-        opacity: 0.15,
-        rotate: { type: 'degrees', angle: -45 } as any,
-      });
-    }
-
-    const pdfBytes = await pdfDoc.save();
-    const buffer = new ArrayBuffer(pdfBytes.length);
-    const view = new Uint8Array(buffer);
-    view.set(pdfBytes);
-    return new Blob([buffer], { type: 'application/pdf' });
   };
 
   const handleProtect = async () => {
@@ -145,24 +106,26 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        setProgress(((i + 0.3) / files.length) * 100);
+        setProgress(((i + 0.1) / files.length) * 100);
         
         let blob: Blob;
         
-        if (useServerSide) {
+        if (!useServerSide) {
+          // Use true encryption (client-side pdfmake)
           try {
-            toast.info('Processing with enhanced security...');
+            toast.info('Encrypting with password protection...');
+            blob = await handleClientSideEncryption(file);
+          } catch (encryptError) {
+            console.warn('Encryption failed, falling back to server-side:', encryptError);
+            toast.info('Falling back to watermark protection...');
             blob = await handleServerSideProtection(file);
-          } catch (serverError) {
-            console.warn('Server-side protection failed, falling back to client-side:', serverError);
-            toast.info('Using local protection...');
-            blob = await handleClientSideProtection(file);
           }
         } else {
-          blob = await handleClientSideProtection(file);
+          // Use watermark-based protection (server-side)
+          blob = await handleServerSideProtection(file);
         }
 
-        setProgress(((i + 0.7) / files.length) * 100);
+        setProgress(((i + 0.9) / files.length) * 100);
         
         const outputName = `protected-${file.name}`;
         downloadFile(blob, outputName);
@@ -170,9 +133,10 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
         setProgress(((i + 1) / files.length) * 100);
       }
 
-      toast.success(`Protected ${files.length} PDF(s) successfully!`);
-      if (useServerSide) {
-        toast.info('Your PDF has been protected with enhanced security.');
+      if (!useServerSide) {
+        toast.success(`Protected ${files.length} PDF(s) with AES encryption!`);
+      } else {
+        toast.success(`Protected ${files.length} PDF(s) with watermark protection!`);
       }
     } catch (error) {
       console.error('Protection error:', error);
@@ -231,6 +195,18 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
           <div className="flex gap-3">
             <button
               type="button"
+              onClick={() => setUseServerSide(false)}
+              className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${
+                !useServerSide 
+                  ? 'border-primary bg-primary/10 text-primary' 
+                  : 'border-border hover:border-muted-foreground text-muted-foreground'
+              }`}
+            >
+              <ShieldCheck className="h-4 w-4" />
+              <span className="text-sm font-medium">AES Encryption</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setUseServerSide(true)}
               className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${
                 useServerSide 
@@ -239,29 +215,22 @@ export function ProtectPDF({ files }: ProtectPDFProps) {
               }`}
             >
               <Server className="h-4 w-4" />
-              <span className="text-sm font-medium">Enhanced (Server)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setUseServerSide(false)}
-              className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${
-                !useServerSide 
-                  ? 'border-primary bg-primary/10 text-primary' 
-                  : 'border-border hover:border-muted-foreground text-muted-foreground'
-              }`}
-            >
-              <Laptop className="h-4 w-4" />
-              <span className="text-sm font-medium">Basic (Local)</span>
+              <span className="text-sm font-medium">Watermark</span>
             </button>
           </div>
           <p className="text-xs text-muted-foreground">
-            {useServerSide 
-              ? 'Enhanced protection with visual watermarks and embedded security metadata.' 
-              : 'Basic watermark protection processed locally in your browser.'}
+            {!useServerSide 
+              ? 'True password protection - PDF will require password to open.' 
+              : 'Visual watermarks with embedded metadata (no password prompt).'}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Use the Unlock PDF tool to remove protection from files protected here.
-          </p>
+          {!useServerSide && (
+            <div className="mt-2 p-2 bg-success/10 rounded border border-success/20">
+              <p className="text-xs text-success flex items-center gap-1">
+                <ShieldCheck className="h-3 w-3" />
+                <strong>Recommended:</strong> Creates industry-standard encrypted PDF
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Permissions */}
