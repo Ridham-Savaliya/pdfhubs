@@ -10,11 +10,32 @@ interface AnnouncementBarSettings {
   background_color: string;
 }
 
+// Default: hidden until API confirms enabled - prevents render blocking
+const defaultSettings: AnnouncementBarSettings = {
+  enabled: false,
+  text: "",
+  link: "",
+  background_color: "#ef4444",
+};
+
 export function AnnouncementBar() {
-  const [settings, setSettings] = useState<AnnouncementBarSettings | null>(null);
+  const [settings, setSettings] = useState<AnnouncementBarSettings>(defaultSettings);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
+    // Fetch async after initial render - non-blocking
+    const fetchSettings = async () => {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'announcement_bar')
+        .maybeSingle();
+
+      if (data?.value) {
+        setSettings(data.value as unknown as AnnouncementBarSettings);
+      }
+    };
+
     fetchSettings();
 
     // Subscribe to real-time updates
@@ -42,19 +63,7 @@ export function AnnouncementBar() {
     };
   }, []);
 
-  const fetchSettings = async () => {
-    const { data } = await supabase
-      .from('site_settings')
-      .select('value')
-      .eq('key', 'announcement_bar')
-      .maybeSingle();
-
-    if (data?.value) {
-      setSettings(data.value as unknown as AnnouncementBarSettings);
-    }
-  };
-
-  if (!settings?.enabled || dismissed || !settings?.text) return null;
+  if (!settings.enabled || dismissed || !settings.text) return null;
 
   return (
     <div 
@@ -81,8 +90,9 @@ export function AnnouncementBar() {
         onClick={() => setDismissed(true)}
         className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:opacity-70 transition-opacity"
         aria-label="Dismiss announcement"
+        type="button"
       >
-        <X className="h-4 w-4" />
+        <X className="h-4 w-4" aria-hidden="true" />
       </button>
     </div>
   );

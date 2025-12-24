@@ -23,22 +23,38 @@ export default defineConfig(({ mode }) => ({
     // Chunk splitting for better caching
     rollupOptions: {
       output: {
-        manualChunks: {
+        manualChunks: (id: string) => {
           // Vendor chunk for React and core libraries
-          vendor: ["react", "react-dom", "react-router-dom"],
-          // UI components chunk
-          ui: ["@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu", "@radix-ui/react-tooltip"],
-          // PDF libraries chunk (heavy, load separately)
-          pdf: ["pdf-lib", "pdfjs-dist"],
+          if (id.includes('node_modules/react/') || 
+              id.includes('node_modules/react-dom/') || 
+              id.includes('node_modules/react-router-dom/')) {
+            return 'vendor';
+          }
+          // UI components chunk - lazy load
+          if (id.includes('@radix-ui/')) {
+            return 'ui';
+          }
+          // PDF libraries chunk - only load on tool pages
+          if (id.includes('pdf-lib') || id.includes('pdfjs-dist') || id.includes('pdfmake')) {
+            return 'pdf';
+          }
           // Query and state management
-          query: ["@tanstack/react-query"],
+          if (id.includes('@tanstack/react-query')) {
+            return 'query';
+          }
+          // Supabase client
+          if (id.includes('@supabase/')) {
+            return 'supabase';
+          }
         },
       },
     },
-    // Generate source maps for debugging in production
+    // No source maps in production for smaller bundles
     sourcemap: false,
     // Compress CSS
     cssMinify: true,
+    // Reduce chunk size warnings threshold
+    chunkSizeWarningLimit: 500,
   },
   // Optimize dependencies
   optimizeDeps: {

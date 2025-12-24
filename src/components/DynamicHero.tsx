@@ -50,14 +50,39 @@ interface HeroBannerSettings {
   background_color: string;
 }
 
+// Default settings - render immediately without waiting for API
+const defaultHeroSettings: HeroBannerSettings = {
+  enabled: false,
+  title: "Every tool you need to work with PDFs",
+  description: "Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits, works in your browser.",
+  cta_text: "",
+  cta_link: "",
+  image_url: "",
+  background_color: "",
+};
+
 export function DynamicHero() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [heroSettings, setHeroSettings] = useState<HeroBannerSettings | null>(null);
+  // Start with defaults to render immediately - no render blocking!
+  const [heroSettings, setHeroSettings] = useState<HeroBannerSettings>(defaultHeroSettings);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Fetch async after initial render - non-blocking
+    const fetchHeroSettings = async () => {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'hero_banner')
+        .maybeSingle();
+
+      if (data?.value) {
+        setHeroSettings(data.value as unknown as HeroBannerSettings);
+      }
+    };
+
     fetchHeroSettings();
 
     // Subscribe to real-time updates
@@ -83,18 +108,6 @@ export function DynamicHero() {
       supabase.removeChannel(channel);
     };
   }, []);
-
-  const fetchHeroSettings = async () => {
-    const { data } = await supabase
-      .from('site_settings')
-      .select('value')
-      .eq('key', 'hero_banner')
-      .maybeSingle();
-
-    if (data?.value) {
-      setHeroSettings(data.value as unknown as HeroBannerSettings);
-    }
-  };
 
   const filteredTools = useMemo(() => {
     if (!searchQuery.trim()) return [];

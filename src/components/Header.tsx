@@ -71,10 +71,12 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-8">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group">
+          <Link to="/" className="flex items-center gap-2.5 group" aria-label="PDFTools Home">
             <img 
               src="/favicon.png" 
               alt="PDFTools Logo" 
+              width="40"
+              height="40"
               className="h-10 w-10 rounded-xl shadow-md group-hover:shadow-glow transition-shadow duration-300"
             />
             <span className="font-heading text-xl font-bold text-foreground">
@@ -137,8 +139,10 @@ export function Header() {
                     setIsSearchOpen(false);
                   }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label="Clear search"
+                  type="button"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -250,18 +254,20 @@ export function Header() {
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
-                <Menu className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
+                <Menu className="h-5 w-5" aria-hidden="true" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-80 p-0">
               <div className="flex flex-col h-full">
                 {/* Mobile menu header */}
                 <div className="p-6 border-b border-border">
-                  <Link to="/" className="flex items-center gap-2.5">
+                  <Link to="/" className="flex items-center gap-2.5" aria-label="PDFTools Home">
                     <img 
                       src="/favicon.png" 
                       alt="PDFTools Logo" 
+                      width="40"
+                      height="40"
                       className="h-10 w-10 rounded-xl"
                     />
                     <span className="font-heading text-xl font-bold text-foreground">
