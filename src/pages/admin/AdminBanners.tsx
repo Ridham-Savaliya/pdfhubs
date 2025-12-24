@@ -83,8 +83,10 @@ export default function AdminBanners() {
     try {
       const { error } = await supabase
         .from('site_settings')
-        .update({ value: JSON.parse(JSON.stringify(heroBanner)) })
-        .eq('key', 'hero_banner');
+        .upsert({ 
+          key: 'hero_banner',
+          value: JSON.parse(JSON.stringify(heroBanner)) 
+        }, { onConflict: 'key' });
 
       if (error) throw error;
       toast.success('Hero banner saved!');
@@ -100,8 +102,10 @@ export default function AdminBanners() {
     try {
       const { error } = await supabase
         .from('site_settings')
-        .update({ value: JSON.parse(JSON.stringify(announcementBar)) })
-        .eq('key', 'announcement_bar');
+        .upsert({ 
+          key: 'announcement_bar',
+          value: JSON.parse(JSON.stringify(announcementBar)) 
+        }, { onConflict: 'key' });
 
       if (error) throw error;
       toast.success('Announcement bar saved!');
