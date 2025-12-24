@@ -5,18 +5,18 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Hash password to compare with stored hash
+// Hash password with the same salt used in protect-pdf
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
-  const data = encoder.encode(password);
+  const data = encoder.encode(password + 'pdtools-salt-2024');
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Create a clean unlocked PDF by removing protection markers
+// Create an unlocked PDF by properly preserving all content
 async function createUnlockedPDF(pdfBytes: Uint8Array, password: string): Promise<Uint8Array> {
-  const { PDFDocument, StandardFonts } = await import("https://esm.sh/pdf-lib@1.17.1");
+  const { PDFDocument } = await import("https://esm.sh/pdf-lib@1.17.1");
   
   // Try to load the PDF
   let pdfDoc;
@@ -31,70 +31,71 @@ async function createUnlockedPDF(pdfBytes: Uint8Array, password: string): Promis
   
   // Check if password matches (for PDFTools-protected files)
   const keywords = pdfDoc.getKeywords() || '';
-  const keywordsArray = keywords.split(',').map(k => k.trim());
+  const keywordsArray = keywords.split(',').map((k: string) => k.trim());
   
   let passwordValid = false;
+  let isPDFToolsProtected = false;
   
-  // Check for PDFTools password hash
+  // Check for PDFTools metadata
   for (const keyword of keywordsArray) {
+    if (keyword === 'protected' || keyword === 'pdtools-secured') {
+      isPDFToolsProtected = true;
+    }
+    
+    // Check for password hash with new salt
     if (keyword.startsWith('hash:')) {
+      isPDFToolsProtected = true;
       const storedHash = keyword.substring(5);
       const providedHash = await hashPassword(password);
+      console.log(`Comparing hashes: stored=${storedHash.substring(0, 16)}..., provided=${providedHash.substring(0, 16)}...`);
       if (storedHash === providedHash) {
         passwordValid = true;
-        break;
       }
     }
-    // Also check legacy base64 encoded password
-    if (keyword.startsWith('password:')) {
+    
+    // Check for embedded metadata with password hash
+    if (keyword.startsWith('meta:')) {
+      isPDFToolsProtected = true;
       try {
-        const storedPassword = atob(keyword.substring(9));
-        if (storedPassword === password) {
-          passwordValid = true;
-          break;
+        const decodedMeta = JSON.parse(atob(keyword.substring(5)));
+        if (decodedMeta.passwordHash) {
+          const providedHash = await hashPassword(password);
+          if (decodedMeta.passwordHash === providedHash) {
+            passwordValid = true;
+          }
         }
       } catch (e) {
-        // Ignore decode errors
+        console.log('Could not decode metadata:', e);
       }
     }
-  }
-  
-  // If not a PDFTools-protected file, just proceed (it may be an unprotected PDF)
-  const isPDFToolsProtected = keywordsArray.some(k => k === 'protected' || k === 'encrypted');
-  
-  if (isPDFToolsProtected && !passwordValid) {
-    console.log('Password verification failed for PDFTools-protected file');
-    throw new Error('Incorrect password. Please enter the correct password to unlock this PDF.');
   }
   
   console.log(`PDF unlock: isPDFToolsProtected=${isPDFToolsProtected}, passwordValid=${passwordValid}`);
   
-  // Create a new clean PDF by copying all pages
-  const newPdf = await PDFDocument.create();
-  const font = await newPdf.embedFont(StandardFonts.Helvetica);
-  
-  // Copy all pages from the original
-  const pageIndices = pdfDoc.getPageIndices();
-  const copiedPages = await newPdf.copyPages(pdfDoc, pageIndices);
-  
-  for (const page of copiedPages) {
-    newPdf.addPage(page);
+  // If it's a PDFTools-protected file and password is wrong, reject
+  if (isPDFToolsProtected && !passwordValid) {
+    throw new Error('Incorrect password. Please enter the correct password to unlock this PDF.');
   }
   
-  // Set clean metadata
-  const originalTitle = pdfDoc.getTitle() || '';
-  const cleanTitle = originalTitle.replace('Protected - ', '').replace('Protected Document', 'Document');
+  // For PDFTools-protected PDFs (watermark-based), we need to remove the watermarks
+  // by creating a fresh copy that preserves all content but removes protection markers
   
-  newPdf.setTitle(cleanTitle || 'Unlocked Document');
-  newPdf.setSubject('');
-  newPdf.setKeywords([]);
-  newPdf.setProducer('PDFTools Unlock');
-  newPdf.setCreator('PDFTools');
-  newPdf.setCreationDate(new Date());
-  newPdf.setModificationDate(new Date());
+  // Get all pages and their content
+  const pages = pdfDoc.getPages();
   
-  // Save the unlocked PDF
-  const unlockedBytes = await newPdf.save({
+  // Instead of copying pages (which can lose embedded images), 
+  // we'll save the document directly with clean metadata
+  pdfDoc.setTitle('Unlocked Document');
+  pdfDoc.setAuthor('');
+  pdfDoc.setSubject('');
+  pdfDoc.setKeywords([]);
+  pdfDoc.setProducer('PDFTools');
+  pdfDoc.setCreator('PDFTools Unlock');
+  pdfDoc.setCreationDate(new Date());
+  pdfDoc.setModificationDate(new Date());
+  
+  // Save directly - this preserves all page content including images
+  const unlockedBytes = await pdfDoc.save({
     useObjectStreams: false,
   });
   
