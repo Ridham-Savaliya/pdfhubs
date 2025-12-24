@@ -72,10 +72,11 @@ export function Header() {
         <div className="flex items-center gap-8">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-md group-hover:shadow-glow transition-shadow duration-300">
-              <FileText className="h-5 w-5 text-primary-foreground" />
-              <div className="absolute inset-0 rounded-xl bg-primary-foreground/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
+            <img 
+              src="/favicon.png" 
+              alt="PDFTools Logo" 
+              className="h-10 w-10 rounded-xl shadow-md group-hover:shadow-glow transition-shadow duration-300"
+            />
             <span className="font-heading text-xl font-bold text-foreground">
               PDF<span className="text-primary">Tools</span>
             </span>
@@ -258,9 +259,11 @@ export function Header() {
                 {/* Mobile menu header */}
                 <div className="p-6 border-b border-border">
                   <Link to="/" className="flex items-center gap-2.5">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
-                      <FileText className="h-5 w-5 text-primary-foreground" />
-                    </div>
+                    <img 
+                      src="/favicon.png" 
+                      alt="PDFTools Logo" 
+                      className="h-10 w-10 rounded-xl"
+                    />
                     <span className="font-heading text-xl font-bold text-foreground">
                       PDF<span className="text-primary">Tools</span>
                     </span>
