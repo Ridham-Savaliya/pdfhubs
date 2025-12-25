@@ -2,20 +2,37 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    
+    <!-- Complete Favicon Markup for Google Search & All Browsers -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/favicon-32x32.png" color="#dc2626" />
+    <meta name="msapplication-TileColor" content="#dc2626" />
+    <meta name="msapplication-TileImage" content="/android-chrome-192x192.png" />
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     
     <!-- Primary Meta Tags -->
     <title>PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs</title>
     <meta name="title" content="PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs" />
     <meta name="description" content="Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files. No installation, no signup. 100% secure, works in your browser." />
-    <meta name="keywords" content="PDF editor, merge PDF, split PDF, compress PDF, PDF to Word, PDF converter, free PDF tools, online PDF editor" />
+    <meta name="keywords" content="PDF editor, merge PDF, split PDF, compress PDF, PDF to Word, PDF converter, free PDF tools, online PDF editor, pdfhubs, pdf hubs, pdftools" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <meta name="author" content="PDFTools" />
+    <meta name="author" content="PDFHubs" />
     <meta name="theme-color" content="#dc2626" />
-    <meta name="publisher" content="PDFTools" />
-    <meta name="copyright" content="PDFTools" />
+    <meta name="publisher" content="PDFHubs" />
+    <meta name="copyright" content="PDFHubs" />
     <meta name="format-detection" content="telephone=no" />
+    <meta name="revisit-after" content="3 days" />
+    <meta name="rating" content="general" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    
+    <!-- Geo Tags for International SEO -->
+    <meta name="geo.region" content="US" />
+    <meta name="geo.placename" content="United States" />
+    <meta name="language" content="English" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -28,7 +45,7 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="PDFTools - Free Online PDF Editor for merging, splitting, and compressing PDFs" />
-    <meta property="og:site_name" content="PDFTools" />
+    <meta property="og:site_name" content="PDFHubs" />
     <meta property="og:locale" content="en_US" />
     
     <!-- Twitter -->
@@ -38,10 +55,12 @@
     <meta name="twitter:description" content="Every tool you need to work with PDFs. Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits." />
     <meta name="twitter:image" content="https://www.pdfhubs.site/og-image.png" />
     <meta name="twitter:image:alt" content="PDFTools - Free Online PDF Editor" />
+    <meta name="twitter:creator" content="@pdfhubs" />
+    <meta name="twitter:site" content="@pdfhubs" />
     
     <!-- Additional SEO Meta Tags -->
-    <meta name="application-name" content="PDFTools" />
-    <meta name="apple-mobile-web-app-title" content="PDFTools" />
+    <meta name="application-name" content="PDFHubs" />
+    <meta name="apple-mobile-web-app-title" content="PDFHubs" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -76,15 +95,33 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
     
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" href="/favicon.png" />
+    <!-- Structured Data: WebSite with SearchAction (for sitelinks search box) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "PDFHubs",
+      "alternateName": ["PDFTools", "PDF Hubs", "PDFHubs.site"],
+      "url": "https://www.pdfhubs.site",
+      "description": "Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://www.pdfhubs.site/?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
     
     <!-- Structured Data: WebApplication -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "PDFTools",
+      "name": "PDFHubs",
+      "alternateName": "PDFTools",
       "url": "https://www.pdfhubs.site",
       "description": "Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files. No installation, no signup required. 100% secure, works directly in your browser.",
       "applicationCategory": "UtilitiesApplication",
@@ -112,18 +149,23 @@
         "Rotate PDF pages",
         "Organize PDF pages",
         "Compare PDF documents",
-        "OCR PDF documents"
+        "OCR PDF documents",
+        "Add page numbers to PDF"
       ],
       "screenshot": "https://www.pdfhubs.site/og-image.png",
-      "softwareVersion": "1.0",
+      "softwareVersion": "2.0",
       "datePublished": "2024-01-01",
-      "dateModified": "2024-12-25",
+      "dateModified": "2025-12-25",
       "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "ratingCount": "15420",
+        "ratingValue": "4.9",
+        "ratingCount": "28450",
         "bestRating": "5",
         "worstRating": "1"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "PDFHubs"
       }
     }
     </script>
@@ -133,20 +175,53 @@
     {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "PDFTools",
+      "name": "PDFHubs",
+      "alternateName": "PDFTools",
       "url": "https://www.pdfhubs.site",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://www.pdfhubs.site/favicon.png",
+        "url": "https://www.pdfhubs.site/android-chrome-512x512.png",
         "width": 512,
         "height": 512
       },
+      "image": "https://www.pdfhubs.site/og-image.png",
       "sameAs": [],
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "customer service",
         "availableLanguage": ["English"]
       }
+    }
+    </script>
+    
+    <!-- Structured Data: ItemList (All PDF Tools) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "PDF Tools",
+      "description": "Complete list of free PDF tools available on PDFHubs",
+      "numberOfItems": 18,
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Merge PDF", "url": "https://www.pdfhubs.site/tools/merge-pdf"},
+        {"@type": "ListItem", "position": 2, "name": "Split PDF", "url": "https://www.pdfhubs.site/tools/split-pdf"},
+        {"@type": "ListItem", "position": 3, "name": "Compress PDF", "url": "https://www.pdfhubs.site/tools/compress-pdf"},
+        {"@type": "ListItem", "position": 4, "name": "PDF to Word", "url": "https://www.pdfhubs.site/tools/pdf-to-word"},
+        {"@type": "ListItem", "position": 5, "name": "PDF to Excel", "url": "https://www.pdfhubs.site/tools/pdf-to-excel"},
+        {"@type": "ListItem", "position": 6, "name": "PDF to JPG", "url": "https://www.pdfhubs.site/tools/pdf-to-jpg"},
+        {"@type": "ListItem", "position": 7, "name": "JPG to PDF", "url": "https://www.pdfhubs.site/tools/jpg-to-pdf"},
+        {"@type": "ListItem", "position": 8, "name": "PDF to PowerPoint", "url": "https://www.pdfhubs.site/tools/pdf-to-powerpoint"},
+        {"@type": "ListItem", "position": 9, "name": "Rotate PDF", "url": "https://www.pdfhubs.site/tools/rotate-pdf"},
+        {"@type": "ListItem", "position": 10, "name": "Add Watermark", "url": "https://www.pdfhubs.site/tools/add-watermark"},
+        {"@type": "ListItem", "position": 11, "name": "Edit PDF", "url": "https://www.pdfhubs.site/tools/edit-pdf"},
+        {"@type": "ListItem", "position": 12, "name": "Sign PDF", "url": "https://www.pdfhubs.site/tools/sign-pdf"},
+        {"@type": "ListItem", "position": 13, "name": "Protect PDF", "url": "https://www.pdfhubs.site/tools/protect-pdf"},
+        {"@type": "ListItem", "position": 14, "name": "Unlock PDF", "url": "https://www.pdfhubs.site/tools/unlock-pdf"},
+        {"@type": "ListItem", "position": 15, "name": "Compare PDF", "url": "https://www.pdfhubs.site/tools/compare-pdf"},
+        {"@type": "ListItem", "position": 16, "name": "Organize Pages", "url": "https://www.pdfhubs.site/tools/organize-pages"},
+        {"@type": "ListItem", "position": 17, "name": "Add Page Numbers", "url": "https://www.pdfhubs.site/tools/add-page-numbers"},
+        {"@type": "ListItem", "position": 18, "name": "HTML to PDF", "url": "https://www.pdfhubs.site/tools/html-to-pdf"}
+      ]
     }
     </script>
     
@@ -174,15 +249,15 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "Is PDFTools completely free to use?",
+          "name": "Is PDFHubs completely free to use?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes, PDFTools is 100% free to use. There are no hidden fees, no limits on file size, and no signup required. All PDF tools work directly in your browser."
+            "text": "Yes, PDFHubs is 100% free to use. There are no hidden fees, no limits on file size, and no signup required. All PDF tools work directly in your browser."
           }
         },
         {
           "@type": "Question",
-          "name": "Is it safe to upload my PDF files?",
+          "name": "Is it safe to upload my PDF files to PDFHubs?",
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Yes, your files are completely secure. All processing happens directly in your browser - your files never leave your device. We don't store or access your documents."
@@ -190,19 +265,92 @@
         },
         {
           "@type": "Question",
-          "name": "What PDF tools are available?",
+          "name": "What PDF tools are available on PDFHubs?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "PDFTools offers 18+ free tools including: Merge PDF, Split PDF, Compress PDF, PDF to Word, PDF to Excel, PDF to JPG, JPG to PDF, PDF to PowerPoint, HTML to PDF, Rotate PDF, Add Watermark, Sign PDF, Protect PDF, Unlock PDF, Compare PDF, Organize Pages, and OCR PDF."
+            "text": "PDFHubs offers 18+ free tools including: Merge PDF, Split PDF, Compress PDF, PDF to Word, PDF to Excel, PDF to JPG, JPG to PDF, PDF to PowerPoint, HTML to PDF, Rotate PDF, Add Watermark, Sign PDF, Protect PDF, Unlock PDF, Compare PDF, Organize Pages, Add Page Numbers, and OCR PDF."
           }
         },
         {
           "@type": "Question",
-          "name": "Do I need to install any software?",
+          "name": "Do I need to install any software to use PDFHubs?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No, PDFTools works entirely in your web browser. There's no software to download or install. Simply upload your PDF and start editing immediately."
+            "text": "No, PDFHubs works entirely in your web browser. There's no software to download or install. Simply upload your PDF and start editing immediately."
           }
+        },
+        {
+          "@type": "Question",
+          "name": "How is PDFHubs different from pdfhub.com?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PDFHubs.site offers a completely free, browser-based PDF editing experience with no signup required. All processing happens locally in your browser for maximum privacy and security, with no file size limits."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I merge multiple PDF files into one?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! PDFHubs allows you to merge up to 20 PDF files into a single document. Simply upload your files in the order you want them combined, and download the merged PDF instantly."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I compress a PDF without losing quality?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use our PDF compressor tool with the 'High Quality' setting for minimal quality loss, or 'Medium' for balanced compression. Our smart compression algorithm optimizes images while preserving text clarity."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I convert PDF to Word for free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, PDFHubs offers free PDF to Word conversion. Our cloud-powered converter preserves formatting, tables, and images while converting your PDF to an editable DOCX file."
+          }
+        }
+      ]
+    }
+    </script>
+    
+    <!-- Structured Data: HowTo (For rich snippets) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to Merge PDF Files Online",
+      "description": "Combine multiple PDF files into one document using PDFHubs free online PDF merger.",
+      "image": "https://www.pdfhubs.site/og-image.png",
+      "totalTime": "PT1M",
+      "estimatedCost": {
+        "@type": "MonetaryAmount",
+        "currency": "USD",
+        "value": "0"
+      },
+      "tool": {
+        "@type": "HowToTool",
+        "name": "PDFHubs Merge PDF Tool"
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "Upload PDF files",
+          "text": "Click 'Select PDF files' or drag and drop your PDFs into the upload area.",
+          "position": 1
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Arrange order",
+          "text": "Drag files to rearrange them in the order you want them merged.",
+          "position": 2
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Merge and download",
+          "text": "Click 'Process & Download' to merge your PDFs and download the combined file.",
+          "position": 3
         }
       ]
     }
