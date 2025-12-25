@@ -10,38 +10,55 @@
     <meta name="title" content="PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs" />
     <meta name="description" content="Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files. No installation, no signup. 100% secure, works in your browser." />
     <meta name="keywords" content="PDF editor, merge PDF, split PDF, compress PDF, PDF to Word, PDF converter, free PDF tools, online PDF editor" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="author" content="PDFTools" />
     <meta name="theme-color" content="#dc2626" />
+    <meta name="publisher" content="PDFTools" />
+    <meta name="copyright" content="PDFTools" />
+    <meta name="format-detection" content="telephone=no" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://pdftools.app/" />
-    <meta property="og:title" content="PDFTools - Free Online PDF Editor" />
-    <meta property="og:description" content="Every tool you need to work with PDFs. Merge, split, compress, convert, and edit PDFs instantly. 100% free." />
-    <meta property="og:image" content="https://pdftools.app/og-image.png" />
+    <meta property="og:url" content="https://www.pdfhubs.site/" />
+    <meta property="og:title" content="PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs" />
+    <meta property="og:description" content="Every tool you need to work with PDFs. Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits, no signup required." />
+    <meta property="og:image" content="https://www.pdfhubs.site/og-image.png" />
+    <meta property="og:image:secure_url" content="https://www.pdfhubs.site/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="PDFTools - Free Online PDF Editor for merging, splitting, and compressing PDFs" />
     <meta property="og:site_name" content="PDFTools" />
     <meta property="og:locale" content="en_US" />
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://pdftools.app/" />
-    <meta name="twitter:title" content="PDFTools - Free Online PDF Editor" />
-    <meta name="twitter:description" content="Every tool you need to work with PDFs. Merge, split, compress, convert, and edit PDFs instantly. 100% free." />
-    <meta name="twitter:image" content="https://pdftools.app/og-image.png" />
+    <meta name="twitter:url" content="https://www.pdfhubs.site/" />
+    <meta name="twitter:title" content="PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs" />
+    <meta name="twitter:description" content="Every tool you need to work with PDFs. Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits." />
+    <meta name="twitter:image" content="https://www.pdfhubs.site/og-image.png" />
+    <meta name="twitter:image:alt" content="PDFTools - Free Online PDF Editor" />
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="application-name" content="PDFTools" />
+    <meta name="apple-mobile-web-app-title" content="PDFTools" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="mobile-web-app-capable" content="yes" />
     
     <!-- Performance: Preconnect to critical origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://flbkqehloxlvizwocdsv.supabase.co" />
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="dns-prefetch" href="https://flbkqehloxlvizwocdsv.supabase.co" />
     
-    <!-- Preload critical fonts -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" /></noscript>
+    <!-- Preload critical font file -->
+    <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtqUYLknw.woff2" crossorigin="anonymous" />
+    
+    <!-- Google Fonts - Direct loading for crawler compatibility -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" />
     
     <!-- Critical CSS - inline to eliminate render blocking -->
     <style>
@@ -54,7 +71,13 @@
     </style>
     
     <!-- Canonical -->
-    <link rel="canonical" href="https://pdftools.app/" />
+    <link rel="canonical" href="https://www.pdfhubs.site/" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="/favicon.png" />
     
     <!-- Structured Data: WebApplication -->
     <script type="application/ld+json">
@@ -62,10 +85,11 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "PDFTools",
-      "url": "https://pdftools.app",
-      "description": "Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files. No installation, no signup.",
+      "url": "https://www.pdfhubs.site",
+      "description": "Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files. No installation, no signup required. 100% secure, works directly in your browser.",
       "applicationCategory": "UtilitiesApplication",
       "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -78,13 +102,22 @@
         "Convert PDF to Word",
         "Convert PDF to Excel",
         "Convert PDF to JPG",
-        "Add watermarks",
+        "Convert JPG to PDF",
+        "Convert PDF to PowerPoint",
+        "Convert HTML to PDF",
+        "Add watermarks to PDF",
         "Sign PDF documents",
         "Protect PDF with password",
-        "Unlock PDF files"
+        "Unlock PDF files",
+        "Rotate PDF pages",
+        "Organize PDF pages",
+        "Compare PDF documents",
+        "OCR PDF documents"
       ],
-      "screenshot": "https://pdftools.app/og-image.png",
+      "screenshot": "https://www.pdfhubs.site/og-image.png",
       "softwareVersion": "1.0",
+      "datePublished": "2024-01-01",
+      "dateModified": "2024-12-25",
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "4.8",
@@ -101,8 +134,13 @@
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "PDFTools",
-      "url": "https://pdftools.app",
-      "logo": "https://pdftools.app/favicon.png",
+      "url": "https://www.pdfhubs.site",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.pdfhubs.site/favicon.png",
+        "width": 512,
+        "height": 512
+      },
       "sameAs": [],
       "contactPoint": {
         "@type": "ContactPoint",
@@ -122,7 +160,49 @@
           "@type": "ListItem",
           "position": 1,
           "name": "Home",
-          "item": "https://pdftools.app/"
+          "item": "https://www.pdfhubs.site/"
+        }
+      ]
+    }
+    </script>
+    
+    <!-- Structured Data: FAQPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is PDFTools completely free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, PDFTools is 100% free to use. There are no hidden fees, no limits on file size, and no signup required. All PDF tools work directly in your browser."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it safe to upload my PDF files?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, your files are completely secure. All processing happens directly in your browser - your files never leave your device. We don't store or access your documents."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What PDF tools are available?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PDFTools offers 18+ free tools including: Merge PDF, Split PDF, Compress PDF, PDF to Word, PDF to Excel, PDF to JPG, JPG to PDF, PDF to PowerPoint, HTML to PDF, Rotate PDF, Add Watermark, Sign PDF, Protect PDF, Unlock PDF, Compare PDF, Organize Pages, and OCR PDF."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need to install any software?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No, PDFTools works entirely in your web browser. There's no software to download or install. Simply upload your PDF and start editing immediately."
+          }
         }
       ]
     }

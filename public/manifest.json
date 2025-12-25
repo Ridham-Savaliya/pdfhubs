@@ -1,0 +1,31 @@
+{
+  "name": "PDFTools - Free Online PDF Editor",
+  "short_name": "PDFTools",
+  "description": "Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files. No installation, no signup required.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#dc2626",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "label": "PDFTools Homepage - Free Online PDF Editor"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
