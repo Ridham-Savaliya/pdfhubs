@@ -1,5 +1,5 @@
 # PDFTools robots.txt
-# https://pdftools.app
+# https://www.pdfhubs.site
 
 # Allow all search engines
 User-agent: Googlebot
@@ -14,6 +14,12 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
 # General rules for all bots
 User-agent: *
 Allow: /
@@ -25,5 +31,8 @@ Disallow: /admin/*
 # Block history (requires auth)
 Disallow: /history
 
+# Block API routes
+Disallow: /api/
+
 # Sitemap location
-Sitemap: https://pdftools.app/sitemap.xml
+Sitemap: https://www.pdfhubs.site/sitemap.xml
