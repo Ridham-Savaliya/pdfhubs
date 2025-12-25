@@ -14,6 +14,8 @@ import { PDFEditor } from "@/components/pdf-editor";
 import { PageOrganizer, PDFComparer, PDFSigner, ProtectPDF, UnlockPDF } from "@/components/pdf-tools";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { SEOHead, toolSEO } from "@/components/SEOHead";
+import { ToolFAQ } from "@/components/ToolFAQ";
 import {
   mergePDFs,
   splitPDF,
@@ -512,8 +514,23 @@ export default function ToolPage() {
     );
   }
 
+  // Get SEO data for this tool
+  const seoData = toolId && toolSEO[toolId] ? toolSEO[toolId] : null;
+  const canonicalUrl = `https://www.pdfhubs.site/tools/${toolId}`;
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      {/* SEO Head with tool-specific meta tags */}
+      {seoData && (
+        <SEOHead
+          title={seoData.title}
+          description={seoData.description}
+          keywords={seoData.keywords}
+          canonical={canonicalUrl}
+          toolId={toolId}
+        />
+      )}
+      
       <Header />
       
       <main className="flex-1">
@@ -804,6 +821,11 @@ export default function ToolPage() {
                 </div>
               )}
             </div>
+
+            {/* FAQ Section for SEO */}
+            {toolId && (
+              <ToolFAQ toolId={toolId} toolTitle={tool.title} />
+            )}
           </div>
         </div>
       </main>
