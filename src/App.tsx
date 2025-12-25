@@ -13,6 +13,12 @@ const ToolPage = lazy(() => import("./pages/ToolPage"));
 const Auth = lazy(() => import("./pages/Auth"));
 const History = lazy(() => import("./pages/History"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const About = lazy(() => import("./pages/About"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Contact = lazy(() => import("./pages/Contact"));
 
 // Admin routes - rarely accessed, load separately
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -45,6 +51,12 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/history" element={<History />} />
               <Route path="/tool/:toolId" element={<ToolPage />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/contact" element={<Contact />} />
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/ads" element={<AdminAds />} />
