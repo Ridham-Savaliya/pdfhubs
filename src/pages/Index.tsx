@@ -5,6 +5,7 @@ import { ToolsGrid } from "@/components/ToolsGrid";
 import { Features } from "@/components/Features";
 import { Stats } from "@/components/Stats";
 import { Footer } from "@/components/Footer";
+import { HomeFAQ } from "@/components/HomeFAQ";
 
 const Index = () => {
   return (
@@ -16,6 +17,7 @@ const Index = () => {
         <ToolsGrid />
         <Stats />
         <Features />
+        <HomeFAQ />
       </main>
       <Footer />
     </div>

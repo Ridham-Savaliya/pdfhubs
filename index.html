@@ -1,104 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    
-    <!-- Complete Favicon Markup for Google Search & All Browsers (v2 cache bust) -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
-    <link rel="shortcut icon" href="/favicon.ico?v=2" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
-    <link rel="mask-icon" href="/favicon-32x32.png?v=2" color="#dc2626" />
-    <meta name="msapplication-TileColor" content="#dc2626" />
-    <meta name="msapplication-TileImage" content="/android-chrome-192x192.png?v=2" />
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-    
-    <!-- Primary Meta Tags -->
-    <title>PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs</title>
-    <meta name="title" content="PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs" />
-    <meta name="description" content="Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files. No installation, no signup. 100% secure, works in your browser." />
-    <meta name="keywords" content="PDF editor, merge PDF, split PDF, compress PDF, PDF to Word, PDF converter, free PDF tools, online PDF editor, pdfhubs, pdf hubs, pdftools" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <meta name="author" content="PDFHubs" />
-    <meta name="theme-color" content="#dc2626" />
-    <meta name="publisher" content="PDFHubs" />
-    <meta name="copyright" content="PDFHubs" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="revisit-after" content="3 days" />
-    <meta name="rating" content="general" />
-    <meta name="referrer" content="origin-when-cross-origin" />
-    
-    <!-- Geo Tags for International SEO -->
-    <meta name="geo.region" content="US" />
-    <meta name="geo.placename" content="United States" />
-    <meta name="language" content="English" />
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.pdfhubs.site/" />
-    <meta property="og:title" content="PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs" />
-    <meta property="og:description" content="Every tool you need to work with PDFs. Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits, no signup required." />
-    <meta property="og:image" content="https://www.pdfhubs.site/og-image.png" />
-    <meta property="og:image:secure_url" content="https://www.pdfhubs.site/og-image.png" />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="PDFTools - Free Online PDF Editor for merging, splitting, and compressing PDFs" />
-    <meta property="og:site_name" content="PDFHubs" />
-    <meta property="og:locale" content="en_US" />
-    
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://www.pdfhubs.site/" />
-    <meta name="twitter:title" content="PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs" />
-    <meta name="twitter:description" content="Every tool you need to work with PDFs. Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits." />
-    <meta name="twitter:image" content="https://www.pdfhubs.site/og-image.png" />
-    <meta name="twitter:image:alt" content="PDFTools - Free Online PDF Editor" />
-    <meta name="twitter:creator" content="@pdfhubs" />
-    <meta name="twitter:site" content="@pdfhubs" />
-    
-    <!-- Additional SEO Meta Tags -->
-    <meta name="application-name" content="PDFHubs" />
-    <meta name="apple-mobile-web-app-title" content="PDFHubs" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    
-    <!-- Performance: Preconnect to critical origins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://flbkqehloxlvizwocdsv.supabase.co" />
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-    <link rel="dns-prefetch" href="https://flbkqehloxlvizwocdsv.supabase.co" />
-    
-    <!-- Preload critical font file -->
-    <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtqUYLknw.woff2" crossorigin="anonymous" />
-    
-    <!-- Google Fonts - Direct loading for crawler compatibility -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" />
-    
-    <!-- Critical CSS - inline to eliminate render blocking -->
-    <style>
-      :root{--background:0 0% 100%;--foreground:0 0% 3.9%;--primary:0 72% 51%;--muted:0 0% 96.1%;--muted-foreground:0 0% 45.1%}
-      .dark{--background:0 0% 6%;--foreground:0 0% 98%;--muted:0 0% 15%;--muted-foreground:0 0% 65%}
-      *,::before,::after{box-sizing:border-box;border-width:0;border-style:solid}
-      html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:Outfit,system-ui,sans-serif}
-      body{margin:0;background-color:hsl(var(--background));color:hsl(var(--foreground))}
-      #root{min-height:100vh;display:flex;flex-direction:column}
-    </style>
-    
-    <!-- Canonical -->
-    <link rel="canonical" href="https://www.pdfhubs.site/" />
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
-    
-    <!-- Structured Data: WebSite with SearchAction (for sitelinks search box) -->
-    <script type="application/ld+json">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- Complete Favicon Markup for Google Search & All Browsers (v2 cache bust) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
+  <link rel="shortcut icon" href="/favicon.ico?v=2" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
+  <link rel="mask-icon" href="/favicon-32x32.png?v=2" color="#dc2626" />
+  <meta name="msapplication-TileColor" content="#dc2626" />
+  <meta name="msapplication-TileImage" content="/android-chrome-192x192.png?v=2" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+
+  <!-- Primary Meta Tags -->
+  <title>PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs</title>
+  <meta name="title" content="PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs" />
+  <meta name="description"
+    content="Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files. No installation, no signup. 100% secure, works in your browser." />
+  <meta name="keywords"
+    content="PDF editor, merge PDF, split PDF, compress PDF, PDF to Word, PDF converter, free PDF tools, online PDF editor, pdfhubs, pdf hubs, pdftools" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="author" content="PDFHubs" />
+  <meta name="theme-color" content="#dc2626" />
+  <meta name="publisher" content="PDFHubs" />
+  <meta name="copyright" content="PDFHubs" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="revisit-after" content="3 days" />
+  <meta name="rating" content="general" />
+  <meta name="referrer" content="origin-when-cross-origin" />
+
+  <!-- Geo Tags for International SEO -->
+  <meta name="geo.region" content="US" />
+  <meta name="geo.placename" content="United States" />
+  <meta name="language" content="English" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.pdfhubs.site/" />
+  <meta property="og:title" content="PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs" />
+  <meta property="og:description"
+    content="Every tool you need to work with PDFs. Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits, no signup required." />
+  <meta property="og:image" content="https://www.pdfhubs.site/og-image.png" />
+  <meta property="og:image:secure_url" content="https://www.pdfhubs.site/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt"
+    content="PDFTools - Free Online PDF Editor for merging, splitting, and compressing PDFs" />
+  <meta property="og:site_name" content="PDFHubs" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://www.pdfhubs.site/" />
+  <meta name="twitter:title" content="PDFTools - Free Online PDF Editor | Merge, Split, Compress PDFs" />
+  <meta name="twitter:description"
+    content="Every tool you need to work with PDFs. Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits." />
+  <meta name="twitter:image" content="https://www.pdfhubs.site/og-image.png" />
+  <meta name="twitter:image:alt" content="PDFTools - Free Online PDF Editor" />
+  <meta name="twitter:creator" content="@pdfhubs" />
+  <meta name="twitter:site" content="@pdfhubs" />
+
+  <!-- Additional SEO Meta Tags -->
+  <meta name="application-name" content="PDFHubs" />
+  <meta name="apple-mobile-web-app-title" content="PDFHubs" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- Performance: Preconnect to critical origins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://flbkqehloxlvizwocdsv.supabase.co" />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+  <link rel="dns-prefetch" href="https://flbkqehloxlvizwocdsv.supabase.co" />
+
+  <!-- Preload critical font file -->
+  <link rel="preload" as="font" type="font/woff2"
+    href="https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtqUYLknw.woff2" crossorigin="anonymous" />
+
+  <!-- Google Fonts - Direct loading for crawler compatibility -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" />
+
+  <!-- Critical CSS - inline to eliminate render blocking -->
+  <style>
+    :root {
+      --background: 0 0% 100%;
+      --foreground: 0 0% 3.9%;
+      --primary: 0 72% 51%;
+      --muted: 0 0% 96.1%;
+      --muted-foreground: 0 0% 45.1%
+    }
+
+    .dark {
+      --background: 0 0% 6%;
+      --foreground: 0 0% 98%;
+      --muted: 0 0% 15%;
+      --muted-foreground: 0 0% 65%
+    }
+
+    *,
+    ::before,
+    ::after {
+      box-sizing: border-box;
+      border-width: 0;
+      border-style: solid
+    }
+
+    html {
+      line-height: 1.5;
+      -webkit-text-size-adjust: 100%;
+      font-family: Outfit, system-ui, sans-serif
+    }
+
+    body {
+      margin: 0;
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground))
+    }
+
+    #root {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
+  </style>
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://www.pdfhubs.site/" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Structured Data: WebSite with SearchAction (for sitelinks search box) -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -116,9 +157,9 @@
       }
     }
     </script>
-    
-    <!-- Structured Data: WebApplication -->
-    <script type="application/ld+json">
+
+  <!-- Structured Data: WebApplication -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
@@ -171,9 +212,9 @@
       }
     }
     </script>
-    
-    <!-- Structured Data: Organization -->
-    <script type="application/ld+json">
+
+  <!-- Structured Data: Organization -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
@@ -195,9 +236,9 @@
       }
     }
     </script>
-    
-    <!-- Structured Data: ItemList (All PDF Tools) -->
-    <script type="application/ld+json">
+
+  <!-- Structured Data: ItemList (All PDF Tools) -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "ItemList",
@@ -226,9 +267,9 @@
       ]
     }
     </script>
-    
-    <!-- Structured Data: BreadcrumbList -->
-    <script type="application/ld+json">
+
+  <!-- Structured Data: BreadcrumbList -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -242,83 +283,11 @@
       ]
     }
     </script>
-    
-    <!-- Structured Data: FAQPage -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Is PDFHubs completely free to use?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes, PDFHubs is 100% free to use. There are no hidden fees, no limits on file size, and no signup required. All PDF tools work directly in your browser."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is it safe to upload my PDF files to PDFHubs?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes, your files are completely secure. All processing happens directly in your browser - your files never leave your device. We don't store or access your documents."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What PDF tools are available on PDFHubs?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "PDFHubs offers 18+ free tools including: Merge PDF, Split PDF, Compress PDF, PDF to Word, PDF to Excel, PDF to JPG, JPG to PDF, PDF to PowerPoint, HTML to PDF, Rotate PDF, Add Watermark, Sign PDF, Protect PDF, Unlock PDF, Compare PDF, Organize Pages, Add Page Numbers, and OCR PDF."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Do I need to install any software to use PDFHubs?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No, PDFHubs works entirely in your web browser. There's no software to download or install. Simply upload your PDF and start editing immediately."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How is PDFHubs different from pdfhub.com?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "PDFHubs.site offers a completely free, browser-based PDF editing experience with no signup required. All processing happens locally in your browser for maximum privacy and security, with no file size limits."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I merge multiple PDF files into one?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes! PDFHubs allows you to merge up to 20 PDF files into a single document. Simply upload your files in the order you want them combined, and download the merged PDF instantly."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do I compress a PDF without losing quality?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Use our PDF compressor tool with the 'High Quality' setting for minimal quality loss, or 'Medium' for balanced compression. Our smart compression algorithm optimizes images while preserving text clarity."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I convert PDF to Word for free?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes, PDFHubs offers free PDF to Word conversion. Our cloud-powered converter preserves formatting, tables, and images while converting your PDF to an editable DOCX file."
-          }
-        }
-      ]
-    }
-    </script>
-    
-    <!-- Structured Data: HowTo (For rich snippets) -->
-    <script type="application/ld+json">
+
+
+
+  <!-- Structured Data: HowTo (For rich snippets) -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "HowTo",
@@ -357,9 +326,11 @@
       ]
     }
     </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

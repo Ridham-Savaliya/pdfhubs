@@ -9,9 +9,7 @@ interface BreadcrumbItem {
 interface BreadcrumbProps {
     items: BreadcrumbItem[];
 }
-// checkking
 
-const a = "ridham";
 
 export function Breadcrumb({ items }: BreadcrumbProps) {
     return (
