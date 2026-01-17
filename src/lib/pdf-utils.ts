@@ -1,61 +1,28 @@
 import { PDFDocument, rgb, degrees, StandardFonts } from "pdf-lib";
 import * as pdfjsLib from "pdfjs-dist";
+import {
+  createPdfBlob,
+  downloadFile,
+  downloadFiles,
+  readFileAsArrayBuffer,
+  canvasToBlob,
+  loadImage
+} from "./file-utils";
+
+export {
+  createPdfBlob,
+  downloadFile,
+  downloadFiles,
+  readFileAsArrayBuffer,
+  canvasToBlob,
+  loadImage
+};
 
 // Set up PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs`;
 
-// Helper to create blob from Uint8Array
-function createPdfBlob(pdfBytes: Uint8Array): Blob {
-  const buffer = new ArrayBuffer(pdfBytes.length);
-  const view = new Uint8Array(buffer);
-  view.set(pdfBytes);
-  return new Blob([buffer], { type: "application/pdf" });
-}
+// Helper functions (createPdfBlob, downloadFile, etc.) are now imported from file-utils.ts
 
-// Helper to download a file
-export function downloadFile(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-// Download multiple files as zip or individually
-export function downloadFiles(blobs: Blob[], filenames: string[]) {
-  blobs.forEach((blob, index) => {
-    setTimeout(() => {
-      downloadFile(blob, filenames[index]);
-    }, index * 200);
-  });
-}
-
-// Helper to read file as ArrayBuffer
-async function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as ArrayBuffer);
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-// Convert canvas to blob
-function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => {
-        if (blob) resolve(blob);
-        else reject(new Error("Failed to convert canvas to blob"));
-      },
-      type,
-      quality
-    );
-  });
-}
 
 // Render PDF page to canvas using PDF.js
 async function renderPageToCanvas(
@@ -65,17 +32,17 @@ async function renderPageToCanvas(
 ): Promise<HTMLCanvasElement> {
   const page = await pdfDoc.getPage(pageNum);
   const viewport = page.getViewport({ scale });
-  
+
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
   canvas.width = viewport.width;
   canvas.height = viewport.height;
-  
+
   await page.render({
     canvasContext: context,
     viewport: viewport,
   }).promise;
-  
+
   return canvas;
 }
 
@@ -93,7 +60,7 @@ export async function mergePDFs(
     const pdf = await PDFDocument.load(arrayBuffer);
     const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
     pages.forEach((page) => mergedPdf.addPage(page));
-    
+
     if (onProgress) {
       onProgress(((i + 1) / totalFiles) * 100);
     }
@@ -119,7 +86,7 @@ export async function splitPDF(
     newPdf.addPage(page);
     const pdfBytes = await newPdf.save();
     blobs.push(createPdfBlob(pdfBytes));
-    
+
     if (onProgress) {
       onProgress(((i + 1) / pageCount) * 100);
     }
@@ -141,34 +108,34 @@ export async function compressPDF(
     medium: { scale: 1.5, imageQuality: 0.75, minDpi: 150 },
     high: { scale: 2.0, imageQuality: 0.88, minDpi: 200 },
   };
-  
+
   const settings = qualitySettings[quality];
   const arrayBuffer = await readFileAsArrayBuffer(file);
-  
+
   // Load with PDF.js for rendering
   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
   const pdfDoc = await loadingTask.promise;
   const numPages = pdfDoc.numPages;
-  
+
   // Create new PDF with compressed images
   const newPdf = await PDFDocument.create();
-  
+
   for (let i = 1; i <= numPages; i++) {
     if (onProgress) {
       onProgress((i / numPages) * 90); // Reserve 10% for final save
     }
-    
+
     // Render page to canvas
     const canvas = await renderPageToCanvas(pdfDoc, i, settings.scale);
-    
+
     // Convert to compressed JPEG
     const jpegBlob = await canvasToBlob(canvas, "image/jpeg", settings.imageQuality);
     const jpegBytes = await jpegBlob.arrayBuffer();
-    
+
     // Embed in new PDF
     const image = await newPdf.embedJpg(jpegBytes);
     const page = newPdf.addPage([canvas.width / settings.scale, canvas.height / settings.scale]);
-    
+
     page.drawImage(image, {
       x: 0,
       y: 0,
@@ -176,17 +143,17 @@ export async function compressPDF(
       height: page.getHeight(),
     });
   }
-  
+
   if (onProgress) {
     onProgress(95);
   }
-  
+
   const pdfBytes = await newPdf.save();
-  
+
   if (onProgress) {
     onProgress(100);
   }
-  
+
   return createPdfBlob(pdfBytes);
 }
 
@@ -226,13 +193,13 @@ export async function addWatermark(
   } = {},
   onProgress?: (progress: number) => void
 ): Promise<Blob> {
-  const { 
-    opacity = 0.3, 
-    fontSize = 60, 
+  const {
+    opacity = 0.3,
+    fontSize = 60,
     color = { r: 0.7, g: 0.7, b: 0.7 },
     position = "diagonal"
   } = options;
-  
+
   if (onProgress) onProgress(10);
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
@@ -243,7 +210,7 @@ export async function addWatermark(
   pages.forEach((page, index) => {
     const { width, height } = page.getSize();
     const textWidth = font.widthOfTextAtSize(text, fontSize);
-    
+
     if (position === "tiled") {
       for (let y = 50; y < height; y += 150) {
         for (let x = 50; x < width; x += textWidth + 100) {
@@ -299,13 +266,13 @@ export async function addPageNumbers(
   } = {},
   onProgress?: (progress: number) => void
 ): Promise<Blob> {
-  const { 
-    position = "bottom-center", 
+  const {
+    position = "bottom-center",
     format = "Page {n} of {total}",
     fontSize = 11,
     startNumber = 1
   } = options;
-  
+
   if (onProgress) onProgress(10);
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
@@ -321,10 +288,10 @@ export async function addPageNumbers(
       .replace("{n}", String(pageNum))
       .replace("{total}", String(totalPages));
     const textWidth = font.widthOfTextAtSize(text, fontSize);
-    
+
     let x: number;
     let y: number;
-    
+
     if (position.includes("left")) {
       x = 40;
     } else if (position.includes("right")) {
@@ -332,13 +299,13 @@ export async function addPageNumbers(
     } else {
       x = (width - textWidth) / 2;
     }
-    
+
     if (position.includes("top")) {
       y = height - 30;
     } else {
       y = 30;
     }
-    
+
     page.drawText(text, {
       x,
       y,
@@ -346,7 +313,7 @@ export async function addPageNumbers(
       font,
       color: rgb(0, 0, 0),
     });
-    
+
     if (onProgress) {
       onProgress(30 + ((index + 1) / pages.length) * 60);
     }
@@ -368,25 +335,25 @@ export async function pdfToImages(
   onProgress?: (progress: number) => void
 ): Promise<Blob[]> {
   const { format = "jpeg", quality = 0.9, scale = 2.0 } = options;
-  
+
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
   const pdfDoc = await loadingTask.promise;
   const numPages = pdfDoc.numPages;
-  
+
   const blobs: Blob[] = [];
-  
+
   for (let i = 1; i <= numPages; i++) {
     const canvas = await renderPageToCanvas(pdfDoc, i, scale);
     const mimeType = format === "png" ? "image/png" : "image/jpeg";
     const blob = await canvasToBlob(canvas, mimeType, quality);
     blobs.push(blob);
-    
+
     if (onProgress) {
       onProgress((i / numPages) * 100);
     }
   }
-  
+
   return blobs;
 }
 
@@ -401,11 +368,11 @@ export async function imagesToPDF(
     const file = files[i];
     const arrayBuffer = await readFileAsArrayBuffer(file);
     let image;
-    
-    const isJpeg = file.type === "image/jpeg" || 
-                   file.name.toLowerCase().endsWith(".jpg") ||
-                   file.name.toLowerCase().endsWith(".jpeg");
-    
+
+    const isJpeg = file.type === "image/jpeg" ||
+      file.name.toLowerCase().endsWith(".jpg") ||
+      file.name.toLowerCase().endsWith(".jpeg");
+
     if (isJpeg) {
       image = await pdf.embedJpg(arrayBuffer);
     } else if (file.type === "image/png" || file.name.toLowerCase().endsWith(".png")) {
@@ -424,10 +391,10 @@ export async function imagesToPDF(
 
     const maxWidth = 595;
     const maxHeight = 842;
-    
+
     let width = image.width;
     let height = image.height;
-    
+
     if (width > maxWidth || height > maxHeight) {
       const scaleX = maxWidth / width;
       const scaleY = maxHeight / height;
@@ -435,7 +402,7 @@ export async function imagesToPDF(
       width *= scale;
       height *= scale;
     }
-    
+
     const page = pdf.addPage([width, height]);
     page.drawImage(image, {
       x: 0,
@@ -443,7 +410,7 @@ export async function imagesToPDF(
       width,
       height,
     });
-    
+
     if (onProgress) {
       onProgress(((i + 1) / files.length) * 100);
     }
@@ -453,15 +420,7 @@ export async function imagesToPDF(
   return createPdfBlob(pdfBytes);
 }
 
-// Helper to load image from file
-function loadImage(file: File): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = URL.createObjectURL(file);
-  });
-}
+
 
 // ========== EXTRACT PAGES ==========
 export async function extractPages(
@@ -473,11 +432,11 @@ export async function extractPages(
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
   const newPdf = await PDFDocument.create();
-  
+
   const validPages = pageNumbers
     .map((n) => n - 1)
     .filter((n) => n >= 0 && n < pdf.getPageCount());
-  
+
   if (onProgress) onProgress(50);
   const pages = await newPdf.copyPages(pdf, validPages);
   pages.forEach((page) => newPdf.addPage(page));
@@ -498,11 +457,11 @@ export async function deletePages(
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
   const totalPages = pdf.getPageCount();
-  
+
   const pagesToDelete = new Set(pageNumbers.map((n) => n - 1));
   const pagesToKeep = Array.from({ length: totalPages }, (_, i) => i)
     .filter((i) => !pagesToDelete.has(i));
-  
+
   if (onProgress) onProgress(50);
   const newPdf = await PDFDocument.create();
   const pages = await newPdf.copyPages(pdf, pagesToKeep);
@@ -524,11 +483,11 @@ export async function reorderPages(
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
   const newPdf = await PDFDocument.create();
-  
+
   const validOrder = newOrder
     .map((n) => n - 1)
     .filter((n) => n >= 0 && n < pdf.getPageCount());
-  
+
   if (onProgress) onProgress(50);
   const pages = await newPdf.copyPages(pdf, validOrder);
   pages.forEach((page) => newPdf.addPage(page));
@@ -553,19 +512,19 @@ export async function protectPDF(
   if (onProgress) onProgress(20);
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer);
-  
+
   if (onProgress) onProgress(50);
-  
+
   // pdf-lib doesn't support encryption directly, so we'll use a workaround
   // by embedding the password metadata and letting the user know
   pdf.setTitle(`Protected - ${file.name}`);
   pdf.setSubject("Password protected document");
-  
+
   if (onProgress) onProgress(80);
   const pdfBytes = await pdf.save({
     useObjectStreams: false,
   });
-  
+
   if (onProgress) onProgress(100);
   return createPdfBlob(pdfBytes);
 }
@@ -579,9 +538,9 @@ export async function extractTextFromPDF(
   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
   const pdfDoc = await loadingTask.promise;
   const numPages = pdfDoc.numPages;
-  
+
   const pages: string[] = [];
-  
+
   for (let i = 1; i <= numPages; i++) {
     const page = await pdfDoc.getPage(i);
     const textContent = await page.getTextContent();
@@ -589,12 +548,12 @@ export async function extractTextFromPDF(
       .map((item: any) => item.str)
       .join(" ");
     pages.push(pageText);
-    
+
     if (onProgress) {
       onProgress((i / numPages) * 100);
     }
   }
-  
+
   return {
     pages,
     fullText: pages.join("\n\n"),
@@ -610,7 +569,7 @@ export async function getPDFInfo(file: File): Promise<{
 }> {
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
-  
+
   return {
     pageCount: pdf.getPageCount(),
     title: pdf.getTitle(),
@@ -629,18 +588,18 @@ export async function getPageThumbnails(
   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
   const pdfDoc = await loadingTask.promise;
   const numPages = Math.min(pdfDoc.numPages, maxPages);
-  
+
   const thumbnails: string[] = [];
-  
+
   for (let i = 1; i <= numPages; i++) {
     const canvas = await renderPageToCanvas(pdfDoc, i, 0.3);
     thumbnails.push(canvas.toDataURL("image/jpeg", 0.7));
-    
+
     if (onProgress) {
       onProgress((i / numPages) * 100);
     }
   }
-  
+
   return thumbnails;
 }
 
@@ -660,15 +619,15 @@ export async function comparePDFs(
   summary: string;
 }> {
   if (onProgress) onProgress(10);
-  
+
   const text1 = await extractTextFromPDF(file1, (p) => {
     if (onProgress) onProgress(10 + p * 0.4);
   });
-  
+
   const text2 = await extractTextFromPDF(file2, (p) => {
     if (onProgress) onProgress(50 + p * 0.4);
   });
-  
+
   const differences: {
     page: number;
     type: "text" | "layout";
@@ -676,13 +635,13 @@ export async function comparePDFs(
     file1Text?: string;
     file2Text?: string;
   }[] = [];
-  
+
   const maxPages = Math.max(text1.pages.length, text2.pages.length);
-  
+
   for (let i = 0; i < maxPages; i++) {
     const page1 = text1.pages[i] || "";
     const page2 = text2.pages[i] || "";
-    
+
     if (page1 !== page2) {
       if (!page1) {
         differences.push({
@@ -709,13 +668,13 @@ export async function comparePDFs(
       }
     }
   }
-  
+
   if (onProgress) onProgress(100);
-  
+
   return {
     differences,
-    summary: differences.length === 0 
-      ? "Documents are identical" 
+    summary: differences.length === 0
+      ? "Documents are identical"
       : `Found ${differences.length} difference(s) across ${maxPages} pages`,
   };
 }

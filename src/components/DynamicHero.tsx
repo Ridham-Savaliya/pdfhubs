@@ -112,7 +112,7 @@ export function DynamicHero() {
   const filteredTools = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const query = searchQuery.toLowerCase();
-    return allTools.filter(tool => 
+    return allTools.filter(tool =>
       tool.name.toLowerCase().includes(query) ||
       tool.category.toLowerCase().includes(query)
     ).slice(0, 6);
@@ -148,12 +148,12 @@ export function DynamicHero() {
 
   // Use admin settings if enabled, otherwise use defaults
   const isEnabled = heroSettings?.enabled;
-  const title = isEnabled && heroSettings?.title 
-    ? heroSettings.title 
+  const title = isEnabled && heroSettings?.title
+    ? heroSettings.title
     : "Every tool you need to work with PDFs";
-  
-  const subtitle = isEnabled && heroSettings?.description 
-    ? heroSettings.description 
+
+  const subtitle = isEnabled && heroSettings?.description
+    ? heroSettings.description
     : "Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits, works in your browser.";
 
   const ctaText = isEnabled ? heroSettings?.cta_text : null;
@@ -162,7 +162,7 @@ export function DynamicHero() {
   const bgColor = isEnabled ? heroSettings?.background_color : null;
 
   return (
-    <section 
+    <section
       className="relative overflow-hidden"
       style={bgColor ? { backgroundColor: bgColor } : undefined}
     >
@@ -173,15 +173,15 @@ export function DynamicHero() {
           <div className="absolute inset-0 bg-gradient-mesh" />
         </>
       )}
-      
+
       {/* Floating decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-float-slow" />
         <div className="absolute top-1/4 -left-20 w-60 h-60 bg-primary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float-slow" style={{ animationDelay: "2s" }} />
-        
+
         {/* Subtle grid pattern */}
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
@@ -193,7 +193,7 @@ export function DynamicHero() {
       <div className="container relative py-20 md:py-32 lg:py-40">
         <div className="mx-auto max-w-4xl text-center">
           {/* Badge */}
-          <div 
+          <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium text-primary mb-8 animate-fade-up"
             style={{ animationDelay: "0ms" }}
           >
@@ -202,7 +202,7 @@ export function DynamicHero() {
           </div>
 
           {/* Heading */}
-          <h1 
+          <h1
             className="font-heading text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl animate-fade-up"
             style={{ animationDelay: "100ms" }}
           >
@@ -220,23 +220,23 @@ export function DynamicHero() {
               title
             )}
           </h1>
-          
-          <p 
+
+          <p
             className="mt-6 text-lg text-muted-foreground md:text-xl lg:text-2xl max-w-2xl mx-auto leading-relaxed animate-fade-up"
             style={{ animationDelay: "200ms" }}
-            dangerouslySetInnerHTML={{ 
-              __html: subtitle.replace('100% free', '<span class="text-foreground font-medium">100% free</span>') 
+            dangerouslySetInnerHTML={{
+              __html: subtitle.replace('100% free', '<span class="text-foreground font-medium">100% free</span>')
             }}
           />
 
           {/* CTA Button from admin settings */}
           {ctaText && ctaLink && (
-            <div 
+            <div
               className="mt-8 animate-fade-up"
               style={{ animationDelay: "250ms" }}
             >
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="text-lg px-8 py-6"
                 onClick={() => {
                   if (ctaLink.startsWith('http')) {
@@ -254,24 +254,24 @@ export function DynamicHero() {
 
           {/* Hero Image from admin settings */}
           {imageUrl && (
-            <div 
+            <div
               className="mt-10 animate-fade-up"
               style={{ animationDelay: "280ms" }}
             >
-              <img 
-                src={imageUrl} 
-                alt="Hero" 
+              <img
+                src={imageUrl}
+                alt="Hero"
                 className="mx-auto max-w-full h-auto rounded-xl shadow-2xl"
               />
             </div>
           )}
 
           {/* Search Bar */}
-          <div 
-            className="mt-10 animate-fade-up"
+          <div
+            className="mt-10 animate-fade-up relative z-50"
             style={{ animationDelay: "300ms" }}
           >
-            <div ref={searchContainerRef} className="relative mx-auto max-w-xl group" style={{ zIndex: 100 }}>
+            <div ref={searchContainerRef} className="relative mx-auto max-w-xl group">
               <div className="absolute -inset-1 bg-gradient-hero opacity-20 rounded-2xl blur-xl group-focus-within:opacity-30 transition-opacity" />
               <div className="relative">
                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary z-10" />
@@ -285,36 +285,38 @@ export function DynamicHero() {
                   className="h-16 pl-14 pr-5 text-lg rounded-2xl border-2 border-border bg-background shadow-lg focus-visible:ring-0 focus-visible:border-primary transition-all duration-300"
                 />
               </div>
-              
-              {/* Search Results Dropdown */}
+
               {showDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-popover/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-2 animate-fade-in" style={{ zIndex: 200 }}>
+                <div className="absolute top-full left-0 right-0 mt-4 z-50 bg-card border-2 border-border rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
                   {filteredTools.length > 0 ? (
-                    filteredTools.map((tool, index) => (
-                      <button
-                        key={tool.href}
-                        onClick={() => handleToolClick(tool.href)}
-                        className={`w-full text-left px-4 py-3 rounded-xl hover:bg-accent transition-colors flex items-center justify-between ${index === 0 ? 'bg-accent/50' : ''}`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="font-medium text-foreground">{tool.name}</span>
-                        </div>
-                        <span className="text-xs text-muted-foreground px-2 py-1 rounded-full bg-muted">{tool.category}</span>
-                      </button>
-                    ))
+                    <div className="max-h-80 overflow-y-auto">
+                      {filteredTools.map((tool, index) => (
+                        <button
+                          key={tool.href}
+                          onClick={() => handleToolClick(tool.href)}
+                          className={`w-full px-5 py-4 text-left flex items-center justify-between hover:bg-accent transition-colors ${index === 0 ? "bg-accent/30" : ""
+                            }`}
+                        >
+                          <span className="font-medium">{tool.name}</span>
+                          <span className="text-xs px-3 py-1.5 rounded-full bg-secondary">
+                            {tool.category}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   ) : (
-                    <div className="p-6 text-center text-muted-foreground">
-                      <p>No tools found for "<span className="text-foreground font-medium">{searchQuery}</span>"</p>
-                      <p className="text-sm mt-1">Try searching for "merge", "compress", or "convert"</p>
+                    <div className="p-8 text-center text-muted-foreground">
+                      No tools found for "<strong>{searchQuery}</strong>"
                     </div>
                   )}
                 </div>
               )}
+
             </div>
           </div>
 
           {/* Popular Tools - Lower z-index so dropdown appears above */}
-          <div 
+          <div
             className="mt-8 flex flex-wrap items-center justify-center gap-3 animate-fade-up relative z-0"
             style={{ animationDelay: "400ms" }}
           >
@@ -332,7 +334,7 @@ export function DynamicHero() {
           </div>
 
           {/* Feature pills */}
-          <div 
+          <div
             className="mt-12 flex flex-wrap items-center justify-center gap-6 animate-fade-up"
             style={{ animationDelay: "500ms" }}
           >

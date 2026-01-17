@@ -15,14 +15,6 @@
     </image:image>
   </url>
   
-  <!-- Authentication -->
-  <url>
-    <loc>https://www.pdfhubs.site/auth</loc>
-    <lastmod>2024-12-25</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  
   <!-- PDF Tools - High Priority (Core Features) -->
   <url>
     <loc>https://www.pdfhubs.site/tool/merge-pdf</loc>
@@ -135,6 +127,72 @@
     <lastmod>2024-12-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>
+  
+  <!-- Blog and Resources -->
+  <url>
+    <loc>https://www.pdfhubs.site/blog</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Blog Posts (Featured) -->
+  <url>
+    <loc>https://www.pdfhubs.site/blog/how-to-merge-pdf-files-online</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.pdfhubs.site/blog/how-to-compress-pdf-without-losing-quality</loc>
+    <lastmod>2025-01-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.pdfhubs.site/blog/convert-pdf-to-word-free-guide</loc>
+    <lastmod>2025-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.pdfhubs.site/blog/split-pdf-into-multiple-files</loc>
+    <lastmod>2025-01-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.pdfhubs.site/blog/add-digital-signature-to-pdf</loc>
+    <lastmod>2025-01-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Static Pages -->
+  <url>
+    <loc>https://www.pdfhubs.site/about</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.pdfhubs.site/contact</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.pdfhubs.site/privacy</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://www.pdfhubs.site/terms</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
   
 </urlset>

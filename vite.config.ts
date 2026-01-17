@@ -16,48 +16,66 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // Enable minification
+    // Modern browsers target for smaller and faster code
+    target: "esnext",
+    // Use esbuild for minification (fastest and handles dead code well)
     minify: "esbuild",
-    // Target modern browsers for smaller bundles
-    target: "es2020",
-    // Chunk splitting for better caching
+    // Better CSS code splitting
+    cssCodeSplit: true,
+    // Report compressed size
+    reportCompressedSize: false, // Disabling speeds up builds slightly
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: (id: string) => {
-          // Vendor chunk for React and core libraries
-          if (id.includes('node_modules/react/') || 
-              id.includes('node_modules/react-dom/') || 
-              id.includes('node_modules/react-router-dom/')) {
-            return 'vendor';
+        manualChunks: (id) => {
+          // Core React vendor chunk (critical for FCP)
+          if (id.includes('node_modules/react/') ||
+            id.includes('node_modules/react-dom/') ||
+            id.includes('node_modules/scheduler/')) {
+            return 'react-vendor';
           }
-          // UI components chunk - lazy load
-          if (id.includes('@radix-ui/')) {
-            return 'ui';
+
+          // React Router (navigation)
+          if (id.includes('node_modules/react-router')) {
+            return 'router-vendor';
           }
-          // PDF libraries chunk - only load on tool pages
-          if (id.includes('pdf-lib') || id.includes('pdfjs-dist') || id.includes('pdfmake')) {
-            return 'pdf';
+
+          // UI Component library (Radix UI - split by component if possible, or group small ones)
+          if (id.includes('@radix-ui')) {
+            return 'radix-ui';
           }
-          // Query and state management
-          if (id.includes('@tanstack/react-query')) {
-            return 'query';
-          }
-          // Supabase client
-          if (id.includes('@supabase/')) {
-            return 'supabase';
-          }
+
+          // Heavy Libraries - Lazy load them aggressively!
+          if (id.includes('pdfjs-dist')) return 'pdfjs';
+          if (id.includes('pdf-lib')) return 'pdflib';
+          if (id.includes('pdfmake')) return 'pdfmake';
+          if (id.includes('lucide-react')) return 'lucide-icons';
+
+          // Data fetching and state
+          if (id.includes('@tanstack/react-query')) return 'react-query';
+          if (id.includes('@supabase/')) return 'supabase';
+
+          // Utilities
+          if (id.includes('date-fns')) return 'date-fns';
         },
+        // Stable file names for better caching
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]',
       },
     },
-    // No source maps in production for smaller bundles
-    sourcemap: false,
-    // Compress CSS
-    cssMinify: true,
-    // Reduce chunk size warnings threshold
-    chunkSizeWarningLimit: 500,
   },
-  // Optimize dependencies
+  // Aggressively pre-bundle dependencies during dev for speed
   optimizeDeps: {
-    include: ["react", "react-dom", "react-router-dom"],
+    include: [
+      "react",
+      "react-dom",
+      "react-router-dom",
+      "lucide-react",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "clsx",
+      "tailwind-merge"
+    ],
   },
 }));

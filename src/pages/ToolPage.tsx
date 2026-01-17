@@ -8,31 +8,32 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Download, FileText, RotateCw, Loader2, Sparkles, Shield, Zap } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, lazy, Suspense } from "react";
 import { toast } from "sonner";
-import { PDFEditor } from "@/components/pdf-editor";
-import { PageOrganizer, PDFComparer, PDFSigner, ProtectPDF, UnlockPDF } from "@/components/pdf-tools";
+
+// Lazy load heavy tool components
+const PDFEditor = lazy(() => import("@/components/pdf-editor").then(m => ({ default: m.PDFEditor })));
+const PageOrganizer = lazy(() => import("@/components/pdf-tools/PageOrganizer").then(m => ({ default: m.PageOrganizer })));
+const PDFComparer = lazy(() => import("@/components/pdf-tools/PDFComparer").then(m => ({ default: m.PDFComparer })));
+const PDFSigner = lazy(() => import("@/components/pdf-tools/PDFSigner").then(m => ({ default: m.PDFSigner })));
+const ProtectPDF = lazy(() => import("@/components/pdf-tools/ProtectPDF").then(m => ({ default: m.ProtectPDF })));
+const UnlockPDF = lazy(() => import("@/components/pdf-tools/UnlockPDF").then(m => ({ default: m.UnlockPDF })));
+
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { SEOHead, toolSEO } from "@/components/SEOHead";
 import { ToolFAQ } from "@/components/ToolFAQ";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { RelatedTools } from "@/components/RelatedTools";
+import { ToolContent } from "@/components/ToolContent";
 import {
-  mergePDFs,
-  splitPDF,
-  compressPDF,
-  rotatePDF,
-  addWatermark,
-  addPageNumbers,
-  imagesToPDF,
-  pdfToImages,
   downloadFile,
   downloadFiles,
-  getPDFInfo,
-} from "@/lib/pdf-utils";
+} from "@/lib/file-utils";
 
-const toolInfo: Record<string, { 
-  title: string; 
-  description: string; 
+const toolInfo: Record<string, {
+  title: string;
+  description: string;
   color: string;
   acceptedFiles: string;
   minFiles?: number;
@@ -225,7 +226,7 @@ export default function ToolPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [pdfInfo, setPdfInfo] = useState<{ pageCount: number; fileSize: number } | null>(null);
-  
+
   // Options state
   const [rotation, setRotation] = useState<"90" | "180" | "270">("90");
   const [watermarkText, setWatermarkText] = useState("CONFIDENTIAL");
@@ -239,7 +240,7 @@ export default function ToolPage() {
   // Save conversion history
   const saveConversionHistory = async (fileName: string, fileSize: number, outputFileName: string) => {
     if (!user || !toolId || !tool) return;
-    
+
     try {
       await supabase.from('conversion_history').insert({
         user_id: user.id,
@@ -257,9 +258,11 @@ export default function ToolPage() {
   const handleFilesSelected = useCallback(async (newFiles: File[]) => {
     setFiles(newFiles);
     setProgress(0);
-    
+
     if (newFiles.length > 0 && newFiles[0].name.toLowerCase().endsWith('.pdf')) {
       try {
+        // Dynamically load getPDFInfo only when needed
+        const { getPDFInfo } = await import("@/lib/pdf-utils");
         const info = await getPDFInfo(newFiles[0]);
         setPdfInfo({ pageCount: info.pageCount, fileSize: info.fileSize });
       } catch (e) {
@@ -310,10 +313,13 @@ export default function ToolPage() {
     setProgress(0);
 
     try {
+      // Dynamically import the heavy PDF utilities ONLY when processing starts
+      const pdfUtils = await import("@/lib/pdf-utils");
+
       switch (toolId) {
         case "merge-pdf": {
           setProgress(20);
-          const blob = await mergePDFs(files);
+          const blob = await pdfUtils.mergePDFs(files, (p) => setProgress(p));
           setProgress(100);
           const outputName = "merged.pdf";
           downloadFile(blob, outputName);
@@ -324,7 +330,7 @@ export default function ToolPage() {
 
         case "split-pdf": {
           setProgress(20);
-          const blobs = await splitPDF(files[0]);
+          const blobs = await pdfUtils.splitPDF(files[0], (p) => setProgress(p));
           setProgress(80);
           const baseName = files[0].name.replace(".pdf", "");
           const filenames = blobs.map((_, i) => `${baseName}-page-${i + 1}.pdf`);
@@ -339,15 +345,15 @@ export default function ToolPage() {
           for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const originalSize = file.size;
-            
-            const blob = await compressPDF(file, compressionQuality, (p) => {
+
+            const blob = await pdfUtils.compressPDF(file, compressionQuality, (p) => {
               setProgress(((i + p / 100) / files.length) * 100);
             });
-            
+
             const newSize = blob.size;
             const reduction = ((originalSize - newSize) / originalSize * 100);
             const outputName = `compressed-${file.name}`;
-            
+
             downloadFile(blob, outputName);
             await saveConversionHistory(file.name, file.size, outputName);
             toast.success(
@@ -362,7 +368,7 @@ export default function ToolPage() {
           setProgress(20);
           for (const file of files) {
             const outputName = `rotated-${file.name}`;
-            const blob = await rotatePDF(file, rotationAngle);
+            const blob = await pdfUtils.rotatePDF(file, rotationAngle, (p) => setProgress(p));
             downloadFile(blob, outputName);
             await saveConversionHistory(file.name, file.size, outputName);
           }
@@ -380,7 +386,7 @@ export default function ToolPage() {
           setProgress(20);
           for (const file of files) {
             const outputName = `watermarked-${file.name}`;
-            const blob = await addWatermark(file, watermarkText, { position: watermarkPosition });
+            const blob = await pdfUtils.addWatermark(file, watermarkText, { position: watermarkPosition }, (p) => setProgress(p));
             downloadFile(blob, outputName);
             await saveConversionHistory(file.name, file.size, outputName);
           }
@@ -393,7 +399,7 @@ export default function ToolPage() {
           setProgress(20);
           for (const file of files) {
             const outputName = `numbered-${file.name}`;
-            const blob = await addPageNumbers(file, { position: pageNumberPosition });
+            const blob = await pdfUtils.addPageNumbers(file, { position: pageNumberPosition }, (p) => setProgress(p));
             downloadFile(blob, outputName);
             await saveConversionHistory(file.name, file.size, outputName);
           }
@@ -404,7 +410,7 @@ export default function ToolPage() {
 
         case "jpg-to-pdf": {
           setProgress(20);
-          const blob = await imagesToPDF(files);
+          const blob = await pdfUtils.imagesToPDF(files, (p) => setProgress(p));
           setProgress(100);
           const outputName = "images-converted.pdf";
           downloadFile(blob, outputName);
@@ -417,11 +423,11 @@ export default function ToolPage() {
           for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const baseName = file.name.replace(".pdf", "");
-            
-            const blobs = await pdfToImages(file, { format: imageFormat, quality: 0.9 }, (p) => {
+
+            const blobs = await pdfUtils.pdfToImages(file, { format: imageFormat, quality: 0.9 }, (p) => {
               setProgress(((i + p / 100) / files.length) * 100);
             });
-            
+
             const ext = imageFormat === "png" ? "png" : "jpg";
             const filenames = blobs.map((_, j) => `${baseName}-page-${j + 1}.${ext}`);
             downloadFiles(blobs, filenames);
@@ -471,7 +477,6 @@ export default function ToolPage() {
           toast.info("Word to PDF conversion is coming soon!");
           break;
 
-        // These tools use their own specialized components
         case "protect-pdf":
         case "unlock-pdf":
         case "edit-pdf":
@@ -479,7 +484,7 @@ export default function ToolPage() {
         case "organize-pages":
         case "compare-pdf":
         case "compare-pdfs":
-          // These are handled by specialized components, no action needed here
+          // Handled by components
           break;
 
         default:
@@ -516,7 +521,7 @@ export default function ToolPage() {
 
   // Get SEO data for this tool
   const seoData = toolId && toolSEO[toolId] ? toolSEO[toolId] : null;
-  const canonicalUrl = `https://www.pdfhubs.site/tools/${toolId}`;
+  const canonicalUrl = `https://www.pdfhubs.site/tool/${toolId}`;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -530,9 +535,9 @@ export default function ToolPage() {
           toolId={toolId}
         />
       )}
-      
+
       <Header />
-      
+
       <main className="flex-1">
         {/* Hero section */}
         <div className="bg-gradient-hero-soft relative overflow-hidden">
@@ -575,261 +580,263 @@ export default function ToolPage() {
         {/* Main content */}
         <div className="container py-12">
           <div className="max-w-4xl mx-auto">
-            {/* Special tool interfaces */}
-            {toolId === "edit-pdf" && files.length > 0 ? (
-              <PDFEditor file={files[0]} />
-            ) : toolId === "organize-pages" && files.length > 0 ? (
-              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
-                <PageOrganizer file={files[0]} />
-              </div>
-            ) : toolId === "sign-pdf" && files.length > 0 ? (
-              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
-                <PDFSigner file={files[0]} />
-              </div>
-            ) : toolId === "compare-pdf" && files.length === 2 ? (
-              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
-                <PDFComparer files={files} />
-              </div>
-            ) : toolId === "protect-pdf" ? (
-              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
-                <FileUploader
-                  onFilesSelected={handleFilesSelected}
-                  accept={tool.acceptedFiles}
-                  maxFiles={tool.maxFiles}
-                />
-                {files.length > 0 && (
-                  <div className="mt-6">
-                    <ProtectPDF files={files} />
-                  </div>
-                )}
-              </div>
-            ) : toolId === "unlock-pdf" ? (
-              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
-                <FileUploader
-                  onFilesSelected={handleFilesSelected}
-                  accept={tool.acceptedFiles}
-                  maxFiles={tool.maxFiles}
-                />
-                {files.length > 0 && (
-                  <div className="mt-6">
-                    <UnlockPDF files={files} />
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="bg-card rounded-3xl shadow-xl border border-border p-8 md:p-10 animate-fade-in">
-                <FileUploader
-                  onFilesSelected={handleFilesSelected}
-                  accept={tool.acceptedFiles}
-                  maxFiles={tool.maxFiles}
-                />
+            {/* Breadcrumb */}
+            <Breadcrumb items={[
+              { label: "PDF Tools", href: "/" },
+              { label: tool.title }
+            ]} />
 
-              {pdfInfo && (
-                <div className="mt-6 p-4 bg-secondary/50 rounded-2xl flex items-center gap-3 animate-fade-in">
-                  <div className="p-2 rounded-xl bg-primary/10">
-                    <FileText className="h-5 w-5 text-primary" />
-                  </div>
-                  <span className="text-sm text-foreground">
-                    <span className="font-medium">{pdfInfo.pageCount} page{pdfInfo.pageCount !== 1 ? 's' : ''}</span>
-                    <span className="text-muted-foreground"> • {formatFileSize(pdfInfo.fileSize)}</span>
-                  </span>
+            {/* Suspense wrapper for lazy loaded tools */}
+            <Suspense fallback={
+              <div className="flex flex-col items-center justify-center p-12 bg-card rounded-3xl border border-border">
+                <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
+                <p className="text-muted-foreground">Loading tool...</p>
+              </div>
+            }>
+              {/* Special tool interfaces */}
+              {toolId === "edit-pdf" && files.length > 0 ? (
+                <PDFEditor file={files[0]} />
+              ) : toolId === "organize-pages" && files.length > 0 ? (
+                <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
+                  <PageOrganizer file={files[0]} />
                 </div>
-              )}
-
-              {/* Compression Options */}
-              {files.length > 0 && toolId === "compress-pdf" && (
-                <div className="mt-6 p-6 bg-secondary/50 rounded-2xl space-y-4 animate-fade-in">
-                  <Label className="text-sm font-medium text-foreground block">
-                    Compression Level
-                  </Label>
-                  <div className="grid grid-cols-3 gap-3">
-                    {(["low", "medium", "high"] as const).map((level) => (
-                      <Button
-                        key={level}
-                        variant={compressionQuality === level ? "default" : "outline"}
-                        onClick={() => setCompressionQuality(level)}
-                        className={`flex-col h-auto py-4 ${compressionQuality === level ? 'bg-gradient-primary shadow-md' : ''}`}
-                      >
-                        <span className="capitalize font-medium">{level}</span>
-                        <span className="text-xs opacity-70 mt-1">
-                          {level === "low" && "Smallest file"}
-                          {level === "medium" && "Balanced"}
-                          {level === "high" && "Best quality"}
-                        </span>
-                      </Button>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Lower quality = smaller file size. Medium is recommended for most uses.
-                  </p>
+              ) : toolId === "sign-pdf" && files.length > 0 ? (
+                <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
+                  <PDFSigner file={files[0]} />
                 </div>
-              )}
-
-              {/* Rotate Options */}
-              {files.length > 0 && toolId === "rotate-pdf" && (
-                <div className="mt-6 p-6 bg-secondary/50 rounded-2xl animate-fade-in">
-                  <Label className="text-sm font-medium text-foreground mb-4 block">
-                    Rotation Angle
-                  </Label>
-                  <div className="flex gap-3">
-                    {(["90", "180", "270"] as const).map((angle) => (
-                      <Button
-                        key={angle}
-                        variant={rotation === angle ? "default" : "outline"}
-                        onClick={() => setRotation(angle)}
-                        className={`flex-1 ${rotation === angle ? 'bg-gradient-primary shadow-md' : ''}`}
-                      >
-                        <RotateCw className="h-4 w-4 mr-2" />
-                        {angle}° {angle === "90" ? "Right" : angle === "270" ? "Left" : "Flip"}
-                      </Button>
-                    ))}
-                  </div>
+              ) : toolId === "compare-pdf" && files.length === 2 ? (
+                <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
+                  <PDFComparer files={files} />
                 </div>
-              )}
-
-              {/* Watermark Options */}
-              {files.length > 0 && toolId === "add-watermark" && (
-                <div className="mt-6 p-6 bg-secondary/50 rounded-2xl space-y-5 animate-fade-in">
-                  <div>
-                    <Label className="text-sm font-medium text-foreground mb-2 block">
-                      Watermark Text
-                    </Label>
-                    <Input
-                      value={watermarkText}
-                      onChange={(e) => setWatermarkText(e.target.value)}
-                      placeholder="Enter watermark text"
-                      className="bg-background border-border"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-foreground mb-3 block">
-                      Style
-                    </Label>
-                    <div className="grid grid-cols-3 gap-3">
-                      {(["diagonal", "center", "tiled"] as const).map((pos) => (
-                        <Button
-                          key={pos}
-                          variant={watermarkPosition === pos ? "default" : "outline"}
-                          onClick={() => setWatermarkPosition(pos)}
-                          className={`capitalize ${watermarkPosition === pos ? 'bg-gradient-primary shadow-md' : ''}`}
-                        >
-                          {pos}
-                        </Button>
-                      ))}
+              ) : toolId === "protect-pdf" ? (
+                <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
+                  <FileUploader
+                    onFilesSelected={handleFilesSelected}
+                    accept={tool.acceptedFiles}
+                    maxFiles={tool.maxFiles}
+                  />
+                  {files.length > 0 && (
+                    <div className="mt-6">
+                      <ProtectPDF files={files} />
                     </div>
-                  </div>
+                  )}
                 </div>
-              )}
-
-              {/* Page Number Options */}
-              {files.length > 0 && toolId === "add-page-numbers" && (
-                <div className="mt-6 p-6 bg-secondary/50 rounded-2xl animate-fade-in">
-                  <Label className="text-sm font-medium text-foreground mb-3 block">
-                    Position
-                  </Label>
-                  <Select value={pageNumberPosition} onValueChange={(v) => setPageNumberPosition(v as typeof pageNumberPosition)}>
-                    <SelectTrigger className="bg-background">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="bottom-center">Bottom Center</SelectItem>
-                      <SelectItem value="bottom-left">Bottom Left</SelectItem>
-                      <SelectItem value="bottom-right">Bottom Right</SelectItem>
-                      <SelectItem value="top-center">Top Center</SelectItem>
-                    </SelectContent>
-                  </Select>
+              ) : toolId === "unlock-pdf" ? (
+                <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
+                  <FileUploader
+                    onFilesSelected={handleFilesSelected}
+                    accept={tool.acceptedFiles}
+                    maxFiles={tool.maxFiles}
+                  />
+                  {files.length > 0 && (
+                    <div className="mt-6">
+                      <UnlockPDF files={files} />
+                    </div>
+                  )}
                 </div>
-              )}
+              ) : (
+                <div className="bg-card rounded-3xl shadow-xl border border-border p-8 md:p-10 animate-fade-in">
+                  <FileUploader
+                    onFilesSelected={handleFilesSelected}
+                    accept={tool.acceptedFiles}
+                    maxFiles={tool.maxFiles}
+                  />
 
-              {/* PDF to Image Options */}
-              {files.length > 0 && toolId === "pdf-to-jpg" && (
-                <div className="mt-6 p-6 bg-secondary/50 rounded-2xl animate-fade-in">
-                  <Label className="text-sm font-medium text-foreground mb-3 block">
-                    Output Format
-                  </Label>
-                  <div className="flex gap-3">
-                    {(["jpeg", "png"] as const).map((fmt) => (
+                  {pdfInfo && (
+                    <div className="mt-6 p-4 bg-secondary/50 rounded-2xl flex items-center gap-3 animate-fade-in">
+                      <div className="p-2 rounded-xl bg-primary/10">
+                        <FileText className="h-5 w-5 text-primary" />
+                      </div>
+                      <span className="text-sm text-foreground">
+                        <span className="font-medium">{pdfInfo.pageCount} page{pdfInfo.pageCount !== 1 ? 's' : ''}</span>
+                        <span className="text-muted-foreground"> • {formatFileSize(pdfInfo.fileSize)}</span>
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Compression Options */}
+                  {files.length > 0 && toolId === "compress-pdf" && (
+                    <div className="mt-6 p-6 bg-secondary/50 rounded-2xl space-y-4 animate-fade-in">
+                      <Label className="text-sm font-medium text-foreground block">
+                        Compression Level
+                      </Label>
+                      <div className="grid grid-cols-3 gap-3">
+                        {(["low", "medium", "high"] as const).map((level) => (
+                          <Button
+                            key={level}
+                            variant={compressionQuality === level ? "default" : "outline"}
+                            onClick={() => setCompressionQuality(level)}
+                            className={`flex-col h-auto py-4 ${compressionQuality === level ? 'bg-gradient-primary shadow-md' : ''}`}
+                          >
+                            <span className="capitalize font-medium">{level}</span>
+                            <span className="text-xs opacity-70 mt-1">
+                              {level === "low" && "Smallest file"}
+                              {level === "medium" && "Balanced"}
+                              {level === "high" && "Best quality"}
+                            </span>
+                          </Button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Lower quality = smaller file size. Medium is recommended for most uses.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Rotate Options */}
+                  {files.length > 0 && toolId === "rotate-pdf" && (
+                    <div className="mt-6 p-6 bg-secondary/50 rounded-2xl animate-fade-in">
+                      <Label className="text-sm font-medium text-foreground mb-4 block">
+                        Rotation Angle
+                      </Label>
+                      <div className="flex gap-3">
+                        {(["90", "180", "270"] as const).map((angle) => (
+                          <Button
+                            key={angle}
+                            variant={rotation === angle ? "default" : "outline"}
+                            onClick={() => setRotation(angle)}
+                            className={`flex-1 ${rotation === angle ? 'bg-gradient-primary shadow-md' : ''}`}
+                          >
+                            <RotateCw className="h-4 w-4 mr-2" />
+                            {angle}° {angle === "90" ? "Right" : angle === "270" ? "Left" : "Flip"}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Watermark Options */}
+                  {files.length > 0 && toolId === "add-watermark" && (
+                    <div className="mt-6 p-6 bg-secondary/50 rounded-2xl space-y-5 animate-fade-in">
+                      <div>
+                        <Label className="text-sm font-medium text-foreground mb-2 block">
+                          Watermark Text
+                        </Label>
+                        <Input
+                          value={watermarkText}
+                          onChange={(e) => setWatermarkText(e.target.value)}
+                          placeholder="Enter watermark text"
+                          className="bg-background border-border"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-foreground mb-3 block">
+                          Style
+                        </Label>
+                        <div className="grid grid-cols-3 gap-3">
+                          {(["diagonal", "center", "tiled"] as const).map((pos) => (
+                            <Button
+                              key={pos}
+                              variant={watermarkPosition === pos ? "default" : "outline"}
+                              onClick={() => setWatermarkPosition(pos)}
+                              className={`capitalize ${watermarkPosition === pos ? 'bg-gradient-primary shadow-md' : ''}`}
+                            >
+                              {pos}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Page Number Options */}
+                  {files.length > 0 && toolId === "add-page-numbers" && (
+                    <div className="mt-6 p-6 bg-secondary/50 rounded-2xl animate-fade-in">
+                      <Label className="text-sm font-medium text-foreground mb-3 block">
+                        Position
+                      </Label>
+                      <Select value={pageNumberPosition} onValueChange={(v) => setPageNumberPosition(v as typeof pageNumberPosition)}>
+                        <SelectTrigger className="bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="bottom-center">Bottom Center</SelectItem>
+                          <SelectItem value="bottom-left">Bottom Left</SelectItem>
+                          <SelectItem value="bottom-right">Bottom Right</SelectItem>
+                          <SelectItem value="top-center">Top Center</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* PDF to Image Options */}
+                  {files.length > 0 && toolId === "pdf-to-jpg" && (
+                    <div className="mt-6 p-6 bg-secondary/50 rounded-2xl animate-fade-in">
+                      <Label className="text-sm font-medium text-foreground mb-3 block">
+                        Output Format
+                      </Label>
+                      <div className="flex gap-3">
+                        {(["jpeg", "png"] as const).map((fmt) => (
+                          <Button
+                            key={fmt}
+                            variant={imageFormat === fmt ? "default" : "outline"}
+                            onClick={() => setImageFormat(fmt)}
+                            className={`flex-1 uppercase ${imageFormat === fmt ? 'bg-gradient-primary shadow-md' : ''}`}
+                          >
+                            {fmt}
+                          </Button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-3">
+                        JPEG: smaller files, good for photos. PNG: lossless, good for text/graphics.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Progress Bar */}
+                  {isProcessing && progress > 0 && (
+                    <div className="mt-6 animate-fade-in">
+                      <div className="flex justify-between text-sm text-muted-foreground mb-2">
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Processing...
+                        </span>
+                        <span className="font-medium">{Math.round(progress)}%</span>
+                      </div>
+                      <Progress value={progress} className="h-2" />
+                    </div>
+                  )}
+
+                  {files.length > 0 && (
+                    <div className="mt-8 flex justify-center">
                       <Button
-                        key={fmt}
-                        variant={imageFormat === fmt ? "default" : "outline"}
-                        onClick={() => setImageFormat(fmt)}
-                        className={`flex-1 uppercase ${imageFormat === fmt ? 'bg-gradient-primary shadow-md' : ''}`}
+                        size="lg"
+                        onClick={handleProcess}
+                        disabled={isProcessing}
+                        className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-12 py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
                       >
-                        {fmt}
+                        {isProcessing ? (
+                          <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="mr-2 h-5 w-5" />
+                            {tool.serverSide ? "Convert PDF" : "Process PDF"}
+                          </>
+                        )}
                       </Button>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    JPEG: smaller files, good for photos. PNG: lossless, good for text/graphics.
-                  </p>
+                    </div>
+                  )}
                 </div>
               )}
+            </Suspense>
 
-              {/* Progress Bar */}
-              {isProcessing && progress > 0 && (
-                <div className="mt-6 animate-fade-in">
-                  <div className="flex justify-between text-sm text-muted-foreground mb-2">
-                    <span className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Processing...
-                    </span>
-                    <span className="font-medium">{Math.round(progress)}%</span>
-                  </div>
-                  <Progress value={progress} className="h-2" />
-                </div>
-              )}
-
-              {files.length > 0 && (
-                <div className="mt-8 flex justify-center">
-                  <Button
-                    size="lg"
-                    onClick={handleProcess}
-                    disabled={isProcessing}
-                    className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-12 py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        <Download className="mr-2 h-5 w-5" />
-                        Process & Download
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </div>
-            )}
-
-            {/* Security notice */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground animate-fade-in">
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-success" />
-                <span>Secure processing</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-success" />
-                <span>Instant results</span>
-              </div>
-              {!tool.serverSide && (
-                <div className="flex items-center gap-2">
-                  <span>🔒</span>
-                  <span>Files processed in your browser</span>
-                </div>
-              )}
+            <div className="mt-12 md:mt-16">
+              <ToolContent toolId={toolId || ""} />
             </div>
 
-            {/* FAQ Section for SEO */}
-            {toolId && (
-              <ToolFAQ toolId={toolId} toolTitle={tool.title} />
-            )}
+            <div className="mt-12 md:mt-16">
+              <ToolFAQ toolId={toolId || ""} />
+            </div>
+
+            <div className="mt-12 md:mt-16">
+              <RelatedTools currentToolId={toolId || ""} />
+            </div>
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );
