@@ -51,7 +51,7 @@ export function PDFSigner({ file }: PDFSignerProps) {
 
   const handleSignatureCreate = (signatureData: string) => {
     setSavedSignatures(prev => [...prev, signatureData]);
-    
+
     // Add signature to current page
     const newSignature: SignaturePlacement = {
       id: `sig-${Date.now()}`,
@@ -62,7 +62,7 @@ export function PDFSigner({ file }: PDFSignerProps) {
       width: 150,
       height: 60,
     };
-    
+
     setSignatures(prev => [...prev, newSignature]);
     setShowSignaturePad(false);
     toast.success('Signature added! Drag to position it.');
@@ -88,13 +88,13 @@ export function PDFSigner({ file }: PDFSignerProps) {
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!dragging || !containerRef.current) return;
-    
+
     const rect = containerRef.current.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
-    
-    setSignatures(prev => prev.map(sig => 
-      sig.id === dragging 
+
+    setSignatures(prev => prev.map(sig =>
+      sig.id === dragging
         ? { ...sig, x: Math.max(0, Math.min(80, x)), y: Math.max(0, Math.min(80, y)) }
         : sig
     ));
@@ -119,7 +119,7 @@ export function PDFSigner({ file }: PDFSignerProps) {
 
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
       const pdfPages = pdfDoc.getPages();
 
       setProgress(30);
@@ -135,19 +135,19 @@ export function PDFSigner({ file }: PDFSignerProps) {
         for (let i = 0; i < binaryString.length; i++) {
           imageBytes[i] = binaryString.charCodeAt(i);
         }
-        
+
         // Check if PNG or JPEG based on data URI
         const isPng = sig.signatureData.includes('image/png');
-        const image = isPng 
+        const image = isPng
           ? await pdfDoc.embedPng(imageBytes)
           : await pdfDoc.embedJpg(imageBytes);
-        
+
         const { width: pageWidth, height: pageHeight } = page.getSize();
-        
+
         // Get container dimensions for accurate positioning
         const containerWidth = containerRef.current?.clientWidth || 800;
         const containerHeight = containerRef.current?.clientHeight || 600;
-        
+
         // Calculate signature dimensions and position relative to page
         const sigWidth = (sig.width / containerWidth) * pageWidth;
         const sigHeight = (sig.height / containerHeight) * pageHeight;
@@ -167,7 +167,7 @@ export function PDFSigner({ file }: PDFSignerProps) {
 
       const pdfBytes = await pdfDoc.save();
       const blob = new Blob([new Uint8Array(pdfBytes).buffer as ArrayBuffer], { type: 'application/pdf' });
-      
+
       setProgress(100);
       downloadFile(blob, `signed-${file.name}`);
       toast.success('PDF signed and downloaded!');
@@ -194,7 +194,7 @@ export function PDFSigner({ file }: PDFSignerProps) {
   return (
     <div className="space-y-6">
       {showSignaturePad ? (
-        <SignaturePad 
+        <SignaturePad
           onSignatureCreate={handleSignatureCreate}
           onClose={() => setShowSignaturePad(false)}
         />
@@ -207,7 +207,7 @@ export function PDFSigner({ file }: PDFSignerProps) {
                 <PenLine className="h-4 w-4 mr-2" />
                 Create Signature
               </Button>
-              
+
               {savedSignatures.length > 0 && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">Saved:</span>
@@ -223,9 +223,9 @@ export function PDFSigner({ file }: PDFSignerProps) {
                 </div>
               )}
             </div>
-            
-            <Button 
-              onClick={handleSave} 
+
+            <Button
+              onClick={handleSave}
               disabled={processing || signatures.length === 0}
             >
               {processing ? (
@@ -252,11 +252,10 @@ export function PDFSigner({ file }: PDFSignerProps) {
                 <button
                   key={index}
                   onClick={() => setCurrentPage(index)}
-                  className={`w-full rounded-lg border-2 overflow-hidden transition-all ${
-                    currentPage === index 
-                      ? 'border-primary shadow-md' 
+                  className={`w-full rounded-lg border-2 overflow-hidden transition-all ${currentPage === index
+                      ? 'border-primary shadow-md'
                       : 'border-border hover:border-primary/50'
-                  }`}
+                    }`}
                 >
                   <img src={thumb} alt={`Page ${index + 1}`} className="w-full" />
                   <span className="text-xs text-muted-foreground block py-1">
@@ -267,20 +266,20 @@ export function PDFSigner({ file }: PDFSignerProps) {
             </div>
 
             {/* Main Canvas */}
-            <div 
+            <div
               ref={containerRef}
               className="flex-1 relative bg-white rounded-xl shadow-lg overflow-hidden"
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
             >
-              <img 
-                src={pages[currentPage]} 
+              <img
+                src={pages[currentPage]}
                 alt={`Page ${currentPage + 1}`}
                 className="w-full"
                 draggable={false}
               />
-              
+
               {/* Signature Overlays */}
               {currentPageSignatures.map((sig) => (
                 <div
@@ -295,8 +294,8 @@ export function PDFSigner({ file }: PDFSignerProps) {
                   onMouseDown={(e) => handleMouseDown(e, sig.id)}
                 >
                   <div className="relative w-full h-full">
-                    <img 
-                      src={sig.signatureData} 
+                    <img
+                      src={sig.signatureData}
                       alt="Signature"
                       className="w-full h-full object-contain border-2 border-dashed border-primary/50 rounded bg-white/80"
                       draggable={false}

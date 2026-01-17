@@ -19,7 +19,7 @@ export {
 };
 
 // Set up PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs`;
 
 // Helper functions (createPdfBlob, downloadFile, etc.) are now imported from file-utils.ts
 
@@ -57,7 +57,7 @@ export async function mergePDFs(
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const arrayBuffer = await readFileAsArrayBuffer(file);
-    const pdf = await PDFDocument.load(arrayBuffer);
+    const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
     const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
     pages.forEach((page) => mergedPdf.addPage(page));
 
@@ -76,7 +76,7 @@ export async function splitPDF(
   onProgress?: (progress: number) => void
 ): Promise<Blob[]> {
   const arrayBuffer = await readFileAsArrayBuffer(file);
-  const pdf = await PDFDocument.load(arrayBuffer);
+  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
   const pageCount = pdf.getPageCount();
   const blobs: Blob[] = [];
 
@@ -165,7 +165,7 @@ export async function rotatePDF(
 ): Promise<Blob> {
   if (onProgress) onProgress(20);
   const arrayBuffer = await readFileAsArrayBuffer(file);
-  const pdf = await PDFDocument.load(arrayBuffer);
+  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
   const pages = pdf.getPages();
 
   pages.forEach((page, index) => {
@@ -202,7 +202,7 @@ export async function addWatermark(
 
   if (onProgress) onProgress(10);
   const arrayBuffer = await readFileAsArrayBuffer(file);
-  const pdf = await PDFDocument.load(arrayBuffer);
+  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
   const pages = pdf.getPages();
   const font = await pdf.embedFont(StandardFonts.HelveticaBold);
   if (onProgress) onProgress(30);
@@ -275,7 +275,7 @@ export async function addPageNumbers(
 
   if (onProgress) onProgress(10);
   const arrayBuffer = await readFileAsArrayBuffer(file);
-  const pdf = await PDFDocument.load(arrayBuffer);
+  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
   const pages = pdf.getPages();
   const totalPages = pages.length;
   const font = await pdf.embedFont(StandardFonts.Helvetica);
@@ -430,7 +430,7 @@ export async function extractPages(
 ): Promise<Blob> {
   if (onProgress) onProgress(20);
   const arrayBuffer = await readFileAsArrayBuffer(file);
-  const pdf = await PDFDocument.load(arrayBuffer);
+  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
   const newPdf = await PDFDocument.create();
 
   const validPages = pageNumbers
@@ -455,7 +455,7 @@ export async function deletePages(
 ): Promise<Blob> {
   if (onProgress) onProgress(20);
   const arrayBuffer = await readFileAsArrayBuffer(file);
-  const pdf = await PDFDocument.load(arrayBuffer);
+  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
   const totalPages = pdf.getPageCount();
 
   const pagesToDelete = new Set(pageNumbers.map((n) => n - 1));
@@ -481,7 +481,7 @@ export async function reorderPages(
 ): Promise<Blob> {
   if (onProgress) onProgress(20);
   const arrayBuffer = await readFileAsArrayBuffer(file);
-  const pdf = await PDFDocument.load(arrayBuffer);
+  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
   const newPdf = await PDFDocument.create();
 
   const validOrder = newOrder
@@ -511,7 +511,7 @@ export async function protectPDF(
 ): Promise<Blob> {
   if (onProgress) onProgress(20);
   const arrayBuffer = await readFileAsArrayBuffer(file);
-  const pdf = await PDFDocument.load(arrayBuffer);
+  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
 
   if (onProgress) onProgress(50);
 
@@ -604,6 +604,11 @@ export async function getPageThumbnails(
 }
 
 // ========== COMPARE PDFs ==========
+import * as Diff from 'diff';
+
+// ... (existing imports)
+
+// ========== COMPARE PDFs ==========
 export async function comparePDFs(
   file1: File,
   file2: File,
@@ -613,10 +618,11 @@ export async function comparePDFs(
     page: number;
     type: "text" | "layout";
     description: string;
-    file1Text?: string;
-    file2Text?: string;
+    diffs?: Diff.Change[];
   }[];
   summary: string;
+  pageCount1: number;
+  pageCount2: number;
 }> {
   if (onProgress) onProgress(10);
 
@@ -632,8 +638,7 @@ export async function comparePDFs(
     page: number;
     type: "text" | "layout";
     description: string;
-    file1Text?: string;
-    file2Text?: string;
+    diffs?: Diff.Change[];
   }[] = [];
 
   const maxPages = Math.max(text1.pages.length, text2.pages.length);
@@ -643,28 +648,31 @@ export async function comparePDFs(
     const page2 = text2.pages[i] || "";
 
     if (page1 !== page2) {
-      if (!page1) {
+      if (!text1.pages[i]) {
         differences.push({
           page: i + 1,
           type: "layout",
           description: `Page ${i + 1} exists only in second document`,
-          file2Text: page2.substring(0, 200),
         });
-      } else if (!page2) {
+      } else if (!text2.pages[i]) {
         differences.push({
           page: i + 1,
           type: "layout",
           description: `Page ${i + 1} exists only in first document`,
-          file1Text: page1.substring(0, 200),
         });
       } else {
-        differences.push({
-          page: i + 1,
-          type: "text",
-          description: `Text differs on page ${i + 1}`,
-          file1Text: page1.substring(0, 200),
-          file2Text: page2.substring(0, 200),
-        });
+        // Use diff library to find exact differences
+        const diffs = Diff.diffWords(page1, page2);
+
+        // Only report if there are actual diffs (ignoring minor whitespace sometimes handled by logic above)
+        if (diffs.some(d => d.added || d.removed)) {
+          differences.push({
+            page: i + 1,
+            type: "text",
+            description: `Text differences on page ${i + 1}`,
+            diffs: diffs
+          });
+        }
       }
     }
   }
@@ -675,6 +683,8 @@ export async function comparePDFs(
     differences,
     summary: differences.length === 0
       ? "Documents are identical"
-      : `Found ${differences.length} difference(s) across ${maxPages} pages`,
+      : `Found differences on ${differences.length} page(s)`,
+    pageCount1: text1.pages.length,
+    pageCount2: text2.pages.length,
   };
 }

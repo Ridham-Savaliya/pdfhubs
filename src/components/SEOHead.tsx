@@ -61,7 +61,7 @@ export function SEOHead({
     updateMeta("og:image", absoluteOgImage, true);
     updateMeta("og:image:secure_url", absoluteOgImage, true);
     updateMeta("og:site_name", "PDFHubs", true);
-    
+
     if (canonical) {
       updateMeta("og:url", canonical, true);
     }
@@ -135,6 +135,11 @@ export const toolSEO: Record<string, { title: string; description: string; keywo
     title: "Split PDF Files Online Free - Extract Pages | PDFHubs",
     description: "Split PDF files into separate documents by page range. Free online PDF splitter tool. No software installation needed. Fast and secure.",
     keywords: "split PDF, extract PDF pages, separate PDF, PDF splitter online free, split pdf by pages, extract pages from pdf",
+  },
+  "extract-pages": {
+    title: "Extract PDF Pages Online Free - Select & Save Pages | PDFHubs",
+    description: "Extract specific pages from your PDF files. Create a new PDF with only the pages you need. Free, fast, and secure online tool.",
+    keywords: "extract PDF pages, save pdf pages, split pdf pages, extract pages from pdf online, pdf page extractor",
   },
   "compress-pdf": {
     title: "Compress PDF Files Online Free - Reduce PDF Size | PDFHubs",

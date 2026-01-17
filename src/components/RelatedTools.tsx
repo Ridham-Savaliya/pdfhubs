@@ -17,7 +17,8 @@ interface RelatedToolsProps {
 // Define tool relationships for better internal linking
 const toolRelationships: Record<string, string[]> = {
     "merge-pdf": ["split-pdf", "compress-pdf", "organize-pages", "pdf-to-word"],
-    "split-pdf": ["merge-pdf", "organize-pages", "compress-pdf", "pdf-to-jpg"],
+    "split-pdf": ["extract-pages", "merge-pdf", "organize-pages", "compress-pdf"],
+    "extract-pages": ["split-pdf", "organize-pages", "merge-pdf", "delete-pages"],
     "compress-pdf": ["merge-pdf", "split-pdf", "pdf-to-jpg", "pdf-to-word"],
     "pdf-to-word": ["merge-pdf", "pdf-to-excel", "pdf-to-ppt", "compress-pdf"],
     "pdf-to-excel": ["pdf-to-word", "pdf-to-ppt", "split-pdf", "merge-pdf"],
@@ -46,6 +47,12 @@ const allTools: Record<string, Omit<Tool, "id">> = {
         title: "Split PDF",
         description: "Split PDF into separate pages or sections",
         icon: "✂️",
+        color: "bg-tool-split"
+    },
+    "extract-pages": {
+        title: "Extract Pages",
+        description: "Save specific PDF pages to new file",
+        icon: "📄",
         color: "bg-tool-split"
     },
     "compress-pdf": {

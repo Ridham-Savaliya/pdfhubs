@@ -5,6 +5,7 @@ const footerLinks = {
   product: [
     { name: "Merge PDF", href: "/tool/merge-pdf" },
     { name: "Split PDF", href: "/tool/split-pdf" },
+    { name: "Extract Pages", href: "/tool/extract-pages" },
     { name: "Compress PDF", href: "/tool/compress-pdf" },
     { name: "Convert PDF", href: "/tool/pdf-to-word" },
     { name: "Edit PDF", href: "/tool/edit-pdf" },
@@ -41,9 +42,9 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2.5">
-              <img 
-                src="/favicon.png" 
-                alt="PDFTools Logo" 
+              <img
+                src="/favicon.png"
+                alt="PDFTools Logo"
                 className="h-10 w-10 rounded-xl shadow-md"
                 width="40"
                 height="40"
@@ -54,10 +55,10 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-4 text-muted-foreground leading-relaxed max-w-sm">
-              Free online PDF tools to merge, split, compress, convert, and edit PDF files. 
+              Free online PDF tools to merge, split, compress, convert, and edit PDF files.
               No installation, no registration, instant results.
             </p>
-            
+
             {/* Social links */}
             <div className="flex gap-3 mt-6">
               {socialLinks.map((social) => (

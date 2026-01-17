@@ -1,13 +1,13 @@
-import { 
-  Combine, 
-  Scissors, 
-  FileDown, 
-  FileType, 
-  FileEdit, 
-  RotateCw, 
-  Droplets, 
-  Lock, 
-  Unlock, 
+import {
+  Combine,
+  Scissors,
+  FileDown,
+  FileType,
+  FileEdit,
+  RotateCw,
+  Droplets,
+  Lock,
+  Unlock,
   LayoutGrid,
   FileImage,
   Image,
@@ -33,6 +33,13 @@ const tools = [
     description: "Separate PDF pages into individual files.",
     icon: Scissors,
     href: "/tool/split-pdf",
+    color: "bg-tool-split",
+  },
+  {
+    title: "Extract Pages",
+    description: "Extract specific pages from your PDF to a new file.",
+    icon: FileDown,
+    href: "/tool/extract-pages",
     color: "bg-tool-split",
   },
   {
@@ -157,7 +164,7 @@ export function ToolsGrid() {
         <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/3 rounded-full blur-3xl" />
       </div>
-      
+
       <div className="container relative">
         <div className="text-center mb-14">
           <h2 className="font-heading text-3xl font-bold text-foreground md:text-4xl lg:text-5xl animate-fade-up">

@@ -187,6 +187,14 @@ const toolInfo: Record<string, {
     minFiles: 2,
     maxFiles: 2,
   },
+  "extract-pages": {
+    title: "Extract Pages",
+    description: "Extract specific pages from your PDF document. Select pages to keep and create a new PDF.",
+    color: "bg-tool-split",
+    acceptedFiles: ".pdf",
+    minFiles: 1,
+    maxFiles: 1,
+  },
   "compare-pdfs": {
     title: "Compare PDFs",
     description: "Find text and layout differences between two PDF documents.",
@@ -214,6 +222,7 @@ const toolIcons: Record<string, React.ReactNode> = {
   "protect-pdf": "🔒",
   "unlock-pdf": "🔓",
   "organize-pages": "📑",
+  "extract-pages": "📄",
   "sign-pdf": "✍️",
   "compare-pdf": "⚖️",
   "compare-pdfs": "⚖️",
@@ -484,7 +493,13 @@ export default function ToolPage() {
         case "organize-pages":
         case "compare-pdf":
         case "compare-pdfs":
-          // Handled by components
+        case "extract-pages":
+          // Handled by components or special logic
+          if (toolId === "compare-pdf" || toolId === "compare-pdfs") {
+            if (files.length < 2) {
+              toast.error("Please upload 2 files to compare.");
+            }
+          }
           break;
 
         default:
@@ -596,7 +611,7 @@ export default function ToolPage() {
               {/* Special tool interfaces */}
               {toolId === "edit-pdf" && files.length > 0 ? (
                 <PDFEditor file={files[0]} />
-              ) : toolId === "organize-pages" && files.length > 0 ? (
+              ) : (toolId === "organize-pages" || toolId === "extract-pages") && files.length > 0 ? (
                 <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
                   <PageOrganizer file={files[0]} />
                 </div>
@@ -604,7 +619,7 @@ export default function ToolPage() {
                 <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
                   <PDFSigner file={files[0]} />
                 </div>
-              ) : toolId === "compare-pdf" && files.length === 2 ? (
+              ) : (toolId === "compare-pdf" || toolId === "compare-pdfs") && files.length === 2 ? (
                 <div className="bg-card rounded-3xl shadow-xl border border-border p-8 animate-fade-in">
                   <PDFComparer files={files} />
                 </div>
@@ -828,7 +843,7 @@ export default function ToolPage() {
             </div>
 
             <div className="mt-12 md:mt-16">
-              <ToolFAQ toolId={toolId || ""} />
+              <ToolFAQ toolId={toolId || ""} toolTitle={tool.title} />
             </div>
 
             <div className="mt-12 md:mt-16">

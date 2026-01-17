@@ -19,7 +19,7 @@ try {
 }
 
 // Set up PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs`;
 
 interface EncryptionOptions {
   userPassword: string;
@@ -53,17 +53,17 @@ async function renderPageToCanvas(
 ): Promise<HTMLCanvasElement> {
   const page = await pdfDoc.getPage(pageNum);
   const viewport = page.getViewport({ scale });
-  
+
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d')!;
   canvas.width = viewport.width;
   canvas.height = viewport.height;
-  
+
   await page.render({
     canvasContext: context,
     viewport: viewport,
   }).promise;
-  
+
   return canvas;
 }
 
@@ -82,39 +82,39 @@ export async function createEncryptedPDF(
   onProgress?: (progress: number) => void
 ): Promise<Blob> {
   if (onProgress) onProgress(5);
-  
+
   // Load the original PDF with pdfjs
   const arrayBuffer = await readFileAsArrayBuffer(file);
   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
   const pdfDoc = await loadingTask.promise;
   const numPages = pdfDoc.numPages;
-  
+
   if (onProgress) onProgress(10);
-  
+
   // Convert each page to an image
   const pageImages: { image: string; width: number; height: number }[] = [];
-  
+
   for (let i = 1; i <= numPages; i++) {
     const canvas = await renderPageToCanvas(pdfDoc, i, 2.0);
     const dataUrl = canvasToDataURL(canvas, 0.92);
-    
+
     // Get original page dimensions
     const page = await pdfDoc.getPage(i);
     const viewport = page.getViewport({ scale: 1 });
-    
+
     pageImages.push({
       image: dataUrl,
       width: viewport.width,
       height: viewport.height,
     });
-    
+
     if (onProgress) {
       onProgress(10 + (i / numPages) * 60);
     }
   }
-  
+
   if (onProgress) onProgress(75);
-  
+
   // Create document definition for pdfmake
   const docDefinition: any = {
     userPassword: options.userPassword,
@@ -146,14 +146,14 @@ export async function createEncryptedPDF(
       creator: 'PDFTools Encryption Engine',
     },
   };
-  
+
   if (onProgress) onProgress(85);
-  
+
   // Generate the encrypted PDF
   return new Promise((resolve, reject) => {
     try {
       const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-      
+
       pdfDocGenerator.getBlob((blob: Blob) => {
         if (onProgress) onProgress(100);
         resolve(blob);
@@ -174,7 +174,7 @@ export async function createSimpleEncryptedPDF(
   onProgress?: (progress: number) => void
 ): Promise<Blob> {
   if (onProgress) onProgress(20);
-  
+
   const docDefinition: any = {
     userPassword: options.userPassword,
     ownerPassword: options.ownerPassword || options.userPassword + '_owner',
@@ -197,13 +197,13 @@ export async function createSimpleEncryptedPDF(
       creator: 'PDFTools Encryption Engine',
     },
   };
-  
+
   if (onProgress) onProgress(50);
-  
+
   return new Promise((resolve, reject) => {
     try {
       const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-      
+
       pdfDocGenerator.getBlob((blob: Blob) => {
         if (onProgress) onProgress(100);
         resolve(blob);
