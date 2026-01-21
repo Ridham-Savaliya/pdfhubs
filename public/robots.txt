@@ -1,12 +1,14 @@
-# PDFTools robots.txt
+# PDFHubs robots.txt
 # https://www.pdfhubs.site
 
-# Allow all search engines
+# Allow all search engines full access
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Twitterbot
 Allow: /
@@ -20,19 +22,34 @@ Allow: /
 User-agent: Slurp
 Allow: /
 
+User-agent: DuckDuckBot
+Allow: /
+
 # General rules for all bots
 User-agent: *
 Allow: /
 
-# Block admin routes from indexing
+# Block admin routes from indexing (private area)
 Disallow: /admin
 Disallow: /admin/*
 
-# Block history (requires auth)
+# Block history page (requires authentication)
 Disallow: /history
 
-# Block API routes
+# Block API routes if any
 Disallow: /api/
 
-# Sitemap location
+# Important pages that should be crawled
+Allow: /tool/
+Allow: /blog/
+Allow: /about
+Allow: /contact
+Allow: /privacy
+Allow: /terms
+Allow: /auth
+
+# Sitemap location - important for indexing
 Sitemap: https://www.pdfhubs.site/sitemap.xml
+
+# Host directive (optional but helpful)
+Host: https://www.pdfhubs.site

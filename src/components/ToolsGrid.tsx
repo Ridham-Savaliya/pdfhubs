@@ -167,11 +167,14 @@ export function ToolsGrid() {
 
       <div className="container relative">
         <div className="text-center mb-14">
-          <h2 className="font-heading text-3xl font-bold text-foreground md:text-4xl lg:text-5xl animate-fade-up">
-            All PDF Tools You Need
+          <span className="inline-block px-4 py-1.5 mb-4 text-sm font-medium text-primary bg-primary/10 rounded-full">
+            19+ Free PDF Tools
+          </span>
+          <h2 className="font-heading text-3xl font-bold text-foreground md:text-4xl lg:text-5xl animate-fade-up" id="pdf-tools-heading">
+            All Free PDF Tools Online
           </h2>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-up" style={{ animationDelay: "100ms" }}>
-            Professional-grade PDF tools that work instantly in your browser. No installation, no signup.
+            Professional-grade PDF editor, converter & compressor tools that work instantly in your browser. No software installation, no signup required. 100% free.
           </p>
         </div>
 

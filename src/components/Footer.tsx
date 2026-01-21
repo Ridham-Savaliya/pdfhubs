@@ -7,29 +7,36 @@ const footerLinks = {
     { name: "Split PDF", href: "/tool/split-pdf" },
     { name: "Extract Pages", href: "/tool/extract-pages" },
     { name: "Compress PDF", href: "/tool/compress-pdf" },
-    { name: "Convert PDF", href: "/tool/pdf-to-word" },
+    { name: "Rotate PDF", href: "/tool/rotate-pdf" },
     { name: "Edit PDF", href: "/tool/edit-pdf" },
   ],
-  tools: [
+  convert: [
     { name: "PDF to Word", href: "/tool/pdf-to-word" },
     { name: "PDF to Excel", href: "/tool/pdf-to-excel" },
     { name: "PDF to JPG", href: "/tool/pdf-to-jpg" },
     { name: "JPG to PDF", href: "/tool/jpg-to-pdf" },
+    { name: "PDF to PowerPoint", href: "/tool/pdf-to-powerpoint" },
+    { name: "Word to PDF", href: "/tool/word-to-pdf" },
+  ],
+  security: [
+    { name: "Protect PDF", href: "/tool/protect-pdf" },
+    { name: "Unlock PDF", href: "/tool/unlock-pdf" },
+    { name: "Sign PDF", href: "/tool/sign-pdf" },
     { name: "Add Watermark", href: "/tool/add-watermark" },
+    { name: "Compare PDFs", href: "/tool/compare-pdf" },
+    { name: "Add Page Numbers", href: "/tool/add-page-numbers" },
   ],
   company: [
     { name: "About Us", href: "/about" },
     { name: "Blog", href: "/blog" },
     { name: "Contact", href: "/contact" },
-  ],
-  legal: [
     { name: "Privacy Policy", href: "/privacy" },
     { name: "Terms of Service", href: "/terms" },
   ],
 };
 
 const socialLinks = [
-  { name: "Twitter", icon: Twitter, href: "#" },
+  { name: "Twitter", icon: Twitter, href: "https://twitter.com/pdfhubs" },
   { name: "GitHub", icon: Github, href: "#" },
   { name: "LinkedIn", icon: Linkedin, href: "#" },
 ];
@@ -92,9 +99,25 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-heading font-semibold text-foreground mb-4">Tools</h3>
+            <h3 className="font-heading font-semibold text-foreground mb-4">Convert PDF</h3>
             <ul className="space-y-3">
-              {footerLinks.tools.map((link) => (
+              {footerLinks.convert.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    to={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-heading font-semibold text-foreground mb-4">PDF Security</h3>
+            <ul className="space-y-3">
+              {footerLinks.security.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.href}
@@ -122,28 +145,12 @@ export function Footer() {
               ))}
             </ul>
           </div>
-
-          <div>
-            <h3 className="font-heading font-semibold text-foreground mb-4">Legal</h3>
-            <ul className="space-y-3">
-              {footerLinks.legal.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.href}
-                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
 
         {/* Bottom bar */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} PDFTools. All rights reserved.
+            © {new Date().getFullYear()} PDFHubs. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground flex items-center gap-1">
             Made with <Heart className="h-4 w-4 text-primary fill-primary" /> for productivity

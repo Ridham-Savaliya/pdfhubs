@@ -53,8 +53,8 @@ interface HeroBannerSettings {
 // Default settings - render immediately without waiting for API
 const defaultHeroSettings: HeroBannerSettings = {
   enabled: false,
-  title: "Every tool you need to work with PDFs",
-  description: "Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits, works in your browser.",
+  title: "Free Online PDF Editor & Converter",
+  description: "Merge PDF, split PDF, compress PDF, convert PDF to Word, Excel & JPG. 100% free, no limits, works in your browser.",
   cta_text: "",
   cta_link: "",
   image_url: "",
@@ -150,11 +150,11 @@ export function DynamicHero() {
   const isEnabled = heroSettings?.enabled;
   const title = isEnabled && heroSettings?.title
     ? heroSettings.title
-    : "Every tool you need to work with PDFs";
+    : "Free Online PDF Editor & Converter";
 
   const subtitle = isEnabled && heroSettings?.description
     ? heroSettings.description
-    : "Merge, split, compress, convert, and edit PDFs instantly. 100% free, no limits, works in your browser.";
+    : "Merge PDF, split PDF, compress PDF, convert PDF to Word, Excel & JPG. 100% free, no limits, works in your browser.";
 
   const ctaText = isEnabled ? heroSettings?.cta_text : null;
   const ctaLink = isEnabled ? heroSettings?.cta_link : null;
@@ -206,7 +206,17 @@ export function DynamicHero() {
             className="font-heading text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl animate-fade-up"
             style={{ animationDelay: "100ms" }}
           >
-            {title.includes("work with PDFs") ? (
+            {title.includes("PDF Editor & Converter") ? (
+              <>
+                Free Online{" "}
+                <span className="relative">
+                  <span className="gradient-text">PDF Editor & Converter</span>
+                  <svg className="absolute -bottom-2 left-0 w-full h-3 text-primary/30" viewBox="0 0 200 12" preserveAspectRatio="none">
+                    <path d="M0,8 Q50,0 100,8 T200,8" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
+                  </svg>
+                </span>
+              </>
+            ) : title.includes("work with PDFs") ? (
               <>
                 Every tool you need to{" "}
                 <span className="relative">

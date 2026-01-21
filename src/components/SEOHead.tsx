@@ -14,10 +14,10 @@ interface SEOHeadProps {
 }
 
 const defaultSEO = {
-  title: "PDFHubs - Free Online PDF Editor | Merge, Split, Compress PDFs",
-  description: "Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files. No installation, no signup. 100% secure, works in your browser.",
+  title: "PDFHubs - #1 Free Online PDF Editor & Converter | Merge, Split, Compress PDF",
+  description: "Best free online PDF editor & converter 2026. Merge PDF files, split PDF, compress PDF, convert PDF to Word, Excel & JPG. No signup, no watermarks. 100% free & secure.",
   ogImage: `${BASE_URL}/og-image.png`,
-  keywords: "PDF editor, merge PDF, split PDF, compress PDF, PDF to Word, PDF converter, free PDF tools, online PDF editor, pdfhubs, pdf hubs",
+  keywords: "PDF editor, PDF editor online free, merge PDF, merge PDF files, combine PDF, split PDF, compress PDF, reduce PDF size, PDF to Word, PDF to Excel, PDF to JPG, convert PDF, free PDF tools, online PDF editor, pdfhubs, pdf hubs, best PDF editor, PDF converter free",
 };
 
 export function SEOHead({
@@ -95,7 +95,7 @@ export function SEOHead({
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": toolData.title.split(' | ')[0],
-        "url": `${BASE_URL}/tools/${toolId}`,
+        "url": `${BASE_URL}/tool/${toolId}`,
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Any",
         "offers": {

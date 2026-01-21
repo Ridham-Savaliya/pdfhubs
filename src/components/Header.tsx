@@ -20,7 +20,7 @@ const toolCategories = [
   },
   {
     name: "Organize PDF",
-    items: ["Merge PDF", "Split PDF", "Rotate PDF", "Organize Pages", "Extract Pages"],
+    items: ["Merge PDF", "Split PDF", "Compress PDF", "Rotate PDF", "Organize Pages", "Extract Pages"],
   },
   {
     name: "Edit PDF",
@@ -32,7 +32,7 @@ const toolCategories = [
   },
 ];
 
-const allTools = toolCategories.flatMap(category => 
+const allTools = toolCategories.flatMap(category =>
   category.items.map(item => ({
     name: item,
     category: category.name,
@@ -49,7 +49,7 @@ export function Header() {
   const filteredTools = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const query = searchQuery.toLowerCase();
-    return allTools.filter(tool => 
+    return allTools.filter(tool =>
       tool.name.toLowerCase().includes(query) ||
       tool.category.toLowerCase().includes(query)
     ).slice(0, 8);
@@ -72,9 +72,9 @@ export function Header() {
         <div className="flex items-center gap-8">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group" aria-label="PDFTools Home">
-            <img 
-              src="/favicon.png" 
-              alt="PDFTools Logo" 
+            <img
+              src="/favicon.png"
+              alt="PDFTools Logo"
               width="40"
               height="40"
               className="h-10 w-10 rounded-xl shadow-md group-hover:shadow-glow transition-shadow duration-300"
@@ -89,22 +89,22 @@ export function Header() {
             {toolCategories.map((category) => (
               <DropdownMenu key={category.name}>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="gap-1.5 text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
                   >
                     {category.name}
                     <ChevronDown className="h-4 w-4 opacity-50" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="start" 
+                <DropdownMenuContent
+                  align="start"
                   className="w-52 p-2"
                   sideOffset={8}
                 >
                   {category.items.map((item) => (
                     <DropdownMenuItem key={item} asChild>
-                      <Link 
+                      <Link
                         to={`/tool/${item.toLowerCase().replace(/\s+/g, "-")}`}
                         className="cursor-pointer py-2.5 px-3 rounded-lg hover:bg-accent focus:bg-accent transition-colors"
                       >
@@ -146,7 +146,7 @@ export function Header() {
                 </button>
               )}
             </div>
-            
+
             {/* Search Results Dropdown */}
             {isSearchOpen && filteredTools.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-xl shadow-lg p-2 z-50">
@@ -162,7 +162,7 @@ export function Header() {
                 ))}
               </div>
             )}
-            
+
             {isSearchOpen && searchQuery && filteredTools.length === 0 && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-xl shadow-lg p-4 z-50 text-center text-muted-foreground text-sm">
                 No tools found for "{searchQuery}"
@@ -172,8 +172,8 @@ export function Header() {
 
           {/* Click outside to close search */}
           {isSearchOpen && (
-            <div 
-              className="fixed inset-0 z-40" 
+            <div
+              className="fixed inset-0 z-40"
               onClick={() => setIsSearchOpen(false)}
             />
           )}
@@ -183,9 +183,9 @@ export function Header() {
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="gap-2 text-muted-foreground hover:text-foreground"
                     >
                       <div className="h-7 w-7 rounded-full bg-gradient-primary flex items-center justify-center">
@@ -216,7 +216,7 @@ export function Header() {
                       </>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={handleSignOut}
                       className="cursor-pointer py-2.5 px-3 rounded-lg hover:bg-accent flex items-center gap-2 text-destructive"
                     >
@@ -228,9 +228,9 @@ export function Header() {
               ) : (
                 <>
                   <Link to="/auth">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="hidden sm:flex gap-2 text-muted-foreground hover:text-foreground"
                     >
                       <User className="h-4 w-4" />
@@ -238,8 +238,8 @@ export function Header() {
                     </Button>
                   </Link>
                   <Link to="/auth">
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       className="hidden sm:flex bg-gradient-primary hover:opacity-90 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-300"
                     >
                       <Sparkles className="h-4 w-4 mr-2" />
@@ -263,9 +263,9 @@ export function Header() {
                 {/* Mobile menu header */}
                 <div className="p-6 border-b border-border">
                   <Link to="/" className="flex items-center gap-2.5" aria-label="PDFTools Home">
-                    <img 
-                      src="/favicon.png" 
-                      alt="PDFTools Logo" 
+                    <img
+                      src="/favicon.png"
+                      alt="PDFTools Logo"
                       width="40"
                       height="40"
                       className="h-10 w-10 rounded-xl"
