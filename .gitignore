@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 # google search console 
-service-account.json.json
+service-account.json
