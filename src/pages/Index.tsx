@@ -6,10 +6,12 @@ import { Features } from "@/components/Features";
 import { Stats } from "@/components/Stats";
 import { Footer } from "@/components/Footer";
 import { HomeFAQ } from "@/components/HomeFAQ";
+import { SEOHead } from "@/components/SEOHead";
 
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead canonical="https://www.pdfhubs.site" />
       <AnnouncementBar />
       <Header />
       <main className="flex-1">

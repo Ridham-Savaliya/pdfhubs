@@ -8,9 +8,23 @@ interface BlogSEOProps {
 
 export function BlogSEO({ post, isListPage }: BlogSEOProps) {
   useEffect(() => {
+    const canonicalUrl = isListPage
+      ? "https://www.pdfhubs.site/blog"
+      : post ? `https://www.pdfhubs.site/blog/${post.slug}` : null;
+
+    if (canonicalUrl) {
+      let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "canonical";
+        document.head.appendChild(link);
+      }
+      link.href = canonicalUrl;
+    }
+
     if (isListPage) {
       document.title = "PDF Tips & Tutorials Blog | PDFTools - Learn PDF Management";
-      
+
       const metaTags = {
         description: "Expert PDF tips, tutorials, and guides. Learn how to merge, compress, convert, and manage PDF documents effectively. Free resources for students, professionals, and businesses.",
         keywords: "pdf tips, pdf tutorials, pdf guide, how to merge pdf, how to compress pdf, pdf management, document tips",
@@ -30,7 +44,7 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
         let meta = document.querySelector(
           isOg ? `meta[property="${name}"]` : `meta[name="${name}"]`
         );
-        
+
         if (!meta) {
           meta = document.createElement("meta");
           if (isOg || isTwitter) {
@@ -70,7 +84,7 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
       script.textContent = JSON.stringify(structuredData);
     } else if (post) {
       document.title = `${post.title} | PDFTools Blog`;
-      
+
       const metaTags = {
         description: post.description,
         keywords: post.tags.join(", "),
@@ -93,7 +107,7 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
         let meta = document.querySelector(
           (isOg || isArticle) ? `meta[property="${name}"]` : `meta[name="${name}"]`
         );
-        
+
         if (!meta) {
           meta = document.createElement("meta");
           if (isOg || isArticle || isTwitter) {
@@ -151,3 +165,4 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
 
   return null;
 }
+
