@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/generate-sitemap.mjs && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "index": "node scripts/google-indexer.mjs"
+    "generate-sitemap": "node scripts/generate-sitemap.mjs",
+    "index": "node scripts/google-indexer.mjs",
+    "index-now": "node scripts/index-now.mjs"
   },
   "dependencies": {
     "@fontsource/outfit": "^5.2.8",
