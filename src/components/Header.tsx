@@ -71,10 +71,10 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-8">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group" aria-label="PDFTools Home">
+          <Link to="/" className="flex items-center gap-2.5 group" aria-label="PDFHubs Home">
             <img
               src="/favicon.png"
-              alt="PDFTools Logo"
+              alt="PDFHubs Logo"
               width="40"
               height="40"
               className="h-10 w-10 rounded-xl shadow-md group-hover:shadow-glow transition-shadow duration-300"
@@ -262,10 +262,10 @@ export function Header() {
               <div className="flex flex-col h-full">
                 {/* Mobile menu header */}
                 <div className="p-6 border-b border-border">
-                  <Link to="/" className="flex items-center gap-2.5" aria-label="PDFTools Home">
+                  <Link to="/" className="flex items-center gap-2.5" aria-label="PDFHubs Home">
                     <img
                       src="/favicon.png"
-                      alt="PDFTools Logo"
+                      alt="PDFHubs Logo"
                       width="40"
                       height="40"
                       className="h-10 w-10 rounded-xl"

@@ -8,8 +8,8 @@ export default function Terms() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead 
-        title="Terms of Service - PDFTools"
-        description="Read our terms of service to understand the rules and guidelines for using PDFTools services."
+        title="Terms of Service - PDFHubs"
+        description="Read our terms of service to understand the rules and guidelines for using PDFHubs services."
         canonical="https://www.pdfhubs.site/terms"
       />
       <Header />
@@ -34,14 +34,14 @@ export default function Terms() {
           <div className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground">
             <h2>1. Acceptance of Terms</h2>
             <p>
-              By accessing or using PDFTools (the "Service") at pdfhubs.site, you agree to be 
+              By accessing or using PDFHubs (the "Service") at pdfhubs.site, you agree to be 
               bound by these Terms of Service. If you do not agree to these terms, please do 
               not use our services.
             </p>
 
             <h2>2. Description of Service</h2>
             <p>
-              PDFTools provides free online tools for PDF document management, including but 
+              PDFHubs provides free online tools for PDF document management, including but 
               not limited to:
             </p>
             <ul>
@@ -70,7 +70,7 @@ export default function Terms() {
               the requested service.
             </p>
             <p>
-              The PDFTools name, logo, and service design are our intellectual property and 
+              The PDFHubs name, logo, and service design are our intellectual property and 
               may not be used without permission.
             </p>
 
@@ -105,7 +105,7 @@ export default function Terms() {
 
             <h2>8. Indemnification</h2>
             <p>
-              You agree to indemnify and hold harmless PDFTools, its officers, directors, 
+              You agree to indemnify and hold harmless PDFHubs, its officers, directors, 
               employees, and agents from any claims, damages, or expenses arising from your 
               use of the Service or violation of these terms.
             </p>

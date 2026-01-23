@@ -52,7 +52,7 @@ export function AdminSidebar() {
             <span>P</span>
           </div>
           <div>
-            <h2 className="font-bold text-foreground">PDFTools</h2>
+            <h2 className="font-bold text-foreground">PDFHubs</h2>
             <p className="text-xs text-muted-foreground">Admin Panel</p>
           </div>
         </div>

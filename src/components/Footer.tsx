@@ -51,7 +51,7 @@ export function Footer() {
             <Link to="/" className="flex items-center gap-2.5">
               <img
                 src="/favicon.png"
-                alt="PDFTools Logo"
+                alt="PDFHubs Logo"
                 className="h-10 w-10 rounded-xl shadow-md"
                 width="40"
                 height="40"

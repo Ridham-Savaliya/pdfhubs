@@ -8,8 +8,8 @@ export default function Privacy() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead 
-        title="Privacy Policy - PDFTools"
-        description="Read our privacy policy to understand how PDFTools handles your data. Your privacy and security are our top priorities."
+        title="Privacy Policy - PDFHubs"
+        description="Read our privacy policy to understand how PDFHubs handles your data. Your privacy and security are our top priorities."
         canonical="https://www.pdfhubs.site/privacy"
       />
       <Header />
@@ -34,7 +34,7 @@ export default function Privacy() {
           <div className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground">
             <h2>Introduction</h2>
             <p>
-              At PDFTools ("we", "our", or "us"), we are committed to protecting your privacy. 
+              At PDFHubs ("we", "our", or "us"), we are committed to protecting your privacy. 
               This Privacy Policy explains how we collect, use, and safeguard your information 
               when you use our website and services at pdfhubs.site.
             </p>

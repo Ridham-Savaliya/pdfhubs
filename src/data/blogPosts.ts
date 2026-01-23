@@ -59,7 +59,7 @@ No, the original quality of your PDFs is preserved during the merge process.
 You can merge up to 20 files at once, with a combined size limit of 500MB.
     `,
     category: 'how-to',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-15',
     readTime: 5,
     image: '/og-image.png',
@@ -111,7 +111,7 @@ The secret to quality compression is understanding your document's purpose:
 - **For archiving**: Balance between size and quality
     `,
     category: 'how-to',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-14',
     readTime: 6,
     image: '/og-image.png',
@@ -172,7 +172,7 @@ If your PDF is a scanned image, our OCR technology can extract text. Here's how 
 **Solution**: Check if the PDF has embedded images vs. linked images.
     `,
     category: 'how-to',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-13',
     readTime: 5,
     image: '/og-image.png',
@@ -228,7 +228,7 @@ Select only the pages containing forms you need.
 Extract specific slides or pages for distribution.
     `,
     category: 'how-to',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-12',
     readTime: 4,
     image: '/og-image.png',
@@ -287,7 +287,7 @@ Digital signatures are legally binding in most countries, including:
 - **Tamper detection**: Alerts if document is modified after signing
     `,
     category: 'how-to',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-11',
     readTime: 6,
     image: '/og-image.png',
@@ -342,7 +342,7 @@ After removing password:
 - Check your internet connection
     `,
     category: 'how-to',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-10',
     readTime: 4,
     image: '/og-image.png',
@@ -398,7 +398,7 @@ For multiple PDFs:
 4. Download as ZIP
     `,
     category: 'how-to',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-09',
     readTime: 3,
     image: '/og-image.png',
@@ -458,7 +458,7 @@ Choose placement style based on document type.
 - Ensure text remains readable
     `,
     category: 'how-to',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-08',
     readTime: 5,
     image: '/og-image.png',
@@ -527,7 +527,7 @@ Converting images to PDF is useful for:
 4. **Receipts**: Organize expense documentation
     `,
     category: 'how-to',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-07',
     readTime: 4,
     image: '/og-image.png',
@@ -588,7 +588,7 @@ Add text before or after numbers (e.g., "Page 1" or "1 of 50").
 - Test print before finalizing
     `,
     category: 'how-to',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-06',
     readTime: 4,
     image: '/og-image.png',
@@ -651,7 +651,7 @@ Use multiple techniques together for best results.
 | Combined approach | 60-80% |
     `,
     category: 'tips',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-05',
     readTime: 7,
     image: '/og-image.png',
@@ -725,7 +725,7 @@ Use multiple techniques together for best results.
 4. **Convert only when necessary**
     `,
     category: 'tips',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-04',
     readTime: 5,
     image: '/og-image.png',
@@ -793,7 +793,7 @@ Protecting PDFs prevents:
 ☐ Metadata cleaned
     `,
     category: 'tips',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-03',
     readTime: 6,
     image: '/og-image.png',
@@ -857,7 +857,7 @@ International guidelines for web content accessibility.
 ☐ Language specified
     `,
     category: 'tips',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-02',
     readTime: 8,
     image: '/og-image.png',
@@ -929,7 +929,7 @@ For very large files:
 - Consider cloud sharing
     `,
     category: 'tips',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2025-01-01',
     readTime: 5,
     image: '/og-image.png',
@@ -1001,7 +1001,7 @@ Every compression decision involves trade-offs between:
 5. Choose optimal balance
     `,
     category: 'tips',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2024-12-30',
     readTime: 6,
     image: '/og-image.png',
@@ -1075,7 +1075,7 @@ For interactions
 - No error messages
     `,
     category: 'tips',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2024-12-29',
     readTime: 7,
     image: '/og-image.png',
@@ -1154,7 +1154,7 @@ Metadata is information stored within a PDF about the document itself:
 4. **Remove personal data** when needed
     `,
     category: 'tips',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2024-12-28',
     readTime: 5,
     image: '/og-image.png',
@@ -1230,7 +1230,7 @@ Invoices/
 - Store securely for required periods
     `,
     category: 'industry',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2024-12-27',
     readTime: 6,
     image: '/og-image.png',
@@ -1307,7 +1307,7 @@ Use 256-bit AES encryption for sensitive legal documents.
 - Missing audit trail
     `,
     category: 'industry',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2024-12-26',
     readTime: 7,
     image: '/og-image.png',
@@ -1388,7 +1388,7 @@ Research/
 - OCR for scanned documents
     `,
     category: 'industry',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2024-12-25',
     readTime: 5,
     image: '/og-image.png',
@@ -1477,7 +1477,7 @@ Properties/
 \`\`\`
     `,
     category: 'industry',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2024-12-24',
     readTime: 6,
     image: '/og-image.png',
@@ -1560,7 +1560,7 @@ Properties/
 - Follow up on unsigned documents
     `,
     category: 'industry',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2024-12-23',
     readTime: 5,
     image: '/og-image.png',
@@ -1644,7 +1644,7 @@ Healthcare organizations must protect:
 - Excessive access permissions
     `,
     category: 'industry',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2024-12-22',
     readTime: 7,
     image: '/og-image.png',
@@ -1736,7 +1736,7 @@ Freelance/
 - PDF convert (format flexibility)
     `,
     category: 'industry',
-    author: 'PDFTools Team',
+    author: 'PDFHubs Team',
     publishedAt: '2024-12-21',
     readTime: 6,
     image: '/og-image.png',

@@ -74,8 +74,8 @@ export function UnlockPDF({ files }: UnlockPDFProps) {
     newPdf.setTitle(file.name.replace('.pdf', ''));
     newPdf.setSubject('');
     newPdf.setKeywords([]);
-    newPdf.setProducer('PDFTools');
-    newPdf.setCreator('PDFTools');
+    newPdf.setProducer('PDFHubs');
+    newPdf.setCreator('PDFHubs');
 
     const pdfBytes = await newPdf.save();
     const buffer = new ArrayBuffer(pdfBytes.length);
@@ -193,7 +193,7 @@ export function UnlockPDF({ files }: UnlockPDFProps) {
           </div>
           <p className="text-xs text-muted-foreground">
             {useServerSide 
-              ? 'Enhanced unlock with password verification for PDFTools-protected files.' 
+              ? 'Enhanced unlock with password verification for PDFHubs-protected files.' 
               : 'Basic unlock processed locally in your browser.'}
           </p>
         </div>

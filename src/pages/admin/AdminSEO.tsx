@@ -115,7 +115,7 @@ export default function AdminSEO() {
                 <Input
                   value={seoSettings.title}
                   onChange={(e) => setSeoSettings({ ...seoSettings, title: e.target.value })}
-                  placeholder="PDFTools - Free Online PDF Editor & Converter"
+                  placeholder="PDFHubs - Free Online PDF Editor & Converter"
                   maxLength={60}
                 />
                 <p className="text-xs text-muted-foreground">
@@ -142,7 +142,7 @@ export default function AdminSEO() {
                 <Input
                   value={seoSettings.canonical_url || ""}
                   onChange={(e) => setSeoSettings({ ...seoSettings, canonical_url: e.target.value })}
-                  placeholder="https://pdftools.app"
+                  placeholder="https://PDFHubs.app"
                 />
               </div>
             </CardContent>
@@ -200,7 +200,7 @@ export default function AdminSEO() {
                 <Input
                   value={seoSettings.og_image || ""}
                   onChange={(e) => setSeoSettings({ ...seoSettings, og_image: e.target.value })}
-                  placeholder="https://pdftools.app/og-image.png"
+                  placeholder="https://PDFHubs.app/og-image.png"
                 />
                 <p className="text-xs text-muted-foreground">
                   Recommended size: 1200x630 pixels
@@ -212,7 +212,7 @@ export default function AdminSEO() {
                 <Input
                   value={seoSettings.twitter_handle || ""}
                   onChange={(e) => setSeoSettings({ ...seoSettings, twitter_handle: e.target.value })}
-                  placeholder="@pdftools"
+                  placeholder="@PDFHubs"
                 />
               </div>
             </CardContent>
@@ -239,7 +239,7 @@ export default function AdminSEO() {
                   {seoSettings.title || 'Your Page Title'}
                 </p>
                 <p className="text-green-700 text-sm truncate">
-                  {seoSettings.canonical_url || 'https://pdftools.app'}
+                  {seoSettings.canonical_url || 'https://PDFHubs.app'}
                 </p>
                 <p className="text-gray-600 text-sm mt-1 line-clamp-2">
                   {seoSettings.description || 'Your meta description will appear here...'}

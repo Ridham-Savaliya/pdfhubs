@@ -45,8 +45,8 @@ export default function Contact() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead 
-        title="Contact Us - PDFTools"
-        description="Get in touch with the PDFTools team. We're here to help with technical support, feedback, or business inquiries."
+        title="Contact Us - PDFHubs"
+        description="Get in touch with the PDFHubs team. We're here to help with technical support, feedback, or business inquiries."
         canonical="https://www.pdfhubs.site/contact"
       />
       <Header />

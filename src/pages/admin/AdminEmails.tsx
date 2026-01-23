@@ -265,12 +265,12 @@ export default function AdminEmails() {
                   {formData.template === 'feature_highlight' && (
                     <div>
                       <p className="font-semibold mb-2">🚀 Feature Spotlight</p>
-                      <p className="text-muted-foreground">Showcases PDFTools features with colorful cards</p>
+                      <p className="text-muted-foreground">Showcases PDFHubs features with colorful cards</p>
                     </div>
                   )}
                   {formData.template === 'competitor_comparison' && (
                     <div>
-                      <p className="font-semibold mb-2">🏆 Why PDFTools?</p>
+                      <p className="font-semibold mb-2">🏆 Why PDFHubs?</p>
                       <p className="text-muted-foreground">Comparison table vs iLovePDF showing our advantages</p>
                     </div>
                   )}

@@ -81,7 +81,7 @@ export default function Auth() {
           }
           return;
         }
-        toast.success('Account created successfully! Welcome to PDFTools.');
+        toast.success('Account created successfully! Welcome to PDFHubs.');
         navigate('/');
       }
     } finally {
@@ -127,7 +127,7 @@ export default function Auth() {
           <p className="text-muted-foreground mb-8">
             {isLogin 
               ? 'Sign in to access your conversion history and saved files.' 
-              : 'Join thousands of users who trust PDFTools for their document needs.'}
+              : 'Join thousands of users who trust PDFHubs for their document needs.'}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5">

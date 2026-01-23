@@ -23,18 +23,18 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
     }
 
     if (isListPage) {
-      document.title = "PDF Tips & Tutorials Blog | PDFTools - Learn PDF Management";
+      document.title = "PDF Tips & Tutorials Blog | PDFHubs - Learn PDF Management";
 
       const metaTags = {
         description: "Expert PDF tips, tutorials, and guides. Learn how to merge, compress, convert, and manage PDF documents effectively. Free resources for students, professionals, and businesses.",
         keywords: "pdf tips, pdf tutorials, pdf guide, how to merge pdf, how to compress pdf, pdf management, document tips",
-        "og:title": "PDF Tips & Tutorials Blog | PDFTools",
+        "og:title": "PDF Tips & Tutorials Blog | PDFHubs",
         "og:description": "Expert PDF tips, tutorials, and guides for effective document management.",
         "og:type": "website",
         "og:url": "https://www.pdfhubs.site/blog",
         "og:image": "https://www.pdfhubs.site/og-image.png",
         "twitter:card": "summary_large_image",
-        "twitter:title": "PDF Tips & Tutorials Blog | PDFTools",
+        "twitter:title": "PDF Tips & Tutorials Blog | PDFHubs",
         "twitter:description": "Expert PDF tips, tutorials, and guides for effective document management."
       };
 
@@ -61,12 +61,12 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
       const structuredData = {
         "@context": "https://schema.org",
         "@type": "Blog",
-        "name": "PDFTools Blog",
+        "name": "PDFHubs Blog",
         "description": "Expert PDF tips, tutorials, and guides for effective document management.",
         "url": "https://www.pdfhubs.site/blog",
         "publisher": {
           "@type": "Organization",
-          "name": "PDFTools",
+          "name": "PDFHubs",
           "logo": {
             "@type": "ImageObject",
             "url": "https://www.pdfhubs.site/favicon.png"
@@ -83,7 +83,7 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
       }
       script.textContent = JSON.stringify(structuredData);
     } else if (post) {
-      document.title = `${post.title} | PDFTools Blog`;
+      document.title = `${post.title} | PDFHubs Blog`;
 
       const metaTags = {
         description: post.description,
@@ -133,7 +133,7 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
         },
         "publisher": {
           "@type": "Organization",
-          "name": "PDFTools",
+          "name": "PDFHubs",
           "logo": {
             "@type": "ImageObject",
             "url": "https://www.pdfhubs.site/favicon.png"

@@ -39,8 +39,8 @@ export default function About() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead 
-        title="About Us - PDFTools | Free Online PDF Editor"
-        description="Learn about PDFTools, our mission to make PDF management simple and accessible for everyone. Free, secure, and trusted by millions."
+        title="About Us - PDFHubs | Free Online PDF Editor"
+        description="Learn about PDFHubs, our mission to make PDF management simple and accessible for everyone. Free, secure, and trusted by millions."
         canonical="https://www.pdfhubs.site/about"
       />
       <Header />
@@ -61,7 +61,7 @@ export default function About() {
               Making PDF Management <span className="text-primary">Simple</span>
             </h1>
             <p className="text-lg text-muted-foreground">
-              PDFTools was created with a simple mission: provide powerful, free PDF tools 
+              PDFHubs was created with a simple mission: provide powerful, free PDF tools 
               that anyone can use without technical expertise or expensive software.
             </p>
           </section>
@@ -86,12 +86,12 @@ export default function About() {
               </h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  We started PDFTools because we were frustrated with existing PDF solutions. 
+                  We started PDFHubs because we were frustrated with existing PDF solutions. 
                   Most tools were either too expensive, too complicated, or required downloading 
                   software that slowed down our computers.
                 </p>
                 <p>
-                  We believed there had to be a better way. So we built PDFTools - a collection 
+                  We believed there had to be a better way. So we built PDFHubs - a collection 
                   of powerful, browser-based PDF tools that are completely free to use.
                 </p>
                 <p>

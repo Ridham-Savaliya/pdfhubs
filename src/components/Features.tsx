@@ -49,7 +49,7 @@ export function Features() {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium text-primary mb-6 animate-fade-up">
             <Sparkles className="h-4 w-4" />
-            <span>Why choose PDFTools</span>
+            <span>Why choose PDFHubs</span>
           </div>
           <h2 className="font-heading text-3xl font-bold text-foreground md:text-4xl lg:text-5xl animate-fade-up" style={{ animationDelay: "100ms" }}>
             Built for Speed, Privacy & Power

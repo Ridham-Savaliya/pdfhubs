@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const BASE_URL = 'https://www.pdfhubs.site'; // Official URL from index.html
 
 const staticRoutes = [
-    { url: '/', priority: '1.0', changefreq: 'daily' },
+    { url: '', priority: '1.0', changefreq: 'daily' },
     { url: '/history', priority: '0.7', changefreq: 'daily' },
     { url: '/blog', priority: '0.9', changefreq: 'daily' },
     { url: '/about', priority: '0.6', changefreq: 'monthly' },
@@ -21,7 +21,8 @@ const generateSitemap = () => {
     // 1. Extract Tools
     const toolsPath = path.resolve(__dirname, '../src/components/ToolsGrid.tsx');
     const toolsContent = fs.readFileSync(toolsPath, 'utf-8');
-    const toolRegex = /href:\s*"(tool\/[^"]+)"/g;
+    // Updated regex to catch href: "/tool/..."
+    const toolRegex = /href:\s*"\/?(tool\/[^"]+)"/g;
     const toolUrls = [];
     let match;
     while ((match = toolRegex.exec(toolsContent)) !== null) {
