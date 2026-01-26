@@ -73,7 +73,7 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group" aria-label="PDFHubs Home">
             <img
-              src="/favicon.png"
+              src="/favicon.svg"
               alt="PDFHubs Logo"
               width="40"
               height="40"
@@ -264,7 +264,7 @@ export function Header() {
                 <div className="p-6 border-b border-border">
                   <Link to="/" className="flex items-center gap-2.5" aria-label="PDFHubs Home">
                     <img
-                      src="/favicon.png"
+                      src="/favicon.svg"
                       alt="PDFHubs Logo"
                       width="40"
                       height="40"
