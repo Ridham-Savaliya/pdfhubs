@@ -38,6 +38,8 @@ Disallow: /history
 
 # Block API routes if any
 Disallow: /api/
+Disallow: /*?q=
+Disallow: /*?*q=
 
 # Important pages that should be crawled
 Allow: /tool/
