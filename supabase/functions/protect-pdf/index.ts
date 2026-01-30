@@ -8,7 +8,7 @@ const corsHeaders = {
 
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
-  const data = encoder.encode(password + 'pdtools-salt-2024');
+  const data = encoder.encode(password + 'pdtools-salt-2026');
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
@@ -17,18 +17,18 @@ async function hashPassword(password: string): Promise<string> {
 // Note: True PDF encryption (AES/RC4) requires native implementations not available in Deno
 // This creates visual protection with embedded verification data
 async function createProtectedPDF(
-  pdfBytes: Uint8Array, 
+  pdfBytes: Uint8Array,
   password: string,
   permissions: { printing?: boolean; copying?: boolean; modifying?: boolean }
 ): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  
+
   // Generate password hash for verification
   const passwordHash = await hashPassword(password);
   const timestamp = new Date().toISOString();
-  
+
   // Create verification metadata
   const verificationData = {
     version: '3.0',
@@ -41,9 +41,9 @@ async function createProtectedPDF(
       modifying: permissions.modifying ?? false
     }
   };
-  
+
   const encodedMetadata = btoa(JSON.stringify(verificationData));
-  
+
   // Set security metadata
   pdfDoc.setTitle('Password Protected Document');
   pdfDoc.setAuthor('PDFTools Security');
@@ -58,13 +58,13 @@ async function createProtectedPDF(
   pdfDoc.setCreator('PDFTools');
   pdfDoc.setCreationDate(new Date());
   pdfDoc.setModificationDate(new Date());
-  
+
   // Add protection indicators on all pages
   const pages = pdfDoc.getPages();
   for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
     const page = pages[pageIndex];
     const { width, height } = page.getSize();
-    
+
     // Add "PROTECTED" badge in top-right corner
     page.drawRectangle({
       x: width - 130,
@@ -74,7 +74,7 @@ async function createProtectedPDF(
       color: rgb(0.15, 0.55, 0.15),
       opacity: 0.95,
     });
-    
+
     page.drawText('PROTECTED', {
       x: width - 115,
       y: height - 28,
@@ -82,7 +82,7 @@ async function createProtectedPDF(
       font: boldFont,
       color: rgb(1, 1, 1),
     });
-    
+
     // Add diagonal watermark
     page.drawText('Password Protected by PDFTools', {
       x: width / 6,
@@ -93,13 +93,13 @@ async function createProtectedPDF(
       opacity: 0.12,
       rotate: { type: 'degrees', angle: -45 } as any,
     });
-    
+
     // Add permission indicators at bottom
     const permText: string[] = [];
     if (!permissions.printing) permText.push('No Printing');
     if (!permissions.copying) permText.push('No Copying');
     if (!permissions.modifying) permText.push('No Editing');
-    
+
     if (permText.length > 0) {
       page.drawRectangle({
         x: 0,
@@ -109,7 +109,7 @@ async function createProtectedPDF(
         color: rgb(0.95, 0.95, 0.95),
         opacity: 0.9,
       });
-      
+
       page.drawText(`Security Restrictions: ${permText.join(' | ')}`, {
         x: 10,
         y: 8,
@@ -118,7 +118,7 @@ async function createProtectedPDF(
         color: rgb(0.4, 0.4, 0.4),
       });
     }
-    
+
     // Add page footer
     page.drawText(`Page ${pageIndex + 1} of ${pages.length} | Protected: ${timestamp.split('T')[0]}`, {
       x: width - 220,
@@ -128,11 +128,11 @@ async function createProtectedPDF(
       color: rgb(0.5, 0.5, 0.5),
     });
   }
-  
+
   const protectedBytes = await pdfDoc.save({ useObjectStreams: false });
-  
+
   console.log(`PDF protected with visual watermarks. Password hash: ${passwordHash.substring(0, 8)}...`);
-  
+
   return protectedBytes;
 }
 

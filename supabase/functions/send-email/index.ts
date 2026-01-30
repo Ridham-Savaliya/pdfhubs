@@ -3,13 +3,13 @@ import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": 
+  "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
 
 interface EmailRequest {
-  type: 'welcome' | 'promotional' | 'inactivity' | 
-        'daily_tip' | 'feature_highlight' | 'competitor_comparison';
+  type: 'welcome' | 'promotional' | 'inactivity' |
+  'daily_tip' | 'feature_highlight' | 'competitor_comparison';
   email: string;
   fullName?: string;
   userId?: string;
@@ -26,7 +26,7 @@ const secondaryColor = "#f97316";
 // ============== WELCOME EMAIL ==============
 function getWelcomeEmailHtml(fullName?: string): string {
   const name = fullName ? ` ${fullName}` : "";
-  
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -161,7 +161,7 @@ Questions? Just reply to this email!<br>
 <td style="padding:25px;text-align:center;">
 <p style="color:#9ca3af;font-size:12px;
 margin:0;font-family:${fontStack};">
-2024 PDFTools. All rights reserved.
+2026 PDFTools. All rights reserved.
 </p>
 </td>
 </tr>
@@ -176,12 +176,12 @@ margin:0;font-family:${fontStack};">
 
 // ============== INACTIVITY EMAIL ==============
 function getInactivityEmailHtml(
-  fullName?: string, 
+  fullName?: string,
   daysInactive?: number
 ): string {
   const name = fullName ? ` ${fullName}` : "";
   const days = daysInactive || "a few";
-  
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -297,7 +297,7 @@ Come Back and Explore
 <td style="padding:25px;text-align:center;">
 <p style="color:#9ca3af;font-size:12px;
 margin:0;font-family:${fontStack};">
-2024 PDFTools. All rights reserved.
+2026 PDFTools. All rights reserved.
 </p>
 </td>
 </tr>
@@ -350,11 +350,11 @@ const dailyTips = [
 ];
 
 function getDailyTipEmailHtml(
-  fullName?: string, 
+  fullName?: string,
   tipIndex?: number
 ): string {
   const tip = dailyTips[(tipIndex || 0) % dailyTips.length];
-  
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -432,7 +432,7 @@ New tip every day! Stay tuned for more.
 <td style="padding:25px;text-align:center;">
 <p style="color:#9ca3af;font-size:12px;
 margin:0;font-family:${fontStack};">
-2024 PDFTools. All rights reserved.
+2026 PDFTools. All rights reserved.
 </p>
 </td>
 </tr>
@@ -448,7 +448,7 @@ margin:0;font-family:${fontStack};">
 // ============== FEATURE HIGHLIGHT EMAIL ==============
 function getFeatureHighlightEmailHtml(fullName?: string): string {
   const name = fullName ? ` ${fullName}` : "";
-  
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -600,7 +600,7 @@ Explore All Features
 <td style="padding:25px;text-align:center;">
 <p style="color:#9ca3af;font-size:12px;
 margin:0;font-family:${fontStack};">
-2024 PDFTools. All rights reserved.
+2026 PDFTools. All rights reserved.
 </p>
 </td>
 </tr>
@@ -616,7 +616,7 @@ margin:0;font-family:${fontStack};">
 // ============== COMPETITOR COMPARISON EMAIL ==============
 function getCompetitorComparisonEmailHtml(fullName?: string): string {
   const name = fullName ? ` ${fullName}` : "";
-  
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -811,7 +811,7 @@ Try PDFTools Free
 <td style="padding:25px;text-align:center;">
 <p style="color:#9ca3af;font-size:12px;
 margin:0;font-family:${fontStack};">
-2024 PDFTools. All rights reserved.
+2026 PDFTools. All rights reserved.
 </p>
 </td>
 </tr>
@@ -826,7 +826,7 @@ margin:0;font-family:${fontStack};">
 
 // ============== PROMOTIONAL EMAIL ==============
 function getPromotionalEmailHtml(
-  subject: string, 
+  subject: string,
   content: string
 ): string {
   return `<!DOCTYPE html>
@@ -892,7 +892,7 @@ Explore PDFTools
 <td style="padding:25px;text-align:center;">
 <p style="color:#9ca3af;font-size:12px;
 margin:0;font-family:${fontStack};">
-2024 PDFTools. All rights reserved.
+2026 PDFTools. All rights reserved.
 </p>
 </td>
 </tr>
@@ -908,7 +908,7 @@ margin:0;font-family:${fontStack};">
 // ============== MAIN HANDLER ==============
 const handler = async (req: Request): Promise<Response> => {
   console.log("Send email function called");
-  
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -916,7 +916,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const body: EmailRequest = await req.json();
     const { type, email, fullName, subject, content, templateData } = body;
-    
+
     console.log(`Sending ${type} email to: ${email}`);
 
     const gmailUser = Deno.env.get("GMAIL_USER");

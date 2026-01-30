@@ -11,7 +11,7 @@ import { SEOHead } from "@/components/SEOHead";
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      <SEOHead canonical="https://www.pdfhubs.site" />
+      <SEOHead canonical="https://www.pdfhubs.site/" />
       <AnnouncementBar />
       <Header />
       <main className="flex-1">

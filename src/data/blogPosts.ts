@@ -1002,7 +1002,7 @@ Every compression decision involves trade-offs between:
     `,
     category: 'tips',
     author: 'PDFHubs Team',
-    publishedAt: '2024-12-30',
+    publishedAt: '2026-12-30',
     readTime: 6,
     image: '/og-image.png',
     tags: ['pdf compression', 'file quality', 'optimization', 'compression settings']
@@ -1076,7 +1076,7 @@ For interactions
     `,
     category: 'tips',
     author: 'PDFHubs Team',
-    publishedAt: '2024-12-29',
+    publishedAt: '2026-12-29',
     readTime: 7,
     image: '/og-image.png',
     tags: ['fillable pdf', 'pdf forms', 'interactive pdf', 'form design']
@@ -1155,7 +1155,7 @@ Metadata is information stored within a PDF about the document itself:
     `,
     category: 'tips',
     author: 'PDFHubs Team',
-    publishedAt: '2024-12-28',
+    publishedAt: '2026-12-28',
     readTime: 5,
     image: '/og-image.png',
     tags: ['pdf metadata', 'document properties', 'privacy', 'seo']
@@ -1231,7 +1231,7 @@ Invoices/
     `,
     category: 'industry',
     author: 'PDFHubs Team',
-    publishedAt: '2024-12-27',
+    publishedAt: '2026-12-27',
     readTime: 6,
     image: '/og-image.png',
     tags: ['invoices', 'small business', 'pdf management', 'accounting']
@@ -1308,7 +1308,7 @@ Use 256-bit AES encryption for sensitive legal documents.
     `,
     category: 'industry',
     author: 'PDFHubs Team',
-    publishedAt: '2024-12-26',
+    publishedAt: '2026-12-26',
     readTime: 7,
     image: '/og-image.png',
     tags: ['legal documents', 'pdf security', 'e-signatures', 'compliance']
@@ -1389,7 +1389,7 @@ Research/
     `,
     category: 'industry',
     author: 'PDFHubs Team',
-    publishedAt: '2024-12-25',
+    publishedAt: '2026-12-25',
     readTime: 5,
     image: '/og-image.png',
     tags: ['students', 'academic', 'research', 'assignments']
@@ -1478,7 +1478,7 @@ Properties/
     `,
     category: 'industry',
     author: 'PDFHubs Team',
-    publishedAt: '2024-12-24',
+    publishedAt: '2026-12-24',
     readTime: 6,
     image: '/og-image.png',
     tags: ['real estate', 'property documents', 'contracts', 'listings']
@@ -1561,7 +1561,7 @@ Properties/
     `,
     category: 'industry',
     author: 'PDFHubs Team',
-    publishedAt: '2024-12-23',
+    publishedAt: '2026-12-23',
     readTime: 5,
     image: '/og-image.png',
     tags: ['remote work', 'team collaboration', 'document sharing', 'digital signatures']
@@ -1645,7 +1645,7 @@ Healthcare organizations must protect:
     `,
     category: 'industry',
     author: 'PDFHubs Team',
-    publishedAt: '2024-12-22',
+    publishedAt: '2026-12-22',
     readTime: 7,
     image: '/og-image.png',
     tags: ['healthcare', 'hipaa', 'compliance', 'medical records']
@@ -1737,7 +1737,7 @@ Freelance/
     `,
     category: 'industry',
     author: 'PDFHubs Team',
-    publishedAt: '2024-12-21',
+    publishedAt: '2026-12-21',
     readTime: 6,
     image: '/og-image.png',
     tags: ['freelancers', 'contractors', 'invoicing', 'contracts']

@@ -758,8 +758,8 @@ Response:
       "id": "doc_123",
       "name": "Sample.pdf",
       "size": 1024000,
-      "createdAt": "2024-01-15T10:30:00Z",
-      "updatedAt": "2024-01-15T10:30:00Z"
+      "createdAt": "2026-01-15T10:30:00Z",
+      "updatedAt": "2026-01-15T10:30:00Z"
     }
   ],
   "total": 10

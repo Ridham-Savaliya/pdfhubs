@@ -138,23 +138,18 @@
   <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json" />
 
-  <!-- Structured Data: WebSite with SearchAction (for sitelinks search box) -->
+  <!-- Canonical URL - Fix for Google Search Console canonical issue -->
+  <link rel="canonical" href="https://www.pdfhubs.site/" />
+
+  <!-- Structured Data: WebSite -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "PDFHubs",
       "alternateName": ["PDFTools", "PDF Hubs", "PDFHubs.site"],
-      "url": "https://www.pdfhubs.site",
-      "description": "Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files.",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://www.pdfhubs.site/?q={search_term_string}"
-        },
-        "query-input": "required name=search_term_string"
-      }
+      "url": "https://www.pdfhubs.site/",
+      "description": "Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files."
     }
     </script>
 
@@ -165,7 +160,7 @@
       "@type": "WebApplication",
       "name": "PDFHubs",
       "alternateName": "PDFTools",
-      "url": "https://www.pdfhubs.site",
+      "url": "https://www.pdfhubs.site/",
       "description": "Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files. No installation, no signup required. 100% secure, works directly in your browser.",
       "applicationCategory": "UtilitiesApplication",
       "operatingSystem": "Any",
@@ -197,7 +192,7 @@
       ],
       "screenshot": "https://www.pdfhubs.site/og-image.png",
       "softwareVersion": "2.0",
-      "datePublished": "2024-01-01",
+      "datePublished": "2026-01-01",
       "dateModified": "2025-12-25",
       "aggregateRating": {
         "@type": "AggregateRating",
@@ -220,7 +215,7 @@
       "@type": "Organization",
       "name": "PDFHubs",
       "alternateName": "PDFTools",
-      "url": "https://www.pdfhubs.site",
+      "url": "https://www.pdfhubs.site/",
       "logo": {
         "@type": "ImageObject",
         "url": "https://www.pdfhubs.site/android-chrome-512x512.png",
