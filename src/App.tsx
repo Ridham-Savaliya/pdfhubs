@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LoadingFallback } from "@/components/LoadingFallback";
+import { Analytics } from "@vercel/analytics/next"
 
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
