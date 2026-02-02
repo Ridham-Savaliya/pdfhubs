@@ -9,8 +9,8 @@ interface BlogSEOProps {
 export function BlogSEO({ post, isListPage }: BlogSEOProps) {
   useEffect(() => {
     const canonicalUrl = isListPage
-      ? "https://www.pdfhubs.site/blog"
-      : post ? `https://www.pdfhubs.site/blog/${post.slug}` : null;
+      ? "https://pdfhubs.site/blog"
+      : post ? `https://pdfhubs.site/blog/${post.slug}` : null;
 
     if (canonicalUrl) {
       let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
@@ -31,8 +31,8 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
         "og:title": "PDF Tips & Tutorials Blog | PDFHubs",
         "og:description": "Expert PDF tips, tutorials, and guides for effective document management.",
         "og:type": "website",
-        "og:url": "https://www.pdfhubs.site/blog",
-        "og:image": "https://www.pdfhubs.site/og-image.png",
+        "og:url": "https://pdfhubs.site/blog",
+        "og:image": "https://pdfhubs.site/og-image.png",
         "twitter:card": "summary_large_image",
         "twitter:title": "PDF Tips & Tutorials Blog | PDFHubs",
         "twitter:description": "Expert PDF tips, tutorials, and guides for effective document management."
@@ -63,13 +63,13 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
         "@type": "Blog",
         "name": "PDFHubs Blog",
         "description": "Expert PDF tips, tutorials, and guides for effective document management.",
-        "url": "https://www.pdfhubs.site/blog",
+        "url": "https://pdfhubs.site/blog",
         "publisher": {
           "@type": "Organization",
           "name": "PDFHubs",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://www.pdfhubs.site/favicon.png"
+            "url": "https://pdfhubs.site/favicon.png"
           }
         }
       };
@@ -91,8 +91,8 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
         "og:title": post.title,
         "og:description": post.description,
         "og:type": "article",
-        "og:url": `https://www.pdfhubs.site/blog/${post.slug}`,
-        "og:image": "https://www.pdfhubs.site/og-image.png",
+        "og:url": `https://pdfhubs.site/blog/${post.slug}`,
+        "og:image": "https://pdfhubs.site/og-image.png",
         "article:published_time": post.publishedAt,
         "article:author": post.author,
         "twitter:card": "summary_large_image",
@@ -126,7 +126,7 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
         "@type": "Article",
         "headline": post.title,
         "description": post.description,
-        "image": "https://www.pdfhubs.site/og-image.png",
+        "image": "https://pdfhubs.site/og-image.png",
         "author": {
           "@type": "Organization",
           "name": post.author
@@ -136,14 +136,14 @@ export function BlogSEO({ post, isListPage }: BlogSEOProps) {
           "name": "PDFHubs",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://www.pdfhubs.site/favicon.png"
+            "url": "https://pdfhubs.site/favicon.png"
           }
         },
         "datePublished": post.publishedAt,
         "dateModified": post.publishedAt,
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "@id": `https://www.pdfhubs.site/blog/${post.slug}`
+          "@id": `https://pdfhubs.site/blog/${post.slug}`
         }
       };
 

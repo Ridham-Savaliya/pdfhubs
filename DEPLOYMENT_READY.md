@@ -13,13 +13,13 @@
 ## 📋 Issues Fixed
 
 ### 1. ✅ Duplicate, Google chose different canonical than user
-- **URL:** `https://www.pdfhubs.site/`
+- **URL:** `https://pdfhubs.site/`
 - **Cause:** Missing canonical tag, URL inconsistency (with/without trailing slash)
 - **Impact:** Google couldn't determine preferred URL version
 - **Fixed:** Added canonical tag, standardized on trailing slash
 
 ### 2. ✅ Alternate page with proper canonical tag  
-- **URL:** `https://www.pdfhubs.site/?q={search_term_string}`
+- **URL:** `https://pdfhubs.site/?q={search_term_string}`
 - **Cause:** SearchAction in structured data without actual search functionality
 - **Impact:** Google tried to crawl template URL as real page
 - **Fixed:** Removed SearchAction schema, added redirect rule
@@ -72,18 +72,18 @@ git push origin main
 1. Go to: https://search.google.com/search-console
 2. Select: `www.pdfhubs.site`
 3. Click: **URL Inspection** (top bar)
-4. Enter: `https://www.pdfhubs.site/`
+4. Enter: `https://pdfhubs.site/`
 5. Click: **"Request Indexing"**
 
 **Template URL (Optional but Recommended):**
 1. In same URL Inspection tool
-2. Enter: `https://www.pdfhubs.site/?q={search_term_string}`
+2. Enter: `https://pdfhubs.site/?q={search_term_string}`
 3. Click: **"Test Live URL"** to verify redirect
 4. Should show it redirects or is excluded
 
 **Re-submit Sitemap:**
 1. Go to: **Sitemaps** (left sidebar)
-2. Enter: `https://www.pdfhubs.site/sitemap.xml`
+2. Enter: `https://pdfhubs.site/sitemap.xml`
 3. Click: **Submit**
 
 ---
@@ -122,11 +122,11 @@ npm run index-now      # Bing, Yandex, DuckDuckGo
 
 #### URL Inspection
 ```
-URL: https://www.pdfhubs.site/
+URL: https://pdfhubs.site/
 Expected: "URL is on Google"
-Canonical: https://www.pdfhubs.site/
-User-declared canonical: https://www.pdfhubs.site/
-Google-selected canonical: https://www.pdfhubs.site/
+Canonical: https://pdfhubs.site/
+User-declared canonical: https://pdfhubs.site/
+Google-selected canonical: https://pdfhubs.site/
 ```
 
 #### What Success Looks Like:
@@ -157,10 +157,10 @@ Three comprehensive guides created for you:
 ### 1. View Page Source
 ```bash
 # Visit your site and view source
-https://www.pdfhubs.site/
+https://pdfhubs.site/
 
 # Look for this line:
-<link rel="canonical" href="https://www.pdfhubs.site/" />
+<link rel="canonical" href="https://pdfhubs.site/" />
 
 # Make sure this DOESN'T exist:
 SearchAction
@@ -171,15 +171,15 @@ potentialAction
 ### 2. Test Redirect
 ```bash
 # Try visiting with query parameter
-https://www.pdfhubs.site/?q=test
+https://pdfhubs.site/?q=test
 
 # Should redirect to:
-https://www.pdfhubs.site/
+https://pdfhubs.site/
 ```
 
 ### 3. Validate Structured Data
 - Use: https://search.google.com/test/rich-results
-- Enter: `https://www.pdfhubs.site/`
+- Enter: `https://pdfhubs.site/`
 - Should show: WebSite, WebApplication, Organization schemas
 - Should NOT show: SearchAction
 

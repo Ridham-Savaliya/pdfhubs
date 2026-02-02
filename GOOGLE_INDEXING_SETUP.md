@@ -27,7 +27,7 @@ This guide will help you set up the Google Indexing API to get your pages indexe
 ## Step 4: Add the Service Account to Google Search Console
 1. Copy the email address of your new service account (looks like `indexer@your-project.iam.gserviceaccount.com`).
 2. Go to [Google Search Console](https://search.google.com/search-console).
-3. Select your property: `https://www.pdfhubs.site/`.
+3. Select your property: `https://pdfhubs.site/`.
 4. Go to **Settings** > **Users and Permissions**.
 5. Click **"Add User"**.
 6. Paste the service account email and set the Permission to **Owner**. (This is required for the Indexing API to work on your behalf).

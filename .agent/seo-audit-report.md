@@ -25,8 +25,8 @@ Your PDFHubs site has **strong technical SEO foundation** but suffers from **con
 **Impact:** HIGH - Google sees conflicting signals
 
 **Problem:**
-- `sitemap.xml` lists: `https://www.pdfhubs.site/tool/merge-pdf`
-- `ToolPage.tsx` (line 519) sets canonical: `https://www.pdfhubs.site/tools/${toolId}`
+- `sitemap.xml` lists: `https://pdfhubs.site/tool/merge-pdf`
+- `ToolPage.tsx` (line 519) sets canonical: `https://pdfhubs.site/tools/${toolId}`
 - Routes use: `/tool/:toolId` (not `/tools/`)
 
 **Fix:**

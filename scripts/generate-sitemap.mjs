@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BASE_URL = 'https://www.pdfhubs.site'; // Official URL from index.html
+const BASE_URL = 'https://pdfhubs.site'; // Official URL from index.html
 
 const staticRoutes = [
     { url: '', priority: '1.0', changefreq: 'daily' },

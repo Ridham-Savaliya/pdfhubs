@@ -3,7 +3,7 @@
 ## Issue Summary
 **Problem:** "Duplicate, Google chose different canonical than user" error in Google Search Console
 
-**Affected URL:** https://www.pdfhubs.site/
+**Affected URL:** https://pdfhubs.site/
 
 **Date Fixed:** January 30, 2026
 
@@ -24,11 +24,11 @@ Failed: 1/27/26
 1. **Missing Canonical Tag in HTML:** The `index.html` file did not have a `<link rel="canonical">` tag in the `<head>`
 2. **URL Inconsistency:** The site was accessible via both:
    - `https://www.pdfhubs.site` (without trailing slash)
-   - `https://www.pdfhubs.site/` (with trailing slash)
+   - `https://pdfhubs.site/` (with trailing slash)
 3. **Sitemap Mismatch:** The sitemap specified the URL without a trailing slash
 4. **Google's Preference:** Google typically prefers URLs with trailing slashes for directory/page URLs
 
-This caused Google to index the version with a trailing slash (`https://www.pdfhubs.site/`) while the canonical tag (set dynamically via React) pointed to the version without it.
+This caused Google to index the version with a trailing slash (`https://pdfhubs.site/`) while the canonical tag (set dynamically via React) pointed to the version without it.
 
 ---
 
@@ -38,7 +38,7 @@ This caused Google to index the version with a trailing slash (`https://www.pdfh
 **Location:** `index.html` (line 141-142)
 ```html
 <!-- Canonical URL - Fix for Google Search Console canonical issue -->
-<link rel="canonical" href="https://www.pdfhubs.site/" />
+<link rel="canonical" href="https://pdfhubs.site/" />
 ```
 
 **Why This Matters:**
@@ -49,7 +49,7 @@ This caused Google to index the version with a trailing slash (`https://www.pdfh
 ### 2. Updated React SEO Component ✅
 **Location:** `src/pages/Index.tsx` (line 14)
 ```tsx
-<SEOHead canonical="https://www.pdfhubs.site/" />
+<SEOHead canonical="https://pdfhubs.site/" />
 ```
 
 **Why This Matters:**
@@ -60,7 +60,7 @@ This caused Google to index the version with a trailing slash (`https://www.pdfh
 **Location:** `public/sitemap.xml` (lines 10-15)
 ```xml
 <url>
-    <loc>https://www.pdfhubs.site/</loc>
+    <loc>https://pdfhubs.site/</loc>
     <lastmod>2026-01-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -99,19 +99,19 @@ npm run build
 
 Check that `dist/index.html` contains:
 ```html
-<link rel="canonical" href="https://www.pdfhubs.site/" />
+<link rel="canonical" href="https://pdfhubs.site/" />
 ```
 
 ### 2. Deploy and Test
 After deploying:
-1. Visit https://www.pdfhubs.site/
+1. Visit https://pdfhubs.site/
 2. Right-click → View Page Source
-3. Search for `rel="canonical"` and verify it shows: `https://www.pdfhubs.site/`
+3. Search for `rel="canonical"` and verify it shows: `https://pdfhubs.site/`
 
 ### 3. Google Search Console
 1. Go to Google Search Console
-2. Submit the updated sitemap: https://www.pdfhubs.site/sitemap.xml
-3. Request re-indexing for: https://www.pdfhubs.site/
+2. Submit the updated sitemap: https://pdfhubs.site/sitemap.xml
+3. Request re-indexing for: https://pdfhubs.site/
 4. Monitor the indexing status over the next 3-7 days
 
 **Expected Timeline:**
@@ -128,12 +128,12 @@ For important pages, ALWAYS include a canonical tag in the static HTML, not just
 
 ```html
 <!-- Good: Static canonical in HTML -->
-<link rel="canonical" href="https://www.pdfhubs.site/" />
+<link rel="canonical" href="https://pdfhubs.site/" />
 ```
 
 ### 2. Be Consistent with Trailing Slashes
 **Choose ONE pattern and stick to it:**
-- ✅ All URLs WITH trailing slash: `https://www.pdfhubs.site/`
+- ✅ All URLs WITH trailing slash: `https://pdfhubs.site/`
 - ❌ Mixing patterns: Sometimes with, sometimes without
 
 **Recommended:** Use trailing slashes for consistency with web standards.

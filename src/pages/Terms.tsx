@@ -7,17 +7,17 @@ import { ArrowLeft } from "lucide-react";
 export default function Terms() {
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead 
+      <SEOHead
         title="Terms of Service - PDFHubs"
         description="Read our terms of service to understand the rules and guidelines for using PDFHubs services."
-        canonical="https://www.pdfhubs.site/terms"
+        canonical="https://pdfhubs.site/terms"
       />
       <Header />
-      
+
       <main className="pt-24 pb-16">
         <div className="container max-w-4xl">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -34,14 +34,14 @@ export default function Terms() {
           <div className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground">
             <h2>1. Acceptance of Terms</h2>
             <p>
-              By accessing or using PDFHubs (the "Service") at pdfhubs.site, you agree to be 
-              bound by these Terms of Service. If you do not agree to these terms, please do 
+              By accessing or using PDFHubs (the "Service") at pdfhubs.site, you agree to be
+              bound by these Terms of Service. If you do not agree to these terms, please do
               not use our services.
             </p>
 
             <h2>2. Description of Service</h2>
             <p>
-              PDFHubs provides free online tools for PDF document management, including but 
+              PDFHubs provides free online tools for PDF document management, including but
               not limited to:
             </p>
             <ul>
@@ -65,12 +65,12 @@ export default function Terms() {
 
             <h2>4. Intellectual Property</h2>
             <p>
-              You retain all rights to the content you upload. By using our Service, you grant 
-              us a limited license to process your files solely for the purpose of providing 
+              You retain all rights to the content you upload. By using our Service, you grant
+              us a limited license to process your files solely for the purpose of providing
               the requested service.
             </p>
             <p>
-              The PDFHubs name, logo, and service design are our intellectual property and 
+              The PDFHubs name, logo, and service design are our intellectual property and
               may not be used without permission.
             </p>
 
@@ -87,8 +87,8 @@ export default function Terms() {
 
             <h2>6. Service Availability</h2>
             <p>
-              We strive to maintain high availability but do not guarantee uninterrupted 
-              service. We may temporarily suspend the Service for maintenance, updates, 
+              We strive to maintain high availability but do not guarantee uninterrupted
+              service. We may temporarily suspend the Service for maintenance, updates,
               or other reasons without prior notice.
             </p>
 
@@ -105,8 +105,8 @@ export default function Terms() {
 
             <h2>8. Indemnification</h2>
             <p>
-              You agree to indemnify and hold harmless PDFHubs, its officers, directors, 
-              employees, and agents from any claims, damages, or expenses arising from your 
+              You agree to indemnify and hold harmless PDFHubs, its officers, directors,
+              employees, and agents from any claims, damages, or expenses arising from your
               use of the Service or violation of these terms.
             </p>
 
@@ -121,21 +121,21 @@ export default function Terms() {
 
             <h2>10. Modifications</h2>
             <p>
-              We reserve the right to modify these Terms at any time. Continued use of the 
+              We reserve the right to modify these Terms at any time. Continued use of the
               Service after changes constitutes acceptance of the new terms.
             </p>
 
             <h2>11. Termination</h2>
             <p>
-              We may terminate or suspend access to our Service immediately, without prior 
-              notice, for conduct that we believe violates these Terms or is harmful to other 
+              We may terminate or suspend access to our Service immediately, without prior
+              notice, for conduct that we believe violates these Terms or is harmful to other
               users, us, or third parties.
             </p>
 
             <h2>12. Governing Law</h2>
             <p>
-              These Terms shall be governed by and construed in accordance with the laws of 
-              the jurisdiction in which our company is registered, without regard to its 
+              These Terms shall be governed by and construed in accordance with the laws of
+              the jurisdiction in which our company is registered, without regard to its
               conflict of law provisions.
             </p>
 
@@ -150,7 +150,7 @@ export default function Terms() {
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

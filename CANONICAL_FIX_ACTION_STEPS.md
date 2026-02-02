@@ -2,7 +2,7 @@
 
 ## 🎯 Issue Summary
 **Problem:** "Duplicate, Google chose different canonical than user"  
-**URL Affected:** https://www.pdfhubs.site/  
+**URL Affected:** https://pdfhubs.site/  
 **Status:** ✅ **FIXED** - Awaiting Google re-crawl  
 **Date Fixed:** January 30, 2026
 
@@ -11,12 +11,12 @@
 ## 🔧 What Was Fixed
 
 ### 1. **Added Canonical Tag to index.html**
-   - Added `<link rel="canonical" href="https://www.pdfhubs.site/" />` to static HTML
+   - Added `<link rel="canonical" href="https://pdfhubs.site/" />` to static HTML
    - This provides immediate canonical signal before JavaScript loads
 
 ### 2. **Updated React Component**
    - Modified `src/pages/Index.tsx` to use trailing slash in canonical URL
-   - Changed from `https://www.pdfhubs.site` to `https://www.pdfhubs.site/`
+   - Changed from `https://www.pdfhubs.site` to `https://pdfhubs.site/`
 
 ### 3. **Updated Sitemap**
    - Modified `public/sitemap.xml` to include trailing slash for homepage
@@ -50,7 +50,7 @@ git push origin main
 1. Go to: https://search.google.com/search-console
 2. Select property: `www.pdfhubs.site`
 3. Click **URL Inspection** tool (top search bar)
-4. Enter: `https://www.pdfhubs.site/`
+4. Enter: `https://pdfhubs.site/`
 5. Click **"Request Indexing"**
 
 #### Option B: Automated Google Indexing API
@@ -68,7 +68,7 @@ This notifies other search engines immediately about the update.
 ### Step 3: Submit Updated Sitemap
 1. Go to Google Search Console
 2. Navigate to **Sitemaps** (left sidebar)
-3. Add/Re-submit: `https://www.pdfhubs.site/sitemap.xml`
+3. Add/Re-submit: `https://pdfhubs.site/sitemap.xml`
 4. Click **Submit**
 
 ---
@@ -89,19 +89,19 @@ This notifies other search engines immediately about the update.
 ## ✅ Verification Steps
 
 ### After Deployment:
-1. **Visit:** https://www.pdfhubs.site/
+1. **Visit:** https://pdfhubs.site/
 2. **Right-click** → View Page Source
 3. **Search for:** `rel="canonical"`
 4. **Verify it shows:**
    ```html
-   <link rel="canonical" href="https://www.pdfhubs.site/" />
+   <link rel="canonical" href="https://pdfhubs.site/" />
    ```
 
 ### Check in Browser Console:
 ```javascript
 // Open browser console on your site and run:
 document.querySelector('link[rel="canonical"]').href
-// Should output: "https://www.pdfhubs.site/"
+// Should output: "https://pdfhubs.site/"
 ```
 
 ---

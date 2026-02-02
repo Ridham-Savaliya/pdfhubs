@@ -38,17 +38,17 @@ const stats = [
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead 
+      <SEOHead
         title="About Us - PDFHubs | Free Online PDF Editor"
         description="Learn about PDFHubs, our mission to make PDF management simple and accessible for everyone. Free, secure, and trusted by millions."
-        canonical="https://www.pdfhubs.site/about"
+        canonical="https://pdfhubs.site/about"
       />
       <Header />
-      
+
       <main className="pt-24 pb-16">
         <div className="container">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -61,7 +61,7 @@ export default function About() {
               Making PDF Management <span className="text-primary">Simple</span>
             </h1>
             <p className="text-lg text-muted-foreground">
-              PDFHubs was created with a simple mission: provide powerful, free PDF tools 
+              PDFHubs was created with a simple mission: provide powerful, free PDF tools
               that anyone can use without technical expertise or expensive software.
             </p>
           </section>
@@ -86,16 +86,16 @@ export default function About() {
               </h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  We started PDFHubs because we were frustrated with existing PDF solutions. 
-                  Most tools were either too expensive, too complicated, or required downloading 
+                  We started PDFHubs because we were frustrated with existing PDF solutions.
+                  Most tools were either too expensive, too complicated, or required downloading
                   software that slowed down our computers.
                 </p>
                 <p>
-                  We believed there had to be a better way. So we built PDFHubs - a collection 
+                  We believed there had to be a better way. So we built PDFHubs - a collection
                   of powerful, browser-based PDF tools that are completely free to use.
                 </p>
                 <p>
-                  Today, we help millions of people around the world manage their PDF documents 
+                  Today, we help millions of people around the world manage their PDF documents
                   efficiently and securely.
                 </p>
               </div>
@@ -157,7 +157,7 @@ export default function About() {
           </section>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

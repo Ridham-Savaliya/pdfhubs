@@ -29,32 +29,32 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     toast({
       title: "Message sent!",
       description: "We'll get back to you as soon as possible."
     });
-    
+
     setFormData({ name: '', email: '', reason: 'support', message: '' });
     setIsSubmitting(false);
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead 
+      <SEOHead
         title="Contact Us - PDFHubs"
         description="Get in touch with the PDFHubs team. We're here to help with technical support, feedback, or business inquiries."
-        canonical="https://www.pdfhubs.site/contact"
+        canonical="https://pdfhubs.site/contact"
       />
       <Header />
-      
+
       <main className="pt-24 pb-16">
         <div className="container max-w-4xl">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -68,7 +68,7 @@ export default function Contact() {
                 Get in Touch
               </h1>
               <p className="text-muted-foreground mb-8">
-                Have a question, feedback, or need help? We'd love to hear from you. 
+                Have a question, feedback, or need help? We'd love to hear from you.
                 Fill out the form and we'll respond as quickly as possible.
               </p>
 
@@ -77,8 +77,8 @@ export default function Contact() {
                   <h3 className="font-heading font-semibold text-foreground mb-2">
                     Email Us
                   </h3>
-                  <a 
-                    href="mailto:support@pdfhubs.site" 
+                  <a
+                    href="mailto:support@pdfhubs.site"
                     className="text-primary hover:underline"
                   >
                     support@pdfhubs.site
@@ -142,11 +142,10 @@ export default function Contact() {
                         key={reason.id}
                         type="button"
                         onClick={() => setFormData({ ...formData, reason: reason.id })}
-                        className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${
-                          formData.reason === reason.id
+                        className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${formData.reason === reason.id
                             ? 'border-primary bg-primary/5 text-primary'
                             : 'border-border hover:border-primary/50'
-                        }`}
+                          }`}
                       >
                         <reason.icon className="w-5 h-5" />
                         <span className="text-xs font-medium">{reason.label}</span>
@@ -182,7 +181,7 @@ export default function Contact() {
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

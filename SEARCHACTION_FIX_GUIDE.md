@@ -3,8 +3,8 @@
 ## 🔍 Issue Summary
 **Problem:** "Alternate page with proper canonical tag"  
 **Affected URLs:** 
-- `https://www.pdfhubs.site/?q={search_term_string}` (Last crawled: Jan 23, 2026)
-- `https://www.pdfhubs.site/?q={search_term_string}` (Last crawled: Dec 28, 2025)
+- `https://pdfhubs.site/?q={search_term_string}` (Last crawled: Jan 23, 2026)
+- `https://pdfhubs.site/?q={search_term_string}` (Last crawled: Dec 28, 2025)
 
 **Status:** ✅ **FIXED** - Awaiting Google re-crawl  
 **Date Fixed:** January 30, 2026
@@ -15,11 +15,11 @@
 
 Google Search Console reported an "Alternate page with proper canonical tag" issue for the search template URL. This occurred because:
 
-1. **SearchAction in Structured Data:** The homepage had a `SearchAction` schema pointing to `https://www.pdfhubs.site/?q={search_term_string}`
+1. **SearchAction in Structured Data:** The homepage had a `SearchAction` schema pointing to `https://pdfhubs.site/?q={search_term_string}`
 2. **No Actual Search Page:** The site doesn't have a dedicated search results page that handles the `?q=` query parameter
 3. **Google Crawled Template URL:** Google tried to crawl the URL literally (with `{search_term_string}` as-is)
 4. **Homepage Returned:** Since the URL doesn't exist as a route, it returned the homepage HTML
-5. **Canonical Mismatch:** The homepage has canonical `https://www.pdfhubs.site/`, so Google saw the search URL as an "alternate" version
+5. **Canonical Mismatch:** The homepage has canonical `https://pdfhubs.site/`, so Google saw the search URL as an "alternate" version
 
 ---
 
@@ -35,13 +35,13 @@ Google Search Console reported an "Alternate page with proper canonical tag" iss
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "PDFHubs",
-  "url": "https://www.pdfhubs.site/",
+  "url": "https://pdfhubs.site/",
   "description": "...",
   "potentialAction": {
     "@type": "SearchAction",
     "target": {
       "@type": "EntryPoint",
-      "urlTemplate": "https://www.pdfhubs.site/?q={search_term_string}"
+      "urlTemplate": "https://pdfhubs.site/?q={search_term_string}"
     },
     "query-input": "required name=search_term_string"
   }
@@ -54,7 +54,7 @@ Google Search Console reported an "Alternate page with proper canonical tag" iss
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "PDFHubs",
-  "url": "https://www.pdfhubs.site/",
+  "url": "https://pdfhubs.site/",
   "description": "Free online PDF tools to merge, split, compress, convert, rotate, and edit PDF files."
 }
 ```
@@ -110,7 +110,7 @@ Disallow: /*?*q=
 3. **Template Misinterpretation:** Google's crawler attempted to validate the search functionality by crawling the template URL
 4. **No Search Handling:** Your React app doesn't have a route or component to handle `?q=` parameters on the homepage
 5. **Homepage Served:** Due to client-side routing, all non-matching URLs serve the homepage HTML
-6. **Canonical Conflict:** Homepage has canonical pointing to `https://www.pdfhubs.site/`, creating an "alternate page" signal
+6. **Canonical Conflict:** Homepage has canonical pointing to `https://pdfhubs.site/`, creating an "alternate page" signal
 
 ---
 
@@ -151,13 +151,13 @@ git push origin main
 1. Go to Google Search Console
 2. Use URL Inspection Tool
 3. Test both URLs:
-   - `https://www.pdfhubs.site/?q={search_term_string}`
-   - `https://www.pdfhubs.site/`
+   - `https://pdfhubs.site/?q={search_term_string}`
+   - `https://pdfhubs.site/`
 4. Request re-indexing for both
 
 **Option B: Sitemap Re-submission**
 1. Go to Sitemaps section
-2. Re-submit: `https://www.pdfhubs.site/sitemap.xml`
+2. Re-submit: `https://pdfhubs.site/sitemap.xml`
 3. This triggers re-crawl of all pages
 
 ### 3. Monitor Status
@@ -190,13 +190,13 @@ const Search = () => {
 
 3. **Update SearchAction Schema:**
 ```json
-"urlTemplate": "https://www.pdfhubs.site/search?q={search_term_string}"
+"urlTemplate": "https://pdfhubs.site/search?q={search_term_string}"
 ```
 
 4. **Add Canonical to Search Page:**
 ```tsx
 <SEOHead 
-  canonical={`https://www.pdfhubs.site/search?q=${query}`}
+  canonical={`https://pdfhubs.site/search?q=${query}`}
   noindex={true} // Prevent indexing of search results
 />
 ```
@@ -233,12 +233,12 @@ Before deploying, verify:
    - After re-crawl, they should disappear or move to "Excluded"
 
 2. **URL Inspection:**
-   - Inspect: `https://www.pdfhubs.site/?q={search_term_string}`
+   - Inspect: `https://pdfhubs.site/?q={search_term_string}`
    - Should show: "URL is not on Google" or "Crawled - currently not indexed"
    - Message should indicate it's excluded by redirect or robots.txt
 
 3. **Index Coverage:**
-   - Main URL `https://www.pdfhubs.site/` should show "Valid"
+   - Main URL `https://pdfhubs.site/` should show "Valid"
    - No "Alternate page" warnings
 
 ---

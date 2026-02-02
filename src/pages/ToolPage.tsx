@@ -536,7 +536,7 @@ export default function ToolPage() {
 
   // Get SEO data for this tool
   const seoData = toolId && toolSEO[toolId] ? toolSEO[toolId] : null;
-  const canonicalUrl = `https://www.pdfhubs.site/tool/${toolId}`;
+  const canonicalUrl = `https://pdfhubs.site/tool/${toolId}`;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

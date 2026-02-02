@@ -51,7 +51,7 @@ Allow: /terms
 Allow: /auth
 
 # Sitemap location - important for indexing
-Sitemap: https://www.pdfhubs.site/sitemap.xml
+Sitemap: https://pdfhubs.site/sitemap.xml
 
 # Host directive (optional but helpful)
 Host: https://www.pdfhubs.site

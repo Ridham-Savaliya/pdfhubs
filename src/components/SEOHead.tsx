@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const BASE_URL = "https://www.pdfhubs.site";
+const BASE_URL = "https://pdfhubs.site";
 
 interface SEOHeadProps {
   title?: string;

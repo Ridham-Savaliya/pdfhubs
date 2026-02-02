@@ -3,11 +3,11 @@
 ## 🎯 Issues Summary
 
 ### Issue #1: Duplicate, Google chose different canonical than user
-**URL:** `https://www.pdfhubs.site/`  
+**URL:** `https://pdfhubs.site/`  
 **Status:** ✅ **FIXED**
 
 ### Issue #2: Alternate page with proper canonical tag
-**URL:** `https://www.pdfhubs.site/?q={search_term_string}`  
+**URL:** `https://pdfhubs.site/?q={search_term_string}`  
 **Status:** ✅ **FIXED**
 
 **Date Fixed:** January 30, 2026  
@@ -20,20 +20,20 @@
 ### ✅ Fix 1: Added Canonical Tag to index.html
 **Location:** `index.html` (line 141-142)
 ```html
-<link rel="canonical" href="https://www.pdfhubs.site/" />
+<link rel="canonical" href="https://pdfhubs.site/" />
 ```
 
 ### ✅ Fix 2: Updated React SEO Component  
 **Location:** `src/pages/Index.tsx` (line 14)
 ```tsx
-<SEOHead canonical="https://www.pdfhubs.site/" />
+<SEOHead canonical="https://pdfhubs.site/" />
 ```
 
 ### ✅ Fix 3: Updated Sitemap
 **Location:** `public/sitemap.xml` (lines 10-15)
 ```xml
 <url>
-    <loc>https://www.pdfhubs.site/</loc>
+    <loc>https://pdfhubs.site/</loc>
     <lastmod>2026-01-30</lastmod>
     ...
 </url>
@@ -83,10 +83,10 @@ git push origin main
 
 ### Step 3: Verify Deployment
 After deployment:
-1. Visit: `https://www.pdfhubs.site/`
+1. Visit: `https://pdfhubs.site/`
 2. Right-click → **View Page Source**
 3. **Search for:** `rel="canonical"`
-4. **Verify:** Shows `<link rel="canonical" href="https://www.pdfhubs.site/" />`
+4. **Verify:** Shows `<link rel="canonical" href="https://pdfhubs.site/" />`
 5. **Search for:** `SearchAction`
 6. **Verify:** Should NOT appear anywhere in the source
 
@@ -100,18 +100,18 @@ After deployment:
 1. Go to: https://search.google.com/search-console
 2. Select property: `www.pdfhubs.site`
 3. Click **URL Inspection** (top search bar)
-4. Enter: `https://www.pdfhubs.site/`
+4. Enter: `https://pdfhubs.site/`
 5. Click **"Request Indexing"**
 
 #### For Search Template URL:
 1. In same URL Inspection tool
-2. Enter: `https://www.pdfhubs.site/?q={search_term_string}`
+2. Enter: `https://pdfhubs.site/?q={search_term_string}`
 3. Google will show it's redirecting or excluded
 4. Optionally request inspection to verify redirect works
 
 #### Re-submit Sitemap:
 1. In Google Search Console, go to **Sitemaps** (left sidebar)
-2. Enter: `https://www.pdfhubs.site/sitemap.xml`
+2. Enter: `https://pdfhubs.site/sitemap.xml`
 3. Click **Submit**
 
 ---
@@ -178,20 +178,20 @@ npm run index-now
 
 #### 1. Coverage Report
 - Go to: **Coverage** → **Valid / Excluded / Error**
-- Look for: `https://www.pdfhubs.site/` should be in "Valid"
+- Look for: `https://pdfhubs.site/` should be in "Valid"
 - Look for: `?q={search_term_string}` should be in "Excluded" or disappear
 
 #### 2. URL Inspection
 **Main URL:**
 ```
-URL: https://www.pdfhubs.site/
+URL: https://pdfhubs.site/
 Expected: "URL is on Google"
-Canonical: https://www.pdfhubs.site/
+Canonical: https://pdfhubs.site/
 ```
 
 **Template URL:**
 ```
-URL: https://www.pdfhubs.site/?q={search_term_string}
+URL: https://pdfhubs.site/?q={search_term_string}
 Expected: "URL is not on Google" or "Excluded by redirect"
 ```
 
@@ -226,21 +226,21 @@ Expected: "URL is not on Google" or "Excluded by redirect"
 ### Test 1: Canonical Tag
 ```bash
 # Visit homepage
-curl -sL https://www.pdfhubs.site/ | grep -i "canonical"
-# Expected: <link rel="canonical" href="https://www.pdfhubs.site/" />
+curl -sL https://pdfhubs.site/ | grep -i "canonical"
+# Expected: <link rel="canonical" href="https://pdfhubs.site/" />
 ```
 
 ### Test 2: Redirect Works
 ```bash
 # Try URL with query parameter
-curl -sI https://www.pdfhubs.site/?q=test
-# Expected: 307/308 redirect to https://www.pdfhubs.site/
+curl -sI https://pdfhubs.site/?q=test
+# Expected: 307/308 redirect to https://pdfhubs.site/
 ```
 
 ### Test 3: No SearchAction
 ```bash
 # Check for SearchAction in source
-curl -sL https://www.pdfhubs.site/ | grep -i "SearchAction"
+curl -sL https://pdfhubs.site/ | grep -i "SearchAction"
 # Expected: No results
 ```
 
@@ -287,7 +287,7 @@ Three comprehensive guides have been created:
 - Check average response time
 
 #### 4. Check robots.txt
-- Verify: `https://www.pdfhubs.site/robots.txt`
+- Verify: `https://pdfhubs.site/robots.txt`
 - Ensure no conflicting rules
 - Test with Google's robots.txt tester
 

@@ -37,7 +37,7 @@ git push origin main
 1. Go to: https://search.google.com/search-console
 2. Select property: `www.pdfhubs.site`
 3. Go to **URL Inspection** tool
-4. Enter: `https://www.pdfhubs.site/`
+4. Enter: `https://pdfhubs.site/`
 5. Click **"Request Indexing"**
 6. Wait 24-48 hours
 
@@ -71,13 +71,13 @@ Even after requesting indexing, Google Search might take **2-4 weeks** to update
 ### Check if Deployed Correctly:
 ```bash
 # 1. Visit your site directly
-https://www.pdfhubs.site/
+https://pdfhubs.site/
 
 # 2. Check favicon URL
-https://www.pdfhubs.site/favicon-32x32.png?v=3
+https://pdfhubs.site/favicon-32x32.png?v=3
 
 # 3. Check manifest
-https://www.pdfhubs.site/manifest.json
+https://pdfhubs.site/manifest.json
 ```
 
 ### Check Google's Cache:
@@ -95,7 +95,7 @@ For faster recognition, you can also reference the icon in structured data (alre
 ```json
 "logo": {
   "@type": "ImageObject",
-  "url": "https://www.pdfhubs.site/android-chrome-512x512.png",
+  "url": "https://pdfhubs.site/android-chrome-512x512.png",
   "width": 512,
   "height": 512
 }
@@ -123,13 +123,13 @@ A: It's cosmetic but not critical for SEO. It will update eventually. Keep reque
 
 1. **Verify deployment:**
    ```bash
-   curl -I https://www.pdfhubs.site/favicon-32x32.png?v=3
+   curl -I https://pdfhubs.site/favicon-32x32.png?v=3
    # Should return: HTTP/2 200
    ```
 
 2. **Check robots.txt** (make sure favicons aren't blocked):
    ```bash
-   # Visit: https://www.pdfhubs.site/robots.txt
+   # Visit: https://pdfhubs.site/robots.txt
    # Ensure these lines DON'T exist:
    # Disallow: /favicon
    # Disallow: *.png
@@ -137,7 +137,7 @@ A: It's cosmetic but not critical for SEO. It will update eventually. Keep reque
 
 3. **Verify HTML source:**
    ```bash
-   curl https://www.pdfhubs.site/ | grep favicon
+   curl https://pdfhubs.site/ | grep favicon
    # Should show: /favicon-32x32.png?v=3
    ```
 

@@ -10,7 +10,7 @@
 2. Select your property: **www.pdfhubs.site**
 3. Click **Sitemaps** in the left sidebar
 4. If `sitemap.xml` already exists, click the "..." menu and select **Remove/Remove and resubmit**
-5. Enter: `sitemap.xml` (or `https://www.pdfhubs.site/sitemap.xml`)
+5. Enter: `sitemap.xml` (or `https://pdfhubs.site/sitemap.xml`)
 6. Click **Submit**
 7. Wait for "Success" status (usually within minutes)
 
@@ -24,11 +24,11 @@ Request indexing for these high-priority tool pages (do this one by one):
 
 1. Click **URL Inspection** in sidebar
 2. Paste one of these URLs:
-   - `https://www.pdfhubs.site/tool/merge-pdf`
-   - `https://www.pdfhubs.site/tool/split-pdf`
-   - `https://www.pdfhubs.site/tool/compress-pdf`
-   - `https://www.pdfhubs.site/tool/edit-pdf`
-   - `https://www.pdfhubs.site/tool/pdf-to-word`
+   - `https://pdfhubs.site/tool/merge-pdf`
+   - `https://pdfhubs.site/tool/split-pdf`
+   - `https://pdfhubs.site/tool/compress-pdf`
+   - `https://pdfhubs.site/tool/edit-pdf`
+   - `https://pdfhubs.site/tool/pdf-to-word`
    
 3. Click **Test Live URL**
 4. Wait for testing to complete

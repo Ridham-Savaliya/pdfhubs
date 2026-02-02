@@ -7,17 +7,17 @@ import { ArrowLeft } from "lucide-react";
 export default function Privacy() {
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead 
+      <SEOHead
         title="Privacy Policy - PDFHubs"
         description="Read our privacy policy to understand how PDFHubs handles your data. Your privacy and security are our top priorities."
-        canonical="https://www.pdfhubs.site/privacy"
+        canonical="https://pdfhubs.site/privacy"
       />
       <Header />
-      
+
       <main className="pt-24 pb-16">
         <div className="container max-w-4xl">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -34,13 +34,13 @@ export default function Privacy() {
           <div className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground">
             <h2>Introduction</h2>
             <p>
-              At PDFHubs ("we", "our", or "us"), we are committed to protecting your privacy. 
-              This Privacy Policy explains how we collect, use, and safeguard your information 
+              At PDFHubs ("we", "our", or "us"), we are committed to protecting your privacy.
+              This Privacy Policy explains how we collect, use, and safeguard your information
               when you use our website and services at pdfhubs.site.
             </p>
 
             <h2>Information We Collect</h2>
-            
+
             <h3>Files You Upload</h3>
             <p>
               When you use our PDF tools, you may upload files for processing. These files are:
@@ -120,7 +120,7 @@ export default function Privacy() {
 
             <h2>Third-Party Services</h2>
             <p>
-              We may use third-party services for analytics and functionality. 
+              We may use third-party services for analytics and functionality.
               These services have their own privacy policies governing their use of your information.
             </p>
 
@@ -136,13 +136,13 @@ export default function Privacy() {
 
             <h2>Children's Privacy</h2>
             <p>
-              Our services are not intended for children under 13. We do not knowingly 
+              Our services are not intended for children under 13. We do not knowingly
               collect personal information from children.
             </p>
 
             <h2>Changes to This Policy</h2>
             <p>
-              We may update this Privacy Policy from time to time. We will notify you 
+              We may update this Privacy Policy from time to time. We will notify you
               of any significant changes by posting the new policy on this page.
             </p>
 
@@ -157,7 +157,7 @@ export default function Privacy() {
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

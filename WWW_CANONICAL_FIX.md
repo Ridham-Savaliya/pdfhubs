@@ -14,7 +14,7 @@ From your Google Search Console URL Inspection:
 ```
 Page is not indexed: Duplicate, Google chose different canonical than user
 
-User-declared canonical:  https://www.pdfhubs.site/  (WITH www)
+User-declared canonical:  https://pdfhubs.site/  (WITH www)
 Google-selected canonical: https://pdfhubs.site/     (WITHOUT www) ❌
 ```
 
@@ -27,7 +27,7 @@ This is NOT about trailing slashes - it's about **www vs non-www**!
 ## 🎭 The Root Cause
 
 Your site is accessible via **BOTH** domain variations:
-- ✅ `https://www.pdfhubs.site/` ← Your preferred version (with www)
+- ✅ `https://pdfhubs.site/` ← Your preferred version (with www)
 - ❌ `https://pdfhubs.site/` ← Google's chosen version (without www)
 
 **Why This Happens:**
@@ -60,7 +60,7 @@ Your site is accessible via **BOTH** domain variations:
           "value": "pdfhubs.site"
         }
       ],
-      "destination": "https://www.pdfhubs.site/:path*",
+      "destination": "https://pdfhubs.site/:path*",
       "permanent": true
     }
   ]
@@ -71,12 +71,12 @@ Your site is accessible via **BOTH** domain variations:
 
 **Before:**
 - `https://pdfhubs.site/` → Serves homepage ❌
-- `https://www.pdfhubs.site/` → Serves homepage ❌
+- `https://pdfhubs.site/` → Serves homepage ❌
 - Both accessible, causing duplicate content
 
 **After (with redirect):**
-- `https://pdfhubs.site/` → **301 Permanent Redirect** → `https://www.pdfhubs.site/`
-- `https://www.pdfhubs.site/` → Serves homepage ✅
+- `https://pdfhubs.site/` → **301 Permanent Redirect** → `https://pdfhubs.site/`
+- `https://pdfhubs.site/` → Serves homepage ✅
 - Only ONE canonical version accessible!
 
 ### Why Permanent Redirect (301)?
@@ -95,7 +95,7 @@ Your site is accessible via **BOTH** domain variations:
 
 1. **User/Google visits:** `https://pdfhubs.site/tool/merge-pdf`
 2. **Vercel checks:** host = `pdfhubs.site` (matches redirect rule)
-3. **Server responds:** HTTP 301 redirect to `https://www.pdfhubs.site/tool/merge-pdf`
+3. **Server responds:** HTTP 301 redirect to `https://pdfhubs.site/tool/merge-pdf`
 4. **Browser follows:** Loads www version
 5. **Google sees:** "Ah, the canonical is www.pdfhubs.site" ✅
 
@@ -117,7 +117,7 @@ The `:path*` pattern captures everything after the domain and preserves it.
 #### Test 1: Manual Browser Test
 ```
 1. Visit: https://pdfhubs.site/
-2. Expected: URL changes to https://www.pdfhubs.site/
+2. Expected: URL changes to https://pdfhubs.site/
 3. Check Status: View Network tab - should show 301 redirect
 ```
 
@@ -127,7 +127,7 @@ curl -I https://pdfhubs.site/
 
 # Expected response:
 HTTP/2 301
-location: https://www.pdfhubs.site/
+location: https://pdfhubs.site/
 ```
 
 #### Test 3: Google's URL Inspection
@@ -311,10 +311,10 @@ Many developers think:
 You'll know it's working when Google Search Console shows:
 
 ```
-URL: https://www.pdfhubs.site/
+URL: https://pdfhubs.site/
 Status: Indexed
-User-declared canonical: https://www.pdfhubs.site/
-Google-selected canonical: https://www.pdfhubs.site/ ✅
+User-declared canonical: https://pdfhubs.site/
+Google-selected canonical: https://pdfhubs.site/ ✅
 ```
 
 **Both should match!** That's when you know it's fixed.

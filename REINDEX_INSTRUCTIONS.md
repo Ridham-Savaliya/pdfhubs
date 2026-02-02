@@ -10,7 +10,7 @@ The error detected by Google was temporary and has been resolved.
 1. Go to **Google Search Console**: https://search.google.com/search-console
 2. Select your property: `www.pdfhubs.site`
 3. Use the **URL Inspection Tool**:
-   - Enter: `https://www.pdfhubs.site/`
+   - Enter: `https://pdfhubs.site/`
    - Click "Request Indexing"
 4. Google will recrawl and update the status (usually within 24-48 hours)
 

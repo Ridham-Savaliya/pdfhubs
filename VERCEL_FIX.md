@@ -89,20 +89,20 @@ These are all still in place and working correctly.
 - Site should be live with all fixes
 
 ### 2. Verify Live Site
-Visit: https://www.pdfhubs.site/  
+Visit: https://pdfhubs.site/  
 View source and check:
-- ✅ Canonical tag present: `<link rel="canonical" href="https://www.pdfhubs.site/" />`
+- ✅ Canonical tag present: `<link rel="canonical" href="https://pdfhubs.site/" />`
 - ✅ SearchAction NOT present anywhere
 - ✅ All structured data URLs have trailing slash
 
 ### 3. Test URL Behavior
-Try visiting: `https://www.pdfhubs.site/?q=test`
+Try visiting: `https://pdfhubs.site/?q=test`
 - Should load the homepage (client-side routing)
 - Google won't index it (robots.txt blocks it)
 
 ### 4. Request Re-Indexing (Same as Before)
 1. Go to Google Search Console
-2. URL Inspection: `https://www.pdfhubs.site/`
+2. URL Inspection: `https://pdfhubs.site/`
 3. Click "Request Indexing"
 4. Re-submit sitemap
 
