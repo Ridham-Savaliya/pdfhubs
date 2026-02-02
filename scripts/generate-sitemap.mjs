@@ -9,33 +9,35 @@ const BASE_URL = 'https://www.pdfhubs.site'; // Official URL from index.html
 
 const staticRoutes = [
     { url: '', priority: '1.0', changefreq: 'daily' },
-    { url: '/history', priority: '0.7', changefreq: 'daily' },
     { url: '/blog', priority: '0.9', changefreq: 'daily' },
     { url: '/about', priority: '0.6', changefreq: 'monthly' },
-    { url: '/contact', priority: '0.6', changefreq: 'monthly' },
-    { url: '/privacy', priority: '0.3', changefreq: 'yearly' },
-    { url: '/terms', priority: '0.3', changefreq: 'yearly' },
+];
+
+// Top 4 most important tools ONLY
+const topTools = [
+    'merge-pdf',
+    'split-pdf',
+    'compress-pdf',
+    'pdf-to-word',
+    'edit-pdf'
 ];
 
 const generateSitemap = () => {
-    // 1. Extract Tools
-    const toolsPath = path.resolve(__dirname, '../src/components/ToolsGrid.tsx');
-    const toolsContent = fs.readFileSync(toolsPath, 'utf-8');
-    // Updated regex to catch href: "/tool/..."
-    const toolRegex = /href:\s*"\/?(tool\/[^"]+)"/g;
-    const toolUrls = [];
-    let match;
-    while ((match = toolRegex.exec(toolsContent)) !== null) {
-        toolUrls.push(`/${match[1]}`);
-    }
+    // 1. Filter Top Tools
+    const toolUrls = topTools.map(id => `/tool/${id}`);
 
-    // 2. Extract Blog Posts
+    // 2. Extract Top 2 Blog Posts
     const blogPath = path.resolve(__dirname, '../src/data/blogPosts.ts');
-    const blogContent = fs.readFileSync(blogPath, 'utf-8');
-    const blogRegex = /slug:\s*'([^']+)'/g;
-    const blogUrls = [];
-    while ((match = blogRegex.exec(blogContent)) !== null) {
-        blogUrls.push(`/blog/${match[1]}`);
+    let blogUrls = [];
+    try {
+        const blogContent = fs.readFileSync(blogPath, 'utf-8');
+        const blogRegex = /slug:\s*'([^']+)'/g;
+        let match;
+        while ((match = blogRegex.exec(blogContent)) !== null && blogUrls.length < 2) {
+            blogUrls.push(`/blog/${match[1]}`);
+        }
+    } catch (e) {
+        console.warn('Could not read blog posts for sitemap');
     }
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -45,7 +47,7 @@ const generateSitemap = () => {
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
-    <!-- Static Pages -->
+    <!-- Primary Pages (Max 3) -->
     ${staticRoutes.map(route => `
     <url>
         <loc>${BASE_URL}${route.url}</loc>
@@ -54,29 +56,29 @@ const generateSitemap = () => {
         <priority>${route.priority}</priority>
     </url>`).join('')}
 
-    <!-- PDF Tools -->
+    <!-- Top Tools (Max 5) -->
     ${toolUrls.map(url => `
     <url>
         <loc>${BASE_URL}${url}</loc>
         <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-        <changefreq>monthly</changefreq>
+        <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>`).join('')}
 
-    <!-- Blog Posts -->
+    <!-- Top Blog Content (Max 2) -->
     ${blogUrls.map(url => `
     <url>
         <loc>${BASE_URL}${url}</loc>
-        <lastmod>2025-01-15</lastmod>
+        <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
+        <priority>0.7</priority>
     </url>`).join('')}
 
 </urlset>`;
 
     const publicPath = path.resolve(__dirname, '../public/sitemap.xml');
     fs.writeFileSync(publicPath, sitemap.trim());
-    console.log(`✅ Sitemap updated at ${publicPath}`);
+    console.log(`✅ Sitemap optimized at ${publicPath} (Total URLs: ${staticRoutes.length + toolUrls.length + blogUrls.length})`);
 };
 
 generateSitemap();
