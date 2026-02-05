@@ -1,0 +1,16 @@
+project_id = "flbkqehloxlvizwocdsv"
+
+[functions.convert-pdf]
+verify_jwt = false
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.protect-pdf]
+verify_jwt = false
+
+[functions.unlock-pdf]
+verify_jwt = false
+
+[functions.compare-pdf]
+verify_jwt = false
