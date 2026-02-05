@@ -73,8 +73,8 @@
     --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 14% 98%) 100%);
     --gradient-radial: radial-gradient(ellipse 80% 50% at 50% -20%, hsl(4 90% 58% / 0.12) 0%, transparent 70%);
     --gradient-mesh: radial-gradient(at 40% 20%, hsl(4 90% 58% / 0.08) 0px, transparent 50%),
-                     radial-gradient(at 80% 0%, hsl(340 82% 52% / 0.06) 0px, transparent 50%),
-                     radial-gradient(at 0% 50%, hsl(217 91% 60% / 0.06) 0px, transparent 50%);
+      radial-gradient(at 80% 0%, hsl(340 82% 52% / 0.06) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsl(217 91% 60% / 0.06) 0px, transparent 50%);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 222 47% 11%;
@@ -126,8 +126,8 @@
     --gradient-hero-soft: linear-gradient(180deg, hsl(4 90% 58% / 0.08) 0%, hsl(340 82% 52% / 0.04) 50%, transparent 100%);
     --gradient-surface: linear-gradient(180deg, hsl(222 47% 8%) 0%, hsl(222 47% 6%) 100%);
     --gradient-mesh: radial-gradient(at 40% 20%, hsl(4 90% 58% / 0.12) 0px, transparent 50%),
-                     radial-gradient(at 80% 0%, hsl(340 82% 52% / 0.08) 0px, transparent 50%),
-                     radial-gradient(at 0% 50%, hsl(217 91% 60% / 0.08) 0px, transparent 50%);
+      radial-gradient(at 80% 0%, hsl(340 82% 52% / 0.08) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsl(217 91% 60% / 0.08) 0px, transparent 50%);
 
     --sidebar-background: 222 47% 6%;
     --sidebar-foreground: 0 0% 98%;
@@ -155,7 +155,12 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Outfit', system-ui, sans-serif;
     @apply tracking-tight;
   }
@@ -214,6 +219,7 @@
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
@@ -227,9 +233,12 @@
 
 /* Pulse glow */
 @keyframes pulse-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
   }
+
   50% {
     box-shadow: 0 0 40px hsl(var(--primary) / 0.5);
   }
