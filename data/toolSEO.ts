@@ -1,0 +1,109 @@
+const BASE_URL = "https://pdfhubs.site";
+
+export const toolSEO: Record<string, { title: string; description: string; keywords: string }> = {
+    "merge-pdf": {
+        title: "Merge PDF Files Online Free - Combine PDFs | PDFHubs",
+        description: "Merge multiple PDF files into one document instantly. Free online PDF merger with no limits. No registration required. Works on all devices.",
+        keywords: "merge PDF, combine PDF, join PDF files, PDF merger online free, merge pdf files, combine pdf documents",
+    },
+    "split-pdf": {
+        title: "Split PDF Files Online Free - Extract Pages | PDFHubs",
+        description: "Split PDF files into separate documents by page range. Free online PDF splitter tool. No software installation needed. Fast and secure.",
+        keywords: "split PDF, extract PDF pages, separate PDF, PDF splitter online free, split pdf by pages, extract pages from pdf",
+    },
+    "extract-pages": {
+        title: "Extract PDF Pages Online Free - Select & Save Pages | PDFHubs",
+        description: "Extract specific pages from your PDF files. Create a new PDF with only the pages you need. Free, fast, and secure online tool.",
+        keywords: "extract PDF pages, save pdf pages, split pdf pages, extract pages from pdf online, pdf page extractor",
+    },
+    "compress-pdf": {
+        title: "Compress PDF Files Online Free - Reduce PDF Size | PDFHubs",
+        description: "Reduce PDF file size without losing quality. Free online PDF compressor for fast sharing. No limits, no registration. Compress up to 90%.",
+        keywords: "compress PDF, reduce PDF size, shrink PDF, PDF compressor online free, make pdf smaller, compress pdf without losing quality",
+    },
+    "pdf-to-word": {
+        title: "Convert PDF to Word Online Free - PDF to DOCX | PDFHubs",
+        description: "Convert PDF files to editable Word documents instantly. Free online PDF to Word converter. Preserves formatting perfectly.",
+        keywords: "PDF to Word, PDF to DOCX, convert PDF to Word, PDF converter online free, pdf to word converter, pdf to doc",
+    },
+    "pdf-to-excel": {
+        title: "Convert PDF to Excel Online Free - PDF to XLSX | PDFHubs",
+        description: "Extract tables from PDF to Excel spreadsheets. Free online PDF to Excel converter. Accurate data extraction with formatting preserved.",
+        keywords: "PDF to Excel, PDF to XLSX, extract tables from PDF, PDF to spreadsheet, convert pdf to excel free",
+    },
+    "pdf-to-jpg": {
+        title: "Convert PDF to JPG Online Free - PDF to Image | PDFHubs",
+        description: "Convert PDF pages to high-quality JPG images. Free online PDF to image converter. Download instantly. No watermarks.",
+        keywords: "PDF to JPG, PDF to image, convert PDF to picture, PDF to PNG, pdf to jpg converter free",
+    },
+    "jpg-to-pdf": {
+        title: "Convert JPG to PDF Online Free - Image to PDF | PDFHubs",
+        description: "Convert JPG, PNG, and other images to PDF documents. Free online image to PDF converter. Combine multiple images into one PDF.",
+        keywords: "JPG to PDF, image to PDF, convert picture to PDF, PNG to PDF, jpg to pdf converter, images to pdf",
+    },
+    "rotate-pdf": {
+        title: "Rotate PDF Pages Online Free - Turn PDF | PDFHubs",
+        description: "Rotate PDF pages 90°, 180°, or 270°. Free online PDF rotation tool. Fix upside-down or sideways pages instantly.",
+        keywords: "rotate PDF, turn PDF pages, flip PDF, PDF rotation online free, rotate pdf pages, pdf rotator",
+    },
+    "add-watermark": {
+        title: "Add Watermark to PDF Online Free | PDFHubs",
+        description: "Add text or image watermarks to PDF files. Free online PDF watermark tool. Protect your documents with custom watermarks.",
+        keywords: "add watermark to PDF, PDF watermark, stamp PDF, protect PDF, watermark pdf online free",
+    },
+    "edit-pdf": {
+        title: "Edit PDF Online Free - PDF Editor | PDFHubs",
+        description: "Edit PDF files online. Add text, images, shapes, and annotations. Free online PDF editor. No software needed.",
+        keywords: "edit PDF, PDF editor, modify PDF, annotate PDF online free, pdf editor online, edit pdf free",
+    },
+    "sign-pdf": {
+        title: "Sign PDF Online Free - eSign Documents | PDFHubs",
+        description: "Add electronic signatures to PDF documents. Free online PDF signing tool. Legally binding e-signatures. Draw, type, or upload signature.",
+        keywords: "sign PDF, eSign PDF, electronic signature, digital signature PDF, sign pdf online free, pdf signature",
+    },
+    "protect-pdf": {
+        title: "Protect PDF with Password Online Free | PDFHubs",
+        description: "Add password protection to PDF files. Free online PDF encryption tool. Secure your sensitive documents with strong encryption.",
+        keywords: "protect PDF, password PDF, encrypt PDF, secure PDF online, lock pdf, pdf password protection",
+    },
+    "unlock-pdf": {
+        title: "Unlock PDF Online Free - Remove Password | PDFHubs",
+        description: "Remove password protection from PDF files. Free online PDF unlocker tool. Access your locked documents easily.",
+        keywords: "unlock PDF, remove PDF password, decrypt PDF, PDF unlocker, unlock pdf online free, remove pdf password",
+    },
+    "compare-pdf": {
+        title: "Compare PDF Files Online Free - PDF Diff | PDFHubs",
+        description: "Compare two PDF documents side by side. Free online PDF comparison tool. Highlight differences instantly.",
+        keywords: "compare PDF, PDF diff, PDF comparison, find differences in PDF, compare pdf documents, pdf compare tool",
+    },
+    "organize-pages": {
+        title: "Organize PDF Pages Online Free - Rearrange | PDFHubs",
+        description: "Reorder, delete, and organize PDF pages. Free online PDF page organizer. Drag and drop interface. Easy to use.",
+        keywords: "organize PDF pages, rearrange PDF, reorder PDF pages, delete PDF pages, pdf page organizer",
+    },
+    "ocr-pdf": {
+        title: "OCR PDF Online Free - Extract Text from Scans | PDFHubs",
+        description: "Extract text from scanned PDFs using OCR. Free online optical character recognition. Make PDFs searchable and editable.",
+        keywords: "OCR PDF, extract text from PDF, scanned PDF to text, PDF OCR online, pdf text recognition",
+    },
+    "pdf-to-ppt": {
+        title: "Convert PDF to PowerPoint Online Free | PDFHubs",
+        description: "Convert PDF files to editable PowerPoint presentations. Free online PDF to PPT converter. Preserves layout and formatting.",
+        keywords: "PDF to PowerPoint, PDF to PPT, convert PDF to slides, PDF to PPTX, pdf to ppt converter free",
+    },
+    "pdf-to-powerpoint": {
+        title: "Convert PDF to PowerPoint Online Free | PDFHubs",
+        description: "Convert PDF files to editable PowerPoint presentations. Free online PDF to PPT converter. Preserves layout and formatting.",
+        keywords: "PDF to PowerPoint, PDF to PPT, convert PDF to slides, PDF to PPTX, pdf to ppt converter free",
+    },
+    "html-to-pdf": {
+        title: "Convert HTML to PDF Online Free | PDFHubs",
+        description: "Convert web pages and HTML to PDF documents. Free online HTML to PDF converter. Capture full page with styling.",
+        keywords: "HTML to PDF, webpage to PDF, convert website to PDF, URL to PDF, html to pdf converter",
+    },
+    "add-page-numbers": {
+        title: "Add Page Numbers to PDF Online Free | PDFHubs",
+        description: "Insert page numbers to your PDF documents. Free online tool with custom positioning options. Bottom, top, left, right alignment.",
+        keywords: "add page numbers to PDF, PDF page numbers, number PDF pages, pdf page numbering",
+    },
+};
